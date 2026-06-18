@@ -1,0 +1,60 @@
+server:
+  port: 8081
+
+# 文件上传目录(相对运行目录)
+file:
+  upload-dir: ./uploads
+
+spring:
+  application:
+    name: dingtalk-admin
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  profiles:
+    active: ${DB_PROFILE:h2}     # 默认用 H2, 设 DB_PROFILE=mysql 切换
+  ai:
+    model:
+      chat: ${SPRING_AI_CHAT_PROVIDER:openai}
+      embedding: ${SPRING_AI_EMBEDDING_PROVIDER:openai}
+    openai:
+      api-key: ${SPRING_AI_OPENAI_API_KEY:disabled}
+      base-url: ${SPRING_AI_OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: ${SPRING_AI_OPENAI_CHAT_MODEL:gpt-4o-mini}
+      embedding:
+        options:
+          model: ${SPRING_AI_OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+
+# 自定义 JWT 配置
+jwt:
+  secret: dingtalk-admin-demo-secret-key-please-change-in-production-1234567890
+  expire: 86400000   # 24h
+
+app:
+  ai:
+    enabled: ${APP_AI_ENABLED:true}
+    rag:
+      top-k: ${APP_AI_RAG_TOP_K:4}
+      min-score: ${APP_AI_RAG_MIN_SCORE:0.18}
+      max-context-chars: ${APP_AI_RAG_MAX_CONTEXT_CHARS:6000}
+    ingest:
+      max-file-size-bytes: ${APP_AI_INGEST_MAX_FILE_SIZE_BYTES:20971520}
+      max-text-length: ${APP_AI_INGEST_MAX_TEXT_LENGTH:120000}
+      chunk-size: ${APP_AI_INGEST_CHUNK_SIZE:500}
+      min-chunk-size-chars: ${APP_AI_INGEST_MIN_CHUNK_SIZE_CHARS:120}
+      min-chunk-length-to-embed: ${APP_AI_INGEST_MIN_CHUNK_LENGTH_TO_EMBED:40}
+      max-num-chunks: ${APP_AI_INGEST_MAX_NUM_CHUNKS:80}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.example.dingtalk: debug

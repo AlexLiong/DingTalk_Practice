@@ -1,0 +1,10 @@
+# MySQL/MariaDB 持久化 (数据不丢失)
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dingtalk}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USER:root}
+    password: ${DB_PASS:}
+  sql:
+    init:
+      mode: never    # MySQL 不自动执行 schema.sql, 请手动执行 schema-mysql.sql
