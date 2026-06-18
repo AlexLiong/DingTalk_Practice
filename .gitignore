@@ -2,6 +2,7 @@
 backend/target/
 *.class
 *.log
+**/static
 
 # 前端
 frontend/node_modules/
