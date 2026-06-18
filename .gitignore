@@ -13,6 +13,6 @@ frontend/dist/
 *.iml
 .vscode/
 
-data
+**/data/
 
-uploads
+**/uploads/
