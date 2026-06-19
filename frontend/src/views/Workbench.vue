@@ -1337,14 +1337,14 @@
               class="msg-textarea"
               placeholder="输入消息, 回车发送"
               ref="inputRef"
-              @keydown.enter.exact.prevent="aiLoading || sendWithAi()"
+              @keydown.enter.exact.prevent="aiLoading || sendMessage()"
           />
           <div class="input-foot">
             <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
             <el-button
                 type="primary"
                 :disabled="!draft.trim() || aiLoading"
-                @click="sendWithAi"
+                @click="sendMessage"
             >{{ aiLoading ? "AI思考中..." : "发送" }}
             </el-button
             >
@@ -2383,28 +2383,6 @@ async function startChat(u) {
   }
 }
 
-async function send() {
-  const content = draft.value.trim();
-  if (!content || !current.value) return;
-  const atIds = [...atUserSet.value].join(",");
-  const extra = quoteRef.value
-      ? JSON.stringify({
-        quoteId: quoteRef.value.id,
-        quoteSender: quoteRef.value.senderName,
-        quoteContent: quoteRef.value.content?.substring(0, 100),
-      })
-      : undefined;
-  draft.value = "";
-  atUserSet.value = new Set();
-  quoteRef.value = null;
-  await apiSendMessage({
-    sessionId: current.value.id,
-    content,
-    contentType: 1,
-    atUserIds: atIds,
-    extra,
-  });
-}
 
 function ensureSessionSelected() {
   if (current.value) return true;
@@ -3007,10 +2985,35 @@ async function openAiAssistant() {
   }
 }
 
-// 调用AI 助手
-// 调用AI 助手（SSE流式新版）
-async function sendWithAi() {
+async function sendMessage() {
   const content = draft.value.trim();
+  if (!content || !current.value) return;
+  if (current.value.name === "AI 助手") {
+    await sendWithAi(content);
+  } else {
+    const atIds = [...atUserSet.value].join(",");
+    const extra = quoteRef.value
+        ? JSON.stringify({
+          quoteId: quoteRef.value.id,
+          quoteSender: quoteRef.value.senderName,
+          quoteContent: quoteRef.value.content?.substring(0, 100),
+        })
+        : undefined;
+    draft.value = "";
+    atUserSet.value = new Set();
+    quoteRef.value = null;
+    await apiSendMessage({
+      sessionId: current.value.id,
+      content,
+      contentType: 1,
+      atUserIds: atIds,
+      extra,
+    });
+  }
+}
+
+// 调用AI 助手
+async function sendWithAi(content) {
   if (!content) return;
   // 防止重复请求
   if (aiLoading.value || aiEventSource) {
@@ -3091,6 +3094,7 @@ function closeAiSse() {
   }
   aiLoading.value = false;
 }
+
 // 消息收藏
 async function favoriteMsg(m) {
   try {
