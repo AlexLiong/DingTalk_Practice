@@ -6,53 +6,56 @@
       <div class="org-header" @click="profilePanel = !profilePanel">
         <div class="nav-avatar-wrap">
           <el-avatar
-            :size="28"
-            shape="square"
-            :src="user?.avatar"
-            :style="avatarStyle(user?.nickname)"
-            >{{ firstChar(user?.nickname) }}</el-avatar
+              :size="28"
+              shape="square"
+              :src="user?.avatar"
+              :style="avatarStyle(user?.nickname)"
+          >{{ firstChar(user?.nickname) }}
+          </el-avatar
           >
           <span class="nav-status-dot" :class="myStatusClass"></span>
         </div>
         <span class="org-name">{{ user?.deptName || "企业协作" }}</span>
-        <el-icon :size="12"><ArrowDown /></el-icon>
+        <el-icon :size="12">
+          <ArrowDown/>
+        </el-icon>
       </div>
 
       <!-- 导航菜单 (可滚动) -->
       <div class="nav-list">
         <div
-          class="nav-row"
-          :class="{ active: tab === 'chat' && chatFilter === 'all' }"
-          @click="
+            class="nav-row"
+            :class="{ active: tab === 'chat' && chatFilter === 'all' }"
+            @click="
             tab = 'chat';
             chatFilter = 'all';
           "
         >
           <span class="nav-icon">💬</span><span>消息</span>
           <span v-if="unreadTotal > 0" class="nav-badge">{{
-            unreadTotal > 99 ? "99+" : unreadTotal
-          }}</span>
+              unreadTotal > 99 ? "99+" : unreadTotal
+            }}</span>
         </div>
         <div class="nav-row" @click="$router.push('/documents')">
           <span class="nav-icon">📄</span><span>文档</span>
         </div>
         <div
-          class="nav-row"
-          :class="{ active: tab === 'work' }"
-          @click="tab = 'work'"
+            class="nav-row"
+            :class="{ active: tab === 'work' }"
+            @click="tab = 'work'"
         >
           <span class="nav-icon">💼</span><span>工作台</span>
         </div>
         <div
-          class="nav-row"
-          :class="{ active: tab === 'contacts' }"
-          @click="switchContacts"
+            class="nav-row"
+            :class="{ active: tab === 'contacts' }"
+            @click="switchContacts"
         >
           <span class="nav-icon">📇</span><span>通讯录</span>
         </div>
         <div
-          class="nav-row"
-          @click="
+            class="nav-row"
+            @click="
             tab = 'chat';
             chatFilter = 'atme';
           "
@@ -66,9 +69,9 @@
         <div class="nav-sep"></div>
 
         <div
-          class="nav-row"
-          :class="{ active: tab === 'chat' && chatFilter === 'single' }"
-          @click="
+            class="nav-row"
+            :class="{ active: tab === 'chat' && chatFilter === 'single' }"
+            @click="
             tab = 'chat';
             chatFilter = 'single';
           "
@@ -76,9 +79,9 @@
           <span class="nav-icon">👤</span><span>单聊</span>
         </div>
         <div
-          class="nav-row"
-          :class="{ active: tab === 'chat' && chatFilter === 'group' }"
-          @click="
+            class="nav-row"
+            :class="{ active: tab === 'chat' && chatFilter === 'group' }"
+            @click="
             tab = 'chat';
             chatFilter = 'group';
           "
@@ -94,8 +97,8 @@
         <div class="nav-row" @click="$router.push('/mailbox')">
           <span class="nav-icon">📧</span><span>邮箱</span>
           <span v-if="collabCounts.mailboxUnread > 0" class="nav-badge">{{
-            formatCounter(collabCounts.mailboxUnread)
-          }}</span>
+              formatCounter(collabCounts.mailboxUnread)
+            }}</span>
         </div>
         <div class="nav-row" @click="$router.push('/todo')">
           <span class="nav-icon">📝</span><span>待办</span>
@@ -103,16 +106,16 @@
         <div class="nav-row" @click="$router.push('/ding')">
           <span class="nav-icon">🔔</span><span>DING</span>
           <span v-if="collabCounts.dingPending > 0" class="nav-badge">{{
-            formatCounter(collabCounts.dingPending)
-          }}</span>
+              formatCounter(collabCounts.dingPending)
+            }}</span>
         </div>
         <div class="nav-row" @click="$router.push('/favorites')">
           <span class="nav-icon">⭐</span><span>收藏</span>
         </div>
         <div
-          class="nav-row"
-          v-if="isAdmin"
-          @click="$router.push('/admin/dashboard')"
+            class="nav-row"
+            v-if="isAdmin"
+            @click="$router.push('/admin/dashboard')"
         >
           <span class="nav-icon">📊</span><span>数据</span>
         </div>
@@ -136,38 +139,41 @@
     <!-- 个人信息侧边面板 (仿钉钉) -->
     <Transition name="panel-slide">
       <div
-        v-if="profilePanel"
-        class="profile-panel"
-        @click.self="profilePanel = false"
+          v-if="profilePanel"
+          class="profile-panel"
+          @click.self="profilePanel = false"
       >
         <div class="pp-content">
           <div class="pp-header">
             <el-upload
-              :show-file-list="false"
-              :http-request="uploadAvatar"
-              accept="image/*"
-              class="pp-avatar-upload"
+                :show-file-list="false"
+                :http-request="uploadAvatar"
+                accept="image/*"
+                class="pp-avatar-upload"
             >
               <el-avatar
-                :size="56"
-                shape="square"
-                :src="user?.avatar"
-                :style="avatarStyle(user?.nickname)"
-                class="pp-avatar-clickable"
-                >{{ firstChar(user?.nickname) }}</el-avatar
+                  :size="56"
+                  shape="square"
+                  :src="user?.avatar"
+                  :style="avatarStyle(user?.nickname)"
+                  class="pp-avatar-clickable"
+              >{{ firstChar(user?.nickname) }}
+              </el-avatar
               >
               <div class="pp-avatar-overlay">换头像</div>
             </el-upload>
             <div class="pp-info">
               <div
-                class="pp-name"
-                @click="
+                  class="pp-name"
+                  @click="
                   $router.push('/profile');
                   profilePanel = false;
                 "
               >
                 {{ user?.nickname }}
-                <el-icon :size="14"><ArrowRight /></el-icon>
+                <el-icon :size="14">
+                  <ArrowRight/>
+                </el-icon>
               </div>
               <div class="pp-dept">
                 {{ user?.deptName || "" }} · {{ user?.jobTitle || "" }}
@@ -177,14 +183,17 @@
           <el-dropdown trigger="click" @command="changeMyStatus">
             <div class="pp-status">
               <span class="status-dot" :class="myStatusClass"></span
-              >{{ statusText }}<el-icon :size="12"><ArrowDown /></el-icon>
+              >{{ statusText }}
+              <el-icon :size="12">
+                <ArrowDown/>
+              </el-icon>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
-                  v-for="item in statusOptions"
-                  :key="item.value"
-                  :command="item.value"
+                    v-for="item in statusOptions"
+                    :key="item.value"
+                    :command="item.value"
                 >
                   <span class="status-option-dot" :class="item.value"></span
                   >{{ item.label }}
@@ -194,44 +203,62 @@
           </el-dropdown>
           <div class="pp-divider"></div>
           <div
-            class="pp-menu-item"
-            @click="
+              class="pp-menu-item"
+              @click="
               $router.push('/profile');
               profilePanel = false;
             "
           >
-            <el-icon :size="18"><UserFilled /></el-icon> 个人中心
+            <el-icon :size="18">
+              <UserFilled/>
+            </el-icon>
+            个人中心
           </div>
           <div
-            class="pp-menu-item"
-            @click="
+              class="pp-menu-item"
+              @click="
               themeStore.toggle();
               profilePanel = false;
             "
           >
-            <el-icon :size="18"><Moon /></el-icon> 个性主题
+            <el-icon :size="18">
+              <Moon/>
+            </el-icon>
+            个性主题
             <span class="pp-tag">{{ isDark ? "深色" : "浅色" }}</span>
           </div>
           <div
-            class="pp-menu-item"
-            v-if="isAdmin"
-            @click="
+              class="pp-menu-item"
+              v-if="isAdmin"
+              @click="
               $router.push('/admin');
               profilePanel = false;
             "
           >
-            <el-icon :size="18"><Setting /></el-icon> 系统管理
+            <el-icon :size="18">
+              <Setting/>
+            </el-icon>
+            系统管理
           </div>
           <div class="pp-divider"></div>
           <div class="pp-menu-item" @click="profilePanel = false">
-            <el-icon :size="18"><QuestionFilled /></el-icon> 客服与帮助
+            <el-icon :size="18">
+              <QuestionFilled/>
+            </el-icon>
+            客服与帮助
           </div>
           <div class="pp-menu-item" @click="profilePanel = false">
-            <el-icon :size="18"><InfoFilled /></el-icon> 关于
+            <el-icon :size="18">
+              <InfoFilled/>
+            </el-icon>
+            关于
           </div>
           <div class="pp-divider"></div>
           <div class="pp-menu-item pp-logout" @click="logout">
-            <el-icon :size="18"><SwitchButton /></el-icon> 退出登录
+            <el-icon :size="18">
+              <SwitchButton/>
+            </el-icon>
+            退出登录
           </div>
         </div>
       </div>
@@ -241,78 +268,82 @@
     <Transition name="gp-slide">
       <div v-if="tab === 'chat' && groupPanelOpen" class="group-panel">
         <div class="gp-header">
-          <el-icon :size="14"><Operation /></el-icon>
+          <el-icon :size="14">
+            <Operation/>
+          </el-icon>
           <span>分组</span>
           <el-icon :size="14" class="gp-close" @click="groupPanelOpen = false"
-            ><DArrowLeft
-          /></el-icon>
+          >
+            <DArrowLeft
+            />
+          </el-icon>
         </div>
         <div class="gp-title">消息</div>
         <div class="gp-list">
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'all' }"
-            @click="chatFilter = 'all'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'all' }"
+              @click="chatFilter = 'all'"
           >
             消息
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'top' }"
-            @click="chatFilter = 'top'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'top' }"
+              @click="chatFilter = 'top'"
           >
             置顶
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'unread' }"
-            @click="chatFilter = 'unread'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'unread' }"
+              @click="chatFilter = 'unread'"
           >
             未读
             <span v-if="unreadTotal > 0" class="gp-badge">{{
-              unreadTotal > 99 ? "99+" : unreadTotal
-            }}</span>
+                unreadTotal > 99 ? "99+" : unreadTotal
+              }}</span>
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'atme' }"
-            @click="chatFilter = 'atme'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'atme' }"
+              @click="chatFilter = 'atme'"
           >
             @我
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'single' }"
-            @click="chatFilter = 'single'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'single' }"
+              @click="chatFilter = 'single'"
           >
             单聊
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'group' }"
-            @click="chatFilter = 'group'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'group' }"
+              @click="chatFilter = 'group'"
           >
             群聊
           </div>
           <div class="gp-item" @click="$router.push('/notice')">通知</div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'ai' }"
-            @click="openAiAssistant"
+              class="gp-item"
+              :class="{ active: chatFilter === 'ai' }"
+              @click="openAiAssistant"
           >
             AI 助手
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'mute' }"
-            @click="chatFilter = 'mute'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'mute' }"
+              @click="chatFilter = 'mute'"
           >
             免打扰
           </div>
           <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'star' }"
-            @click="chatFilter = 'star'"
+              class="gp-item"
+              :class="{ active: chatFilter === 'star' }"
+              @click="chatFilter = 'star'"
           >
             特别关注
           </div>
@@ -321,31 +352,33 @@
     </Transition>
     <!-- 收起时的展开按钮 -->
     <div
-      v-if="tab === 'chat' && !groupPanelOpen"
-      class="gp-toggle"
-      @click="groupPanelOpen = true"
+        v-if="tab === 'chat' && !groupPanelOpen"
+        class="gp-toggle"
+        @click="groupPanelOpen = true"
     >
-      <el-icon :size="14"><DArrowRight /></el-icon>
+      <el-icon :size="14">
+        <DArrowRight/>
+      </el-icon>
     </div>
 
     <!-- ========== 3. 中栏: 会话列表 / 通讯录 / 工作台 ========== -->
     <div class="mid-panel">
       <div class="mid-header">
         <el-input
-          v-model="keyword"
-          placeholder="搜索"
-          :prefix-icon="Search"
-          size="default"
-          clearable
-          class="search-input"
-          @input="onSearchInput"
+            v-model="keyword"
+            placeholder="搜索"
+            :prefix-icon="Search"
+            size="default"
+            clearable
+            class="search-input"
+            @input="onSearchInput"
         />
         <div class="add-entry" ref="addWrapRef">
           <el-button
-            class="add-btn"
-            :icon="Plus"
-            circle
-            @click.stop="toggleAddPanel"
+              class="add-btn"
+              :icon="Plus"
+              circle
+              @click.stop="toggleAddPanel"
           />
           <div v-if="addPanelOpen" class="add-panel" @click.stop>
             <div class="add-panel-head">
@@ -357,10 +390,10 @@
               </div>
               <div class="add-panel-toolbox">
                 <button
-                  type="button"
-                  class="add-panel-settings"
-                  :class="{ active: addSettingsOpen }"
-                  @click.stop="toggleAddSettings"
+                    type="button"
+                    class="add-panel-settings"
+                    :class="{ active: addSettingsOpen }"
+                    @click.stop="toggleAddSettings"
                 >
                   <span>设置</span>
                 </button>
@@ -369,19 +402,19 @@
                     <div class="add-settings-label">链接</div>
                     <div class="add-settings-card">
                       <button
-                        type="button"
-                        class="add-settings-item"
-                        @click="toggleSavedLinkManage"
+                          type="button"
+                          class="add-settings-item"
+                          @click="toggleSavedLinkManage"
                       >
                         <span class="add-settings-item-icon theme-link">
-                          <el-icon :size="14"><Link /></el-icon>
+                          <el-icon :size="14"><Link/></el-icon>
                         </span>
                         <div class="add-settings-item-main">
                           <div class="add-settings-item-title">
                             {{
                               manageSavedLinks
-                                ? "完成链接管理"
-                                : "管理已保存链接"
+                                  ? "完成链接管理"
+                                  : "管理已保存链接"
                             }}
                           </div>
                           <div class="add-settings-item-desc">
@@ -389,13 +422,15 @@
                           </div>
                         </div>
                         <span class="add-settings-item-meta">{{
-                          manageSavedLinks
-                            ? "编辑中"
-                            : `${savedLinkItems.length} 项`
-                        }}</span>
+                            manageSavedLinks
+                                ? "编辑中"
+                                : `${savedLinkItems.length} 项`
+                          }}</span>
                         <el-icon class="add-settings-item-arrow" :size="14"
-                          ><ArrowRight
-                        /></el-icon>
+                        >
+                          <ArrowRight
+                          />
+                        </el-icon>
                       </button>
                     </div>
                   </div>
@@ -403,12 +438,12 @@
                     <div class="add-settings-label">内容</div>
                     <div class="add-settings-card">
                       <button
-                        type="button"
-                        class="add-settings-item"
-                        @click="refreshAddFiles"
+                          type="button"
+                          class="add-settings-item"
+                          @click="refreshAddFiles"
                       >
                         <span class="add-settings-item-icon theme-refresh">
-                          <el-icon :size="14"><Refresh /></el-icon>
+                          <el-icon :size="14"><Refresh/></el-icon>
                         </span>
                         <div class="add-settings-item-main">
                           <div class="add-settings-item-title">
@@ -420,17 +455,19 @@
                         </div>
                         <span class="add-settings-item-meta">同步</span>
                         <el-icon class="add-settings-item-arrow" :size="14"
-                          ><ArrowRight
-                        /></el-icon>
+                        >
+                          <ArrowRight
+                          />
+                        </el-icon>
                       </button>
                       <button
-                        type="button"
-                        class="add-settings-item danger"
-                        :disabled="!recentUsageKeys.length"
-                        @click="clearRecentUsage"
+                          type="button"
+                          class="add-settings-item danger"
+                          :disabled="!recentUsageKeys.length"
+                          @click="clearRecentUsage"
                       >
                         <span class="add-settings-item-icon theme-danger">
-                          <el-icon :size="14"><Delete /></el-icon>
+                          <el-icon :size="14"><Delete/></el-icon>
                         </span>
                         <div class="add-settings-item-main">
                           <div class="add-settings-item-title">
@@ -441,10 +478,10 @@
                           </div>
                         </div>
                         <span class="add-settings-item-meta">{{
-                          recentUsageKeys.length
-                            ? `${recentUsageKeys.length} 条`
-                            : "空"
-                        }}</span>
+                            recentUsageKeys.length
+                                ? `${recentUsageKeys.length} 条`
+                                : "空"
+                          }}</span>
                       </button>
                     </div>
                   </div>
@@ -453,26 +490,26 @@
             </div>
             <div class="add-link-box">
               <button
-                v-if="!linkEditorOpen"
-                type="button"
-                class="add-link-trigger"
-                @click="openLinkEditor"
+                  v-if="!linkEditorOpen"
+                  type="button"
+                  class="add-link-trigger"
+                  @click="openLinkEditor"
               >
                 添加链接
               </button>
               <div v-else class="add-link-editor">
                 <el-input
-                  ref="addLinkInputRef"
-                  v-model="linkDraft"
-                  placeholder="输入网页链接，例如 https://example.com"
-                  class="add-link-input"
-                  @keyup.enter="saveLink"
+                    ref="addLinkInputRef"
+                    v-model="linkDraft"
+                    placeholder="输入网页链接，例如 https://example.com"
+                    class="add-link-input"
+                    @keyup.enter="saveLink"
                 />
                 <div class="add-link-actions">
                   <button
-                    type="button"
-                    class="add-link-cancel"
-                    @click="cancelLinkEdit"
+                      type="button"
+                      class="add-link-cancel"
+                      @click="cancelLinkEdit"
                   >
                     取消
                   </button>
@@ -489,38 +526,38 @@
               </div>
               <div class="add-panel-list">
                 <div
-                  v-for="item in savedLinkItems"
-                  :key="item.key"
-                  class="add-panel-item"
+                    v-for="item in savedLinkItems"
+                    :key="item.key"
+                    class="add-panel-item"
                 >
                   <div
-                    class="add-item-badge"
-                    :style="{ background: item.color }"
+                      class="add-item-badge"
+                      :style="{ background: item.color }"
                   >
                     <template v-if="item.kind === 'file'">
                       <div
-                        v-if="item.iconShape === 'tile'"
-                        class="add-tile-icon"
-                        :class="`theme-${item.iconTheme || 'stack'}`"
+                          v-if="item.iconShape === 'tile'"
+                          class="add-tile-icon"
+                          :class="`theme-${item.iconTheme || 'stack'}`"
                       >
                         <span
-                          v-if="item.iconTheme === 'stack'"
-                          class="add-tile-stack"
+                            v-if="item.iconTheme === 'stack'"
+                            class="add-tile-stack"
                         ></span>
                         <span v-else class="add-tile-glyph">{{
-                          item.iconBadge || item.badge
-                        }}</span>
+                            item.iconBadge || item.badge
+                          }}</span>
                       </div>
                       <div
-                        v-else
-                        class="add-file-icon"
-                        :class="`theme-${item.iconTheme || 'generic'}`"
+                          v-else
+                          class="add-file-icon"
+                          :class="`theme-${item.iconTheme || 'generic'}`"
                       >
                         <span class="add-file-fold"></span>
                         <span class="add-file-lines"></span>
                         <span class="add-file-type">{{
-                          item.iconBadge || item.badge
-                        }}</span>
+                            item.iconBadge || item.badge
+                          }}</span>
                       </div>
                     </template>
                     <template v-else>{{ item.badge }}</template>
@@ -531,25 +568,25 @@
                   </div>
                   <div class="add-item-actions">
                     <button
-                      type="button"
-                      class="add-item-action ghost"
-                      @click.stop="sendAddItem(item)"
+                        type="button"
+                        class="add-item-action ghost"
+                        @click.stop="sendAddItem(item)"
                     >
                       添加
                     </button>
                     <button
-                      type="button"
-                      class="add-item-action delete"
-                      @click.stop="removeSavedLink(item)"
+                        type="button"
+                        class="add-item-action delete"
+                        @click.stop="removeSavedLink(item)"
                     >
                       删除
                     </button>
                   </div>
                 </div>
                 <el-empty
-                  v-if="!savedLinkItems.length"
-                  description="暂无已保存链接"
-                  :image-size="56"
+                    v-if="!savedLinkItems.length"
+                    description="暂无已保存链接"
+                    :image-size="56"
                 />
               </div>
             </template>
@@ -559,38 +596,38 @@
               </div>
               <div class="add-panel-list">
                 <div
-                  v-for="item in addPanelItems"
-                  :key="item.key"
-                  class="add-panel-item compact"
+                    v-for="item in addPanelItems"
+                    :key="item.key"
+                    class="add-panel-item compact"
                 >
                   <div
-                    class="add-item-badge"
-                    :style="{ background: item.color }"
+                      class="add-item-badge"
+                      :style="{ background: item.color }"
                   >
                     <template v-if="item.kind === 'file'">
                       <div
-                        v-if="item.iconShape === 'tile'"
-                        class="add-tile-icon"
-                        :class="`theme-${item.iconTheme || 'stack'}`"
+                          v-if="item.iconShape === 'tile'"
+                          class="add-tile-icon"
+                          :class="`theme-${item.iconTheme || 'stack'}`"
                       >
                         <span
-                          v-if="item.iconTheme === 'stack'"
-                          class="add-tile-stack"
+                            v-if="item.iconTheme === 'stack'"
+                            class="add-tile-stack"
                         ></span>
                         <span v-else class="add-tile-glyph">{{
-                          item.iconBadge || item.badge
-                        }}</span>
+                            item.iconBadge || item.badge
+                          }}</span>
                       </div>
                       <div
-                        v-else
-                        class="add-file-icon"
-                        :class="`theme-${item.iconTheme || 'generic'}`"
+                          v-else
+                          class="add-file-icon"
+                          :class="`theme-${item.iconTheme || 'generic'}`"
                       >
                         <span class="add-file-fold"></span>
                         <span class="add-file-lines"></span>
                         <span class="add-file-type">{{
-                          item.iconBadge || item.badge
-                        }}</span>
+                            item.iconBadge || item.badge
+                          }}</span>
                       </div>
                     </template>
                     <template v-else>{{ item.badge }}</template>
@@ -602,33 +639,33 @@
                     </div>
                   </div>
                   <button
-                    type="button"
-                    class="add-item-action"
-                    @click.stop="sendAddItem(item)"
+                      type="button"
+                      class="add-item-action"
+                      @click.stop="sendAddItem(item)"
                   >
                     添加
                   </button>
                 </div>
                 <el-empty
-                  v-if="!addPanelItems.length"
-                  description="暂无可添加内容"
-                  :image-size="56"
+                    v-if="!addPanelItems.length"
+                    description="暂无可添加内容"
+                    :image-size="56"
                 />
               </div>
             </template>
             <div class="add-panel-footer">
               <button
-                type="button"
-                class="add-footer-btn"
-                @click="openGroupCreate"
+                  type="button"
+                  class="add-footer-btn"
+                  @click="openGroupCreate"
               >
                 发起群聊
               </button>
               <span class="add-footer-sep"></span>
               <button
-                type="button"
-                class="add-footer-btn"
-                @click="openContactFinder"
+                  type="button"
+                  class="add-footer-btn"
+                  @click="openContactFinder"
               >
                 找人单聊
               </button>
@@ -641,16 +678,17 @@
       <div v-if="searchMode" class="list">
         <div class="contact-section">搜索结果 — 联系人</div>
         <div
-          v-for="u in searchContacts"
-          :key="'c' + u.id"
-          class="session-item"
-          @click="startChat(u)"
+            v-for="u in searchContacts"
+            :key="'c' + u.id"
+            class="session-item"
+            @click="startChat(u)"
         >
           <el-avatar
-            :size="36"
-            shape="square"
-            :style="avatarStyle(u.nickname)"
-            >{{ firstChar(u.nickname) }}</el-avatar
+              :size="36"
+              shape="square"
+              :style="avatarStyle(u.nickname)"
+          >{{ firstChar(u.nickname) }}
+          </el-avatar
           >
           <div class="session-info">
             <div class="line1">
@@ -660,23 +698,24 @@
           </div>
         </div>
         <div
-          v-if="searchMsgs.length"
-          class="contact-section"
-          style="margin-top: 12px"
+            v-if="searchMsgs.length"
+            class="contact-section"
+            style="margin-top: 12px"
         >
           搜索结果 — 消息
         </div>
         <div
-          v-for="m in searchMsgs"
-          :key="'m' + m.id"
-          class="session-item"
-          @click="jumpToMessage(m)"
+            v-for="m in searchMsgs"
+            :key="'m' + m.id"
+            class="session-item"
+            @click="jumpToMessage(m)"
         >
           <el-avatar
-            :size="36"
-            shape="square"
-            :style="avatarStyle(m.senderName)"
-            >{{ firstChar(m.senderName) }}</el-avatar
+              :size="36"
+              shape="square"
+              :style="avatarStyle(m.senderName)"
+          >{{ firstChar(m.senderName) }}
+          </el-avatar
           >
           <div class="session-info">
             <div class="line1">
@@ -687,40 +726,41 @@
           </div>
         </div>
         <el-empty
-          v-if="!searchContacts.length && !searchMsgs.length"
-          description="无结果"
-          :image-size="60"
+            v-if="!searchContacts.length && !searchMsgs.length"
+            description="无结果"
+            :image-size="60"
         />
       </div>
 
       <!-- 会话列表 -->
       <div v-else-if="tab === 'chat'" class="list">
         <div
-          v-for="s in displaySessions"
-          :key="s.id"
-          class="session-item"
-          :class="{ active: current?.id === s.id, topped: s.isTop === 1 }"
-          @click="openSession(s)"
-          @contextmenu.prevent="onSessionMenu($event, s)"
+            v-for="s in displaySessions"
+            :key="s.id"
+            class="session-item"
+            :class="{ active: current?.id === s.id, topped: s.isTop === 1 }"
+            @click="openSession(s)"
+            @contextmenu.prevent="onSessionMenu($event, s)"
         >
           <el-badge
-            :value="s.unread"
-            :hidden="!s.unread"
-            :max="99"
-            class="sess-badge"
+              :value="s.unread"
+              :hidden="!s.unread"
+              :max="99"
+              class="sess-badge"
           >
             <div class="avatar-wrap">
               <el-avatar
-                :size="42"
-                shape="square"
-                :src="s.avatar"
-                :style="avatarStyle(s.name)"
-                >{{ firstChar(s.name) }}</el-avatar
+                  :size="42"
+                  shape="square"
+                  :src="s.avatar"
+                  :style="avatarStyle(s.name)"
+              >{{ firstChar(s.name) }}
+              </el-avatar
               >
               <span
-                v-if="s.type === 1 && s.targetUserId"
-                class="user-online"
-                :class="presenceClass(s.targetUserId)"
+                  v-if="s.type === 1 && s.targetUserId"
+                  class="user-online"
+                  :class="presenceClass(s.targetUserId)"
               ></span>
             </div>
           </el-badge>
@@ -731,28 +771,31 @@
             </div>
             <div class="line2">
               <el-tag
-                v-if="s.type === 2"
-                size="small"
-                type="info"
-                effect="plain"
-                class="group-label"
-                >内部群</el-tag
+                  v-if="s.type === 2"
+                  size="small"
+                  type="info"
+                  effect="plain"
+                  class="group-label"
+              >内部群
+              </el-tag
               >
               {{ s.lastMsg || "暂无消息" }}
             </div>
           </div>
           <el-icon v-if="s.isTop === 1" class="pin-icon" :size="12"
-            ><Top
-          /></el-icon>
+          >
+            <Top
+            />
+          </el-icon>
           <span v-if="s.isMute === 1" class="mute-icon">🔕</span>
           <span v-if="s.isStar === 1" class="star-icon">⭐</span>
         </div>
         <el-empty
-          v-if="!displaySessions.length"
-          :description="
+            v-if="!displaySessions.length"
+            :description="
             chatFilter === 'all' ? '暂无会话' : '没有符合条件的会话'
           "
-          :image-size="80"
+            :image-size="80"
         />
       </div>
 
@@ -760,33 +803,36 @@
       <div v-else-if="tab === 'contacts'" class="list">
         <div class="contact-section">企业通讯录 ({{ contacts.length }})</div>
         <div
-          v-for="u in filteredContacts"
-          :key="u.id"
-          class="session-item"
-          @click="startChat(u)"
+            v-for="u in filteredContacts"
+            :key="u.id"
+            class="session-item"
+            @click="startChat(u)"
         >
           <div class="avatar-wrap">
             <el-avatar
-              :size="42"
-              shape="square"
-              :src="u.avatar"
-              :style="avatarStyle(u.nickname)"
-              >{{ firstChar(u.nickname) }}</el-avatar
+                :size="42"
+                shape="square"
+                :src="u.avatar"
+                :style="avatarStyle(u.nickname)"
+            >{{ firstChar(u.nickname) }}
+            </el-avatar
             >
             <span
-              v-if="u.id"
-              class="user-online"
-              :class="presenceClass(u.id)"
+                v-if="u.id"
+                class="user-online"
+                :class="presenceClass(u.id)"
             ></span>
           </div>
           <div class="session-info">
             <div class="line1">
               <span class="name">{{ u.nickname }}</span
-              ><el-tag
-                size="small"
-                :type="presenceTagType(u.id)"
-                effect="plain"
-                >{{ presenceTextById(u.id) }}</el-tag
+              >
+              <el-tag
+                  size="small"
+                  :type="presenceTagType(u.id)"
+                  effect="plain"
+              >{{ presenceTextById(u.id) }}
+              </el-tag
               >
             </div>
             <div class="line2">{{ u.deptName }} · {{ u.jobTitle }}</div>
@@ -799,9 +845,9 @@
         <div class="grid-title">工作台</div>
         <div class="work-summary-row">
           <button
-            type="button"
-            class="work-summary-card mailbox"
-            @click="$router.push('/mailbox')"
+              type="button"
+              class="work-summary-card mailbox"
+              @click="$router.push('/mailbox')"
           >
             <div class="work-summary-label">未读邮件</div>
             <div class="work-summary-value">
@@ -810,30 +856,30 @@
             <div class="work-summary-desc">
               {{
                 collabCounts.mailboxUnread
-                  ? "有新邮件待处理"
-                  : "当前没有未读邮件"
+                    ? "有新邮件待处理"
+                    : "当前没有未读邮件"
               }}
             </div>
           </button>
           <button
-            type="button"
-            class="work-summary-card ding"
-            @click="$router.push('/ding')"
+              type="button"
+              class="work-summary-card ding"
+              @click="$router.push('/ding')"
           >
             <div class="work-summary-label">待处理 DING</div>
             <div class="work-summary-value">{{ collabCounts.dingPending }}</div>
             <div class="work-summary-desc">
               {{
                 collabCounts.dingUrgent
-                  ? `${collabCounts.dingUrgent} 条紧急`
-                  : "处理状态已同步"
+                    ? `${collabCounts.dingUrgent} 条紧急`
+                    : "处理状态已同步"
               }}
             </div>
           </button>
           <button
-            type="button"
-            class="work-summary-card feed"
-            @click="openWorkNotice(latestWorkNotice)"
+              type="button"
+              class="work-summary-card feed"
+              @click="openWorkNotice(latestWorkNotice)"
           >
             <div class="work-summary-label">最新动态</div>
             <div class="work-summary-title">
@@ -860,8 +906,8 @@
             <div class="app-icon-wrap">
               <div class="app-icon" style="background: #5f6cf8">📧</div>
               <span v-if="collabCounts.mailboxUnread > 0" class="app-badge">{{
-                formatCounter(collabCounts.mailboxUnread)
-              }}</span>
+                  formatCounter(collabCounts.mailboxUnread)
+                }}</span>
             </div>
             <span>企业邮箱</span>
           </div>
@@ -873,8 +919,8 @@
             <div class="app-icon-wrap">
               <div class="app-icon" style="background: #ff9f1a">🔔</div>
               <span v-if="collabCounts.dingPending > 0" class="app-badge">{{
-                formatCounter(collabCounts.dingPending)
-              }}</span>
+                  formatCounter(collabCounts.dingPending)
+                }}</span>
             </div>
             <span>DING 提醒</span>
           </div>
@@ -891,17 +937,17 @@
             <span>收藏</span>
           </div>
           <div
-            v-if="isAdmin"
-            class="app-card"
-            @click="$router.push('/admin/dashboard')"
+              v-if="isAdmin"
+              class="app-card"
+              @click="$router.push('/admin/dashboard')"
           >
             <div class="app-icon" style="background: #722ed1">📊</div>
             <span>数据看板</span>
           </div>
           <div
-            v-if="isAdmin"
-            class="app-card"
-            @click="$router.push('/admin/notice')"
+              v-if="isAdmin"
+              class="app-card"
+              @click="$router.push('/admin/notice')"
           >
             <div class="app-icon" style="background: #eb2f96">📋</div>
             <span>公告管理</span>
@@ -915,27 +961,27 @@
           <div class="work-feed-head">
             <span>协同提醒</span>
             <span class="work-feed-meta">{{
-              workNotices.length ? `${workNotices.length} 条动态` : "实时刷新"
-            }}</span>
+                workNotices.length ? `${workNotices.length} 条动态` : "实时刷新"
+              }}</span>
           </div>
           <div v-if="workNotices.length" class="work-feed-list">
             <button
-              v-for="notice in workNotices"
-              :key="notice.id"
-              type="button"
-              class="work-feed-item"
-              @click="openWorkNotice(notice)"
+                v-for="notice in workNotices"
+                :key="notice.id"
+                type="button"
+                class="work-feed-item"
+                @click="openWorkNotice(notice)"
             >
               <span class="work-feed-badge" :class="notice.category">{{
-                workNoticeCategoryText(notice)
-              }}</span>
+                  workNoticeCategoryText(notice)
+                }}</span>
               <div class="work-feed-main">
                 <div class="work-feed-title">{{ notice.title }}</div>
                 <div class="work-feed-desc">{{ notice.summary }}</div>
               </div>
               <span class="work-feed-time">{{
-                formatWorkNoticeTime(notice.createTime)
-              }}</span>
+                  formatWorkNoticeTime(notice.createTime)
+                }}</span>
             </button>
           </div>
           <div v-else class="work-feed-empty">
@@ -950,23 +996,28 @@
       <template v-if="current">
         <div class="chat-header">
           <div class="ch-title">
-            {{ current.name
+            {{
+              current.name
             }}<span v-if="current.type === 2" class="ch-count">(群聊)</span>
             <span
-              v-if="current.type === 1"
-              class="status-tag"
-              :class="presenceClass(current.targetUserId)"
-              >{{ presenceTextById(current.targetUserId) }}</span
+                v-if="current.type === 1"
+                class="status-tag"
+                :class="presenceClass(current.targetUserId)"
+            >{{ presenceTextById(current.targetUserId) }}</span
             >
           </div>
           <div class="ch-actions">
             <el-icon
-              v-if="current.type === 2"
-              :size="20"
-              @click="openGroupSetting"
-              ><Setting
-            /></el-icon>
-            <el-icon :size="18"><MoreFilled /></el-icon>
+                v-if="current.type === 2"
+                :size="20"
+                @click="openGroupSetting"
+            >
+              <Setting
+              />
+            </el-icon>
+            <el-icon :size="18">
+              <MoreFilled/>
+            </el-icon>
           </div>
         </div>
 
@@ -979,23 +1030,24 @@
               {{ m.status === 0 ? recallText(m) : m.content }}
             </div>
             <div
-              v-else
-              class="msg-row"
-              :class="{ mine: m.senderId === user?.id }"
-              @mouseenter="hoverId = m.id"
-              @mouseleave="hoverId = null"
+                v-else
+                class="msg-row"
+                :class="{ mine: m.senderId === user?.id }"
+                @mouseenter="hoverId = m.id"
+                @mouseleave="hoverId = null"
             >
               <el-avatar
-                :size="40"
-                shape="square"
-                :src="m.senderAvatar"
-                :style="avatarStyle(m.senderName)"
-                >{{ firstChar(m.senderName) }}</el-avatar
+                  :size="40"
+                  shape="square"
+                  :src="m.senderAvatar"
+                  :style="avatarStyle(m.senderName)"
+              >{{ firstChar(m.senderName) }}
+              </el-avatar
               >
               <div class="msg-content">
                 <div
-                  v-if="current.type === 2 && m.senderId !== user?.id"
-                  class="msg-sender"
+                    v-if="current.type === 2 && m.senderId !== user?.id"
+                    class="msg-sender"
                 >
                   {{ m.senderName }}
                 </div>
@@ -1005,29 +1057,29 @@
                 </div>
                 <div class="bubble-wrap">
                   <div
-                    v-if="m.contentType === 1"
-                    class="bubble"
-                    v-html="renderText(m.content)"
+                      v-if="m.contentType === 1"
+                      class="bubble"
+                      v-html="renderText(m.content)"
                   ></div>
                   <div
-                    v-else-if="m.contentType === 2"
-                    class="bubble img-bubble"
+                      v-else-if="m.contentType === 2"
+                      class="bubble img-bubble"
                   >
-                    <img :src="m.content" @click="previewImg(m.content)" />
+                    <img :src="m.content" @click="previewImg(m.content)"/>
                   </div>
                   <div
-                    v-else-if="m.contentType === 3 && isDocumentShareMessage(m)"
-                    class="bubble doc-card-bubble"
-                    @click="openDocumentMessage(m)"
+                      v-else-if="m.contentType === 3 && isDocumentShareMessage(m)"
+                      class="bubble doc-card-bubble"
+                      @click="openDocumentMessage(m)"
                   >
                     <div class="doc-card-head">
                       <div
-                        class="doc-card-icon"
-                        :class="`theme-${documentBadgeMeta(m).theme}`"
+                          class="doc-card-icon"
+                          :class="`theme-${documentBadgeMeta(m).theme}`"
                       >
                         <span class="doc-card-icon-label">{{
-                          documentBadgeMeta(m).badge
-                        }}</span>
+                            documentBadgeMeta(m).badge
+                          }}</span>
                       </div>
                       <div class="doc-card-title-wrap">
                         <div class="doc-card-type">协作文档</div>
@@ -1041,24 +1093,26 @@
                         <span>{{ documentScene(m) }}</span>
                         <span>{{ fmtSize(documentMeta(m).size) }}</span>
                         <span v-if="documentMeta(m).shareCount">{{
-                          `已分享${documentMeta(m).shareCount}次`
-                        }}</span>
+                            `已分享${documentMeta(m).shareCount}次`
+                          }}</span>
                       </div>
                       <button
-                        type="button"
-                        class="doc-card-action"
-                        @click.stop="downloadDocumentFile(m)"
+                          type="button"
+                          class="doc-card-action"
+                          @click.stop="downloadDocumentFile(m)"
                       >
                         下载
                       </button>
                     </div>
                   </div>
                   <div
-                    v-else-if="m.contentType === 3"
-                    class="bubble file-bubble"
-                    @click="downloadFile(m)"
+                      v-else-if="m.contentType === 3"
+                      class="bubble file-bubble"
+                      @click="downloadFile(m)"
                   >
-                    <el-icon :size="32" color="#1677ff"><Document /></el-icon>
+                    <el-icon :size="32" color="#1677ff">
+                      <Document/>
+                    </el-icon>
                     <div class="file-info">
                       <div class="file-name">{{ m.content }}</div>
                       <div class="file-size">
@@ -1067,9 +1121,9 @@
                     </div>
                   </div>
                   <div
-                    v-else-if="m.contentType === 6"
-                    class="bubble link-card-bubble"
-                    @click="openCardMessage(m)"
+                      v-else-if="m.contentType === 6"
+                      class="bubble link-card-bubble"
+                      @click="openCardMessage(m)"
                   >
                     <div class="card-badge" :style="cardBadgeStyle(m)">
                       {{ cardBadgeText(m) }}
@@ -1080,19 +1134,21 @@
                       <div class="card-desc">{{ cardDesc(m) }}</div>
                     </div>
                     <el-icon :size="16" class="card-arrow"
-                      ><ArrowRight
-                    /></el-icon>
+                    >
+                      <ArrowRight
+                      />
+                    </el-icon>
                   </div>
                   <!-- 视频消息 contentType=5 -->
                   <div
-                    v-else-if="m.contentType === 5"
-                    class="bubble video-bubble"
+                      v-else-if="m.contentType === 5"
+                      class="bubble video-bubble"
                   >
                     <video
-                      :src="m.content"
-                      controls
-                      preload="metadata"
-                      class="chat-video"
+                        :src="m.content"
+                        controls
+                        preload="metadata"
+                        class="chat-video"
                     ></video>
                     <div class="video-name">
                       {{ parseExtra(m.extra).name || "视频" }}
@@ -1105,44 +1161,44 @@
                       <template #reference><span>😀</span></template>
                       <div class="reaction-picker">
                         <span
-                          v-for="e in quickReactions"
-                          :key="e"
-                          class="reaction-emoji"
-                          @click="toggleReaction(m.id, e)"
-                          >{{ e }}</span
+                            v-for="e in quickReactions"
+                            :key="e"
+                            class="reaction-emoji"
+                            @click="toggleReaction(m.id, e)"
+                        >{{ e }}</span
                         >
                       </div>
                     </el-popover>
                     <span v-if="m.senderId === user?.id" @click="recall(m)"
-                      >撤回</span
+                    >撤回</span
                     >
                   </div>
                 </div>
                 <!-- 消息反应展示 -->
                 <div
-                  v-if="m.reactions && m.reactions.length"
-                  class="reaction-bar"
+                    v-if="m.reactions && m.reactions.length"
+                    class="reaction-bar"
                 >
                   <span
-                    v-for="r in m.reactions"
-                    :key="r.emoji"
-                    class="reaction-tag"
-                    :class="{ mine: r.userIds?.includes(user?.id) }"
-                    @click="toggleReaction(m.id, r.emoji)"
+                      v-for="r in m.reactions"
+                      :key="r.emoji"
+                      class="reaction-tag"
+                      :class="{ mine: r.userIds?.includes(user?.id) }"
+                      @click="toggleReaction(m.id, r.emoji)"
                   >
                     {{ r.emoji }} {{ r.count }}
                   </span>
                 </div>
                 <div
-                  v-if="m.senderId === user?.id && current.type === 1"
-                  class="read-status"
+                    v-if="m.senderId === user?.id && current.type === 1"
+                    class="read-status"
                 >
                   {{ m.readCount > 0 || readReceipts[m.id] ? "已读" : "未读" }}
                 </div>
                 <div
-                  v-if="m.senderId === user?.id && current.type === 2"
-                  class="read-status"
-                  @click="showReaders(m.id)"
+                    v-if="m.senderId === user?.id && current.type === 2"
+                    class="read-status"
+                    @click="showReaders(m.id)"
                 >
                   {{ (m.readCount || 0) + (readCounts[m.id] || 0) }}人已读
                 </div>
@@ -1150,18 +1206,20 @@
             </div>
           </template>
           <el-empty
-            v-if="!messages.length"
-            description="发送第一条消息"
-            :image-size="90"
+              v-if="!messages.length"
+              description="发送第一条消息"
+              :image-size="90"
           />
         </div>
 
         <div v-if="quoteRef" class="quote-bar">
           <span
-            >回复 {{ quoteRef.senderName }}:
+          >回复 {{ quoteRef.senderName }}:
             {{ quoteRef.content?.substring(0, 40) }}</span
           >
-          <el-icon @click="quoteRef = null"><Close /></el-icon>
+          <el-icon @click="quoteRef = null">
+            <Close/>
+          </el-icon>
         </div>
 
         <div class="chat-input">
@@ -1169,114 +1227,135 @@
             <div class="toolbar-emoji" ref="emojiWrapRef">
               <el-tooltip content="表情包" placement="top">
                 <button
-                  type="button"
-                  class="toolbar-btn"
-                  :class="{ active: emojiPanelOpen }"
-                  @click.stop="toggleEmojiPanel"
+                    type="button"
+                    class="toolbar-btn"
+                    :class="{ active: emojiPanelOpen }"
+                    @click.stop="toggleEmojiPanel"
                 >
-                  <el-icon :size="20"><ChatDotRound /></el-icon>
+                  <el-icon :size="20">
+                    <ChatDotRound/>
+                  </el-icon>
                 </button>
               </el-tooltip>
               <div v-if="emojiPanelOpen" class="emoji-pop" @click.stop>
                 <div class="emoji-panel-header">
                   <span class="emoji-panel-title">表情包</span>
                   <button
-                    type="button"
-                    class="emoji-close"
-                    @click="emojiPanelOpen = false"
+                      type="button"
+                      class="emoji-close"
+                      @click="emojiPanelOpen = false"
                   >
-                    <el-icon :size="14"><Close /></el-icon>
+                    <el-icon :size="14">
+                      <Close/>
+                    </el-icon>
                   </button>
                 </div>
                 <div class="emoji-panel">
                   <div class="emoji-tabs">
                     <span
-                      v-for="(cat, i) in emojiCategories"
-                      :key="i"
-                      class="emoji-tab"
-                      :class="{ active: emojiTab === i }"
-                      @click="emojiTab = i"
-                      >{{ cat.icon }}</span
+                        v-for="(cat, i) in emojiCategories"
+                        :key="i"
+                        class="emoji-tab"
+                        :class="{ active: emojiTab === i }"
+                        @click="emojiTab = i"
+                    >{{ cat.icon }}</span
                     >
                   </div>
                   <div class="emoji-tab-title">
                     {{ activeEmojiCategory.name }}
                   </div>
                   <div
-                    class="emoji-grid"
-                    :class="{
+                      class="emoji-grid"
+                      :class="{
                       'sticker-grid': activeEmojiCategory.type === 'sticker',
                     }"
                   >
                     <span
-                      v-for="e in activeEmojiCategory.list"
-                      :key="e"
-                      class="emoji-item"
-                      :class="{
+                        v-for="e in activeEmojiCategory.list"
+                        :key="e"
+                        class="emoji-item"
+                        :class="{
                         'sticker-item': activeEmojiCategory.type === 'sticker',
                       }"
-                      @click="insertEmoji(e)"
-                      >{{ e }}</span
+                        @click="insertEmoji(e)"
+                    >{{ e }}</span
                     >
                   </div>
                 </div>
               </div>
             </div>
             <el-upload
-              :show-file-list="false"
-              :http-request="sendImage"
-              accept="image/*"
+                :show-file-list="false"
+                :http-request="sendImage"
+                accept="image/*"
             >
               <el-tooltip content="图片" placement="top"
-                ><el-icon :size="20"><Picture /></el-icon
-              ></el-tooltip>
+              >
+                <el-icon :size="20">
+                  <Picture/>
+                </el-icon
+                >
+              </el-tooltip>
             </el-upload>
             <el-upload
-              :show-file-list="false"
-              :http-request="sendVideo"
-              accept="video/*"
+                :show-file-list="false"
+                :http-request="sendVideo"
+                accept="video/*"
             >
               <el-tooltip content="视频" placement="top"
-                ><el-icon :size="20"><VideoCamera /></el-icon
-              ></el-tooltip>
+              >
+                <el-icon :size="20">
+                  <VideoCamera/>
+                </el-icon
+                >
+              </el-tooltip>
             </el-upload>
             <el-upload :show-file-list="false" :http-request="sendFile">
               <el-tooltip content="文件" placement="top"
-                ><el-icon :size="20"><Folder /></el-icon
-              ></el-tooltip>
+              >
+                <el-icon :size="20">
+                  <Folder/>
+                </el-icon
+                >
+              </el-tooltip>
             </el-upload>
             <el-tooltip
-              v-if="current.type === 2"
-              content="@提醒"
-              placement="top"
+                v-if="current.type === 2"
+                content="@提醒"
+                placement="top"
             >
-              <el-icon :size="20" @click="openAt"><Bell /></el-icon>
+              <el-icon :size="20" @click="openAt">
+                <Bell/>
+              </el-icon>
             </el-tooltip>
           </div>
           <el-input
-            v-model="draft"
-            type="textarea"
-            :rows="4"
-            resize="none"
-            class="msg-textarea"
-            placeholder="输入消息, 回车发送"
-            ref="inputRef"
-            @keydown.enter.exact.prevent="sendWithAi"
+              v-model="draft"
+              type="textarea"
+              :rows="4"
+              resize="none"
+              class="msg-textarea"
+              placeholder="输入消息, 回车发送"
+              ref="inputRef"
+              @keydown.enter.exact.prevent="aiLoading || sendWithAi()"
           />
           <div class="input-foot">
             <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
             <el-button
-              type="primary"
-              :disabled="!draft.trim()"
-              @click="sendWithAi"
-              >发送</el-button
+                type="primary"
+                :disabled="!draft.trim() || aiLoading"
+                @click="sendWithAi"
+            >{{ aiLoading ? "AI思考中..." : "发送" }}
+            </el-button
             >
           </div>
         </div>
       </template>
       <div v-else class="chat-empty">
         <div class="empty-illustration">
-          <el-icon :size="56"><ChatLineRound /></el-icon>
+          <el-icon :size="56">
+            <ChatLineRound/>
+          </el-icon>
         </div>
         <p>选择一个会话开始聊天</p>
       </div>
@@ -1285,32 +1364,40 @@
     <!-- 弹窗区 -->
     <el-dialog v-model="groupDialog" title="发起群聊" width="460px">
       <el-input
-        v-model="groupForm.name"
-        placeholder="群名称(可选)"
-        style="margin-bottom: 12px"
+          v-model="groupForm.name"
+          placeholder="群名称(可选)"
+          style="margin-bottom: 12px"
       />
       <div class="member-pick">
         <el-checkbox-group v-model="groupForm.memberIds">
           <div v-for="u in contacts" :key="u.id" class="pick-item">
             <el-checkbox :value="u.id"
-              ><el-avatar
-                :size="28"
-                shape="square"
-                :style="avatarStyle(u.nickname)"
-                >{{ firstChar(u.nickname) }}</el-avatar
-              ><span class="pick-name">{{ u.nickname }}</span></el-checkbox
+            >
+              <el-avatar
+                  :size="28"
+                  shape="square"
+                  :style="avatarStyle(u.nickname)"
+              >{{ firstChar(u.nickname) }}
+              </el-avatar
+              >
+              <span class="pick-name">{{ u.nickname }}</span></el-checkbox
             >
           </div>
         </el-checkbox-group>
       </div>
       <template #footer
-        ><el-button @click="groupDialog = false">取消</el-button
-        ><el-button
-          type="primary"
-          :disabled="!groupForm.memberIds.length"
-          @click="createGroup"
-          >创建</el-button
-        ></template
+      >
+        <el-button @click="groupDialog = false">取消
+        </el-button
+        >
+        <el-button
+            type="primary"
+            :disabled="!groupForm.memberIds.length"
+            @click="createGroup"
+        >创建
+        </el-button
+        >
+      </template
       >
     </el-dialog>
 
@@ -1318,68 +1405,76 @@
       <div class="setting-block">
         <div class="block-title">群公告</div>
         <el-input
-          v-model="groupNotice"
-          type="textarea"
-          :rows="3"
-          :readonly="!isGroupOwner"
-          placeholder="暂无群公告"
+            v-model="groupNotice"
+            type="textarea"
+            :rows="3"
+            :readonly="!isGroupOwner"
+            placeholder="暂无群公告"
         />
         <el-button
-          v-if="isGroupOwner"
-          size="small"
-          type="primary"
-          style="margin-top: 8px"
-          @click="saveNotice"
-          >保存</el-button
+            v-if="isGroupOwner"
+            size="small"
+            type="primary"
+            style="margin-top: 8px"
+            @click="saveNotice"
+        >保存
+        </el-button
         >
       </div>
       <div class="setting-block">
         <div class="block-title">
-          群成员 ({{ groupMembers.length }})<el-button
-            v-if="isGroupOwner"
-            link
-            type="primary"
-            @click="openAddMember"
-            >+ 添加</el-button
+          群成员 ({{ groupMembers.length }})
+          <el-button
+              v-if="isGroupOwner"
+              link
+              type="primary"
+              @click="openAddMember"
+          >+ 添加
+          </el-button
           >
         </div>
         <div v-for="m in groupMembers" :key="m.userId" class="member-row">
           <div class="avatar-wrap-sm">
             <el-avatar
-              :size="32"
-              shape="square"
-              :src="m.avatar"
-              :style="avatarStyle(m.nickname)"
-              >{{ firstChar(m.nickname) }}</el-avatar
-            ><span
-              v-if="m.userId"
-              class="user-online-sm"
-              :class="presenceClass(m.userId)"
+                :size="32"
+                shape="square"
+                :src="m.avatar"
+                :style="avatarStyle(m.nickname)"
+            >{{ firstChar(m.nickname) }}
+            </el-avatar
+            >
+            <span
+                v-if="m.userId"
+                class="user-online-sm"
+                :class="presenceClass(m.userId)"
             ></span>
           </div>
           <span class="m-name">{{ m.nickname }}</span>
           <el-tag v-if="m.memberRole === 1" size="small" type="warning"
-            >群主</el-tag
+          >群主
+          </el-tag
           >
           <span class="spacer"></span>
           <el-button
-            v-if="isGroupOwner && m.memberRole !== 1"
-            link
-            type="danger"
-            size="small"
-            @click="kick(m)"
-            >移除</el-button
+              v-if="isGroupOwner && m.memberRole !== 1"
+              link
+              type="danger"
+              size="small"
+              @click="kick(m)"
+          >移除
+          </el-button
           >
         </div>
       </div>
       <div class="setting-block">
         <el-button
-          v-if="!isGroupOwner"
-          type="danger"
-          plain
-          style="width: 100%"
-          @click="quit"
-          >退出群聊</el-button
+            v-if="!isGroupOwner"
+            type="danger"
+            plain
+            style="width: 100%"
+            @click="quit"
+        >退出群聊
+        </el-button
         >
       </div>
     </el-drawer>
@@ -1388,55 +1483,66 @@
         <el-checkbox-group v-model="addMemberIds">
           <div v-for="u in nonMembers" :key="u.id" class="pick-item">
             <el-checkbox :value="u.id"
-              ><el-avatar
-                :size="28"
-                shape="square"
-                :style="avatarStyle(u.nickname)"
-                >{{ firstChar(u.nickname) }}</el-avatar
-              ><span class="pick-name">{{ u.nickname }}</span></el-checkbox
+            >
+              <el-avatar
+                  :size="28"
+                  shape="square"
+                  :style="avatarStyle(u.nickname)"
+              >{{ firstChar(u.nickname) }}
+              </el-avatar
+              >
+              <span class="pick-name">{{ u.nickname }}</span></el-checkbox
             >
           </div>
         </el-checkbox-group>
       </div>
       <template #footer
-        ><el-button @click="addMemberDialog = false">取消</el-button
-        ><el-button
-          type="primary"
-          :disabled="!addMemberIds.length"
-          @click="confirmAddMember"
-          >添加</el-button
-        ></template
+      >
+        <el-button @click="addMemberDialog = false">取消
+        </el-button
+        >
+        <el-button
+            type="primary"
+            :disabled="!addMemberIds.length"
+            @click="confirmAddMember"
+        >添加
+        </el-button
+        >
+      </template
       >
     </el-dialog>
     <el-dialog v-model="atDialog" title="选择要@的成员" width="380px">
       <div
-        v-for="m in groupMembers.filter((x) => x.userId !== user?.id)"
-        :key="m.userId"
-        class="pick-item"
-        @click="pickAt(m)"
+          v-for="m in groupMembers.filter((x) => x.userId !== user?.id)"
+          :key="m.userId"
+          class="pick-item"
+          @click="pickAt(m)"
       >
         <el-avatar :size="28" shape="square" :style="avatarStyle(m.nickname)">{{
-          firstChar(m.nickname)
-        }}</el-avatar
-        ><span class="pick-name">{{ m.nickname }}</span>
+            firstChar(m.nickname)
+          }}
+        </el-avatar
+        >
+        <span class="pick-name">{{ m.nickname }}</span>
       </div>
     </el-dialog>
     <el-dialog v-model="readersDialog" title="已读成员" width="360px">
       <div v-for="r in readersList" :key="r.userId" class="pick-item">
         <el-avatar :size="28" shape="square" :style="avatarStyle(r.nickname)">{{
-          firstChar(r.nickname)
-        }}</el-avatar>
+            firstChar(r.nickname)
+          }}
+        </el-avatar>
         <span class="pick-name">{{ r.nickname }}</span>
         <span style="color: #999; margin-left: auto; font-size: 12px">{{
-          fmtFullTime(r.readTime)
-        }}</span>
+            fmtFullTime(r.readTime)
+          }}</span>
       </div>
     </el-dialog>
     <div
-      v-if="ctxMenu.visible"
-      class="ctx-menu"
-      :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
-      @mouseleave="ctxMenu.visible = false"
+        v-if="ctxMenu.visible"
+        class="ctx-menu"
+        :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
+        @mouseleave="ctxMenu.visible = false"
     >
       <div class="ctx-item" @click="toggleTop(ctxMenu.session)">
         {{ ctxMenu.session?.isTop === 1 ? "取消置顶" : "📌 置顶" }}
@@ -1449,9 +1555,9 @@
       </div>
     </div>
     <el-image-viewer
-      v-if="previewUrl"
-      :url-list="[previewUrl]"
-      @close="previewUrl = ''"
+        v-if="previewUrl"
+        :url-list="[previewUrl]"
+        @close="previewUrl = ''"
     />
   </div>
 </template>
@@ -1466,8 +1572,8 @@ import {
   nextTick,
   watch,
 } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { ElMessage, ElMessageBox, ElImageViewer } from "element-plus";
+import {useRoute, useRouter} from "vue-router";
+import {ElMessage, ElMessageBox, ElImageViewer} from "element-plus";
 import {
   ChatDotRound,
   ChatLineRound,
@@ -1499,10 +1605,10 @@ import {
   DArrowRight,
   VideoCamera,
 } from "@element-plus/icons-vue";
-import { useUserStore } from "../store/user";
-import { useThemeStore } from "../store/theme";
-import { useCollabStore } from "../store/collab";
-import { useUserPreferenceStore } from "../store/userPreference";
+import {useUserStore} from "../store/user";
+import {useThemeStore} from "../store/theme";
+import {useCollabStore} from "../store/collab";
+import {useUserPreferenceStore} from "../store/userPreference";
 import {
   apiSessions,
   apiMessages,
@@ -1528,6 +1634,7 @@ import {
   apiToggleMute,
   apiToggleStar,
   apiAiReply,
+  apiCreateAiSse,
   apiFavoriteAdd,
   apiAddPanelLinks,
   apiAddPanelSaveLink,
@@ -1538,7 +1645,7 @@ import {
   apiToggleReaction,
   apiUpdateProfile,
 } from "../api";
-import { connectWs, disconnectWs, removeWsListeners } from "../utils/ws";
+import {connectWs, disconnectWs, removeWsListeners} from "../utils/ws";
 
 const router = useRouter();
 const route = useRoute();
@@ -1570,10 +1677,10 @@ const profilePanel = ref(false);
 const groupPanelOpen = ref(true);
 const chatFilter = ref("all");
 const statusOptions = [
-  { value: "online", label: "在线" },
-  { value: "busy", label: "忙碌" },
-  { value: "away", label: "离开" },
-  { value: "offline", label: "离线" },
+  {value: "online", label: "在线"},
+  {value: "busy", label: "忙碌"},
+  {value: "away", label: "离开"},
+  {value: "offline", label: "离线"},
 ];
 
 const onlineSet = ref(new Set());
@@ -1584,9 +1691,9 @@ const readersList = ref([]);
 const searchMode = ref(false);
 const searchContacts = ref([]);
 const searchMsgs = ref([]);
-const ctxMenu = reactive({ visible: false, x: 0, y: 0, session: null });
+const ctxMenu = reactive({visible: false, x: 0, y: 0, session: null});
 const groupDialog = ref(false);
-const groupForm = ref({ name: "", memberIds: [] });
+const groupForm = ref({name: "", memberIds: []});
 const settingDrawer = ref(false);
 const groupMembers = ref([]);
 const groupNotice = ref("");
@@ -1605,6 +1712,8 @@ const recentUsageKeys = ref([]);
 const workbenchStateReady = ref(false);
 const preferredSessionId = ref(null);
 const emojiTab = ref(0);
+const aiLoading = ref(false);
+let aiEventSource = null;
 const emojiCategories = [
   {
     icon: "😀",
@@ -1856,7 +1965,7 @@ const emojiCategories = [
   },
 ];
 const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🎉", "🔥", "👏"];
-const presenceValueMap = { online: 1, busy: 2, away: 3, offline: 4 };
+const presenceValueMap = {online: 1, busy: 2, away: 3, offline: 4};
 const presenceLabelMap = {
   online: "在线",
   busy: "忙碌",
@@ -1877,12 +1986,12 @@ const chatFilterSet = new Set([
 const collabCounts = collabStore;
 
 const filteredSessions = computed(() =>
-  sessions.value.filter(
-    (s) => !keyword.value || (s.name || "").includes(keyword.value),
-  ),
+    sessions.value.filter(
+        (s) => !keyword.value || (s.name || "").includes(keyword.value),
+    ),
 );
 const contactMap = computed(
-  () => new Map(contacts.value.map((u) => [u.id, u])),
+    () => new Map(contacts.value.map((u) => [u.id, u])),
 );
 const displaySessions = computed(() => {
   let list = filteredSessions.value;
@@ -1903,21 +2012,21 @@ const displaySessions = computed(() => {
   return list;
 });
 const unreadTotal = computed(() =>
-  sessions.value.reduce((sum, s) => sum + (s.unread || 0), 0),
+    sessions.value.reduce((sum, s) => sum + (s.unread || 0), 0),
 );
 // @我: 跟踪哪些会话最近@了当前用户
 const atMeSessions = ref(new Set());
 const activeEmojiCategory = computed(
-  () => emojiCategories[emojiTab.value] || emojiCategories[0],
+    () => emojiCategories[emojiTab.value] || emojiCategories[0],
 );
 const myStatusClass = computed(() => normalizePresence(user.value?.chatStatus));
 const statusText = computed(
-  () => presenceLabelMap[myStatusClass.value] || "在线",
+    () => presenceLabelMap[myStatusClass.value] || "在线",
 );
 const filteredContacts = computed(() =>
-  contacts.value.filter(
-    (u) => !keyword.value || (u.nickname || "").includes(keyword.value),
-  ),
+    contacts.value.filter(
+        (u) => !keyword.value || (u.nickname || "").includes(keyword.value),
+    ),
 );
 const isGroupOwner = computed(() => {
   const me = groupMembers.value.find((m) => m.userId === user.value?.id);
@@ -2004,33 +2113,33 @@ const addAppItems = computed(() => {
   ];
   if (isAdmin.value) {
     items.push(
-      {
-        key: "app:/admin/dashboard",
-        kind: "app",
-        title: "数据看板",
-        description: "查看平台运营数据",
-        path: "/admin/dashboard",
-        badge: "数",
-        color: "#531dab",
-      },
-      {
-        key: "app:/admin/notice",
-        kind: "app",
-        title: "公告管理",
-        description: "维护平台公告内容",
-        path: "/admin/notice",
-        badge: "告",
-        color: "#eb2f96",
-      },
-      {
-        key: "app:/admin",
-        kind: "app",
-        title: "系统管理",
-        description: "进入后台管理中心",
-        path: "/admin",
-        badge: "管",
-        color: "#08979c",
-      },
+        {
+          key: "app:/admin/dashboard",
+          kind: "app",
+          title: "数据看板",
+          description: "查看平台运营数据",
+          path: "/admin/dashboard",
+          badge: "数",
+          color: "#531dab",
+        },
+        {
+          key: "app:/admin/notice",
+          kind: "app",
+          title: "公告管理",
+          description: "维护平台公告内容",
+          path: "/admin/notice",
+          badge: "告",
+          color: "#eb2f96",
+        },
+        {
+          key: "app:/admin",
+          kind: "app",
+          title: "系统管理",
+          description: "进入后台管理中心",
+          path: "/admin",
+          badge: "管",
+          color: "#08979c",
+        },
     );
   }
   return items;
@@ -2072,18 +2181,18 @@ const workNotices = computed(() => collabStore.workNotices);
 const latestWorkNotice = computed(() => collabStore.latestWorkNotice);
 
 watch(
-  () => preferenceStore.loaded,
-  (loaded) => {
-    if (!loaded || workbenchStateReady.value) return;
-    restoreWorkbenchState();
-  },
-  { immediate: true },
+    () => preferenceStore.loaded,
+    (loaded) => {
+      if (!loaded || workbenchStateReady.value) return;
+      restoreWorkbenchState();
+    },
+    {immediate: true},
 );
 
 watch(
-  () => [route.query.tab, route.query.filter, route.query.session],
-  syncWorkbenchViewFromRoute,
-  { immediate: true },
+    () => [route.query.tab, route.query.filter, route.query.session],
+    syncWorkbenchViewFromRoute,
+    {immediate: true},
 );
 
 watch([tab, chatFilter, keyword, () => current.value?.id ?? null], () => {
@@ -2106,10 +2215,12 @@ onMounted(async () => {
   try {
     const ids = await apiOnlineUsers();
     onlineSet.value = new Set(ids);
-  } catch {}
+  } catch {
+  }
   connectWs(userStore.token, onWsMessage, onWsReceipt, onWsOnline);
 });
 onUnmounted(() => {
+  closeAiSse();
   document.removeEventListener("click", handleGlobalClick);
   removeWsListeners(onWsMessage, onWsReceipt, onWsOnline);
 });
@@ -2117,9 +2228,9 @@ onUnmounted(() => {
 function syncWorkbenchViewFromRoute() {
   const queryTab = typeof route.query.tab === "string" ? route.query.tab : "";
   const queryFilter =
-    typeof route.query.filter === "string" ? route.query.filter : "";
+      typeof route.query.filter === "string" ? route.query.filter : "";
   const hasExplicitRouteView =
-    Boolean(queryTab) || Boolean(queryFilter) || Boolean(route.query.session);
+      Boolean(queryTab) || Boolean(queryFilter) || Boolean(route.query.session);
 
   if (!hasExplicitRouteView && workbenchStateReady.value) {
     if (keyword.value.trim()) onSearchInput();
@@ -2151,9 +2262,9 @@ function syncWorkbenchViewFromRoute() {
 function restoreWorkbenchState() {
   const state = preferenceStore.getPageState("workbench");
   if (
-    state.tab === "work" ||
-    state.tab === "contacts" ||
-    state.tab === "chat"
+      state.tab === "work" ||
+      state.tab === "contacts" ||
+      state.tab === "chat"
   ) {
     tab.value = state.tab;
   }
@@ -2164,8 +2275,8 @@ function restoreWorkbenchState() {
     keyword.value = state.keyword;
   }
   if (
-    Number.isFinite(Number(state.currentSessionId)) &&
-    Number(state.currentSessionId) > 0
+      Number.isFinite(Number(state.currentSessionId)) &&
+      Number(state.currentSessionId) > 0
   ) {
     preferredSessionId.value = Number(state.currentSessionId);
   }
@@ -2179,6 +2290,7 @@ async function loadSessions() {
   await openSessionFromRoute();
   await openStoredSessionIfNeeded();
 }
+
 async function switchContacts() {
   tab.value = "contacts";
   if (!contacts.value.length) contacts.value = await apiUserList();
@@ -2190,25 +2302,26 @@ async function hydrateAtMeSessions() {
     return;
   }
   const hitSessionIds = await Promise.all(
-    sessions.value.map(async (session) => {
-      try {
-        const list = await apiMessages(session.id);
-        return list.some((msg) =>
-          String(msg.atUserIds || "")
-            .split(",")
-            .includes(String(user.value.id)),
-        )
-          ? session.id
-          : null;
-      } catch {
-        return null;
-      }
-    }),
+      sessions.value.map(async (session) => {
+        try {
+          const list = await apiMessages(session.id);
+          return list.some((msg) =>
+              String(msg.atUserIds || "")
+                  .split(",")
+                  .includes(String(user.value.id)),
+          )
+              ? session.id
+              : null;
+        } catch {
+          return null;
+        }
+      }),
   );
   atMeSessions.value = new Set(hitSessionIds.filter(Boolean));
 }
 
 async function openSession(s) {
+  closeAiSse();
   current.value = s;
   quoteRef.value = null;
   messages.value = (await apiMessages(s.id)).map(hydrateMessage);
@@ -2219,7 +2332,8 @@ async function openSession(s) {
   }
   if (messages.value.length) {
     apiReadReceipt(s.id, messages.value[messages.value.length - 1].id).catch(
-      () => {},
+        () => {
+        },
     );
   }
   scrollBottom();
@@ -2230,28 +2344,28 @@ async function openSessionFromRoute() {
   if (!routeSessionId || !sessions.value.length) return;
   if (current.value?.id === routeSessionId) return;
   const target = sessions.value.find(
-    (session) => session.id === routeSessionId,
+      (session) => session.id === routeSessionId,
   );
   if (!target) return;
   tab.value = "chat";
   searchMode.value = false;
   keyword.value = "";
   await openSession(target);
-  const nextQuery = { ...route.query };
+  const nextQuery = {...route.query};
   delete nextQuery.session;
-  router.replace({ path: "/chat", query: nextQuery });
+  router.replace({path: "/chat", query: nextQuery});
 }
 
 async function openStoredSessionIfNeeded() {
   if (
-    route.query.session ||
-    !preferredSessionId.value ||
-    !sessions.value.length
+      route.query.session ||
+      !preferredSessionId.value ||
+      !sessions.value.length
   )
     return;
   if (current.value?.id === preferredSessionId.value) return;
   const target = sessions.value.find(
-    (session) => session.id === preferredSessionId.value,
+      (session) => session.id === preferredSessionId.value,
   );
   if (!target) return;
   await openSession(target);
@@ -2274,12 +2388,12 @@ async function send() {
   if (!content || !current.value) return;
   const atIds = [...atUserSet.value].join(",");
   const extra = quoteRef.value
-    ? JSON.stringify({
+      ? JSON.stringify({
         quoteId: quoteRef.value.id,
         quoteSender: quoteRef.value.senderName,
         quoteContent: quoteRef.value.content?.substring(0, 100),
       })
-    : undefined;
+      : undefined;
   draft.value = "";
   atUserSet.value = new Set();
   quoteRef.value = null;
@@ -2291,17 +2405,20 @@ async function send() {
     extra,
   });
 }
+
 function ensureSessionSelected() {
   if (current.value) return true;
   ElMessage.warning("请先选择一个会话");
   return false;
 }
+
 function normalizeLinkInput(value) {
   const text = (value || "").trim();
   if (!text) return "";
   const normalized = /^https?:\/\//i.test(text) ? text : `https://${text}`;
   return new URL(normalized).toString();
 }
+
 function formatHost(url) {
   try {
     return new URL(url).host;
@@ -2309,16 +2426,18 @@ function formatHost(url) {
     return "";
   }
 }
+
 function formatLinkDescription(url) {
   try {
     const parsed = new URL(url);
     return parsed.pathname && parsed.pathname !== "/"
-      ? `${parsed.host}${parsed.pathname}`
-      : parsed.host;
+        ? `${parsed.host}${parsed.pathname}`
+        : parsed.host;
   } catch {
     return url;
   }
 }
+
 function fileToAddItem(file) {
   const meta = fileBadgeMeta(file.name);
   return {
@@ -2335,6 +2454,7 @@ function fileToAddItem(file) {
     iconBadge: meta.iconBadge,
   };
 }
+
 function linkToAddItem(link) {
   return {
     id: link.id,
@@ -2347,6 +2467,7 @@ function linkToAddItem(link) {
     color: "#13c2c2",
   };
 }
+
 function fileBadgeMeta(name) {
   const ext = ((name || "").split(".").pop() || "").toUpperCase();
   if (["PDF"].includes(ext))
@@ -2390,23 +2511,23 @@ function fileBadgeMeta(name) {
       iconBadge: "Z",
     };
   if (
-    [
-      "JS",
-      "TS",
-      "JSON",
-      "XML",
-      "HTML",
-      "CSS",
-      "SCSS",
-      "JAVA",
-      "PY",
-      "VUE",
-      "MD",
-      "YAML",
-      "YML",
-      "SH",
-      "SQL",
-    ].includes(ext)
+      [
+        "JS",
+        "TS",
+        "JSON",
+        "XML",
+        "HTML",
+        "CSS",
+        "SCSS",
+        "JAVA",
+        "PY",
+        "VUE",
+        "MD",
+        "YAML",
+        "YML",
+        "SH",
+        "SQL",
+      ].includes(ext)
   ) {
     return {
       badge: ext,
@@ -2432,31 +2553,34 @@ function fileBadgeMeta(name) {
     iconBadge: ext.slice(0, 1),
   };
 }
+
 async function loadAddPanelData() {
   const [filesResult, linksResult, usageResult] = await Promise.allSettled([
-    apiFileList({ limit: 8 }),
+    apiFileList({limit: 8}),
     apiAddPanelLinks(),
     apiAddPanelRecentUsage(),
   ]);
   recentFiles.value =
-    filesResult.status === "fulfilled" && Array.isArray(filesResult.value)
-      ? filesResult.value
-      : [];
+      filesResult.status === "fulfilled" && Array.isArray(filesResult.value)
+          ? filesResult.value
+          : [];
   savedLinks.value =
-    linksResult.status === "fulfilled" && Array.isArray(linksResult.value)
-      ? linksResult.value
-      : [];
+      linksResult.status === "fulfilled" && Array.isArray(linksResult.value)
+          ? linksResult.value
+          : [];
   recentUsageKeys.value =
-    usageResult.status === "fulfilled" && Array.isArray(usageResult.value)
-      ? usageResult.value.filter((item) => typeof item === "string")
-      : [];
+      usageResult.status === "fulfilled" && Array.isArray(usageResult.value)
+          ? usageResult.value.filter((item) => typeof item === "string")
+          : [];
 }
+
 function closeAddPanel() {
   addPanelOpen.value = false;
   addSettingsOpen.value = false;
   manageSavedLinks.value = false;
   linkEditorOpen.value = false;
 }
+
 async function toggleAddPanel() {
   if (addPanelOpen.value) {
     closeAddPanel();
@@ -2468,42 +2592,50 @@ async function toggleAddPanel() {
   await loadAddPanelData();
   addPanelOpen.value = true;
 }
+
 function toggleAddSettings() {
   addSettingsOpen.value = !addSettingsOpen.value;
 }
+
 function openLinkEditor() {
   linkEditorOpen.value = true;
   nextTick(() => addLinkInputRef.value?.focus?.());
 }
+
 function cancelLinkEdit() {
   linkDraft.value = "";
   linkEditorOpen.value = false;
 }
+
 function toggleSavedLinkManage() {
   manageSavedLinks.value = !manageSavedLinks.value;
   linkEditorOpen.value = false;
   linkDraft.value = "";
   addSettingsOpen.value = false;
 }
+
 async function refreshAddFiles() {
   await loadAddPanelData();
   addSettingsOpen.value = false;
   ElMessage.success("最近文件已刷新");
 }
+
 async function clearRecentUsage() {
   await apiAddPanelClearUsage();
   recentUsageKeys.value = [];
   addSettingsOpen.value = false;
   ElMessage.success("最近使用已清空");
 }
+
 async function removeSavedLink(item) {
   await apiAddPanelDeleteLink(item.id);
   savedLinks.value = savedLinks.value.filter((link) => link.id !== item.id);
   recentUsageKeys.value = recentUsageKeys.value.filter(
-    (key) => key !== item.key,
+      (key) => key !== item.key,
   );
   ElMessage.success("链接已删除");
 }
+
 async function rememberAddUsage(key) {
   recentUsageKeys.value = [
     key,
@@ -2511,6 +2643,7 @@ async function rememberAddUsage(key) {
   ].slice(0, 20);
   await apiAddPanelRememberUsage(key);
 }
+
 async function saveLink() {
   let url = "";
   try {
@@ -2536,6 +2669,7 @@ async function saveLink() {
   linkEditorOpen.value = false;
   ElMessage.success("链接已保存");
 }
+
 async function sendAddItem(item) {
   if (!ensureSessionSelected()) return;
   if (item.kind === "file") {
@@ -2543,7 +2677,7 @@ async function sendAddItem(item) {
       sessionId: current.value.id,
       contentType: 3,
       content: item.title,
-      extra: JSON.stringify({ url: item.url, size: item.size }),
+      extra: JSON.stringify({url: item.url, size: item.size}),
     });
   } else {
     await apiSendMessage({
@@ -2568,6 +2702,7 @@ async function sendAddItem(item) {
   }
   closeAddPanel();
 }
+
 function validateUpload(file, type) {
   if (!file) return false;
   if (type === "video") {
@@ -2582,6 +2717,7 @@ function validateUpload(file, type) {
   }
   return true;
 }
+
 async function sendImage(opt) {
   if (!ensureSessionSelected()) return;
   const fd = new FormData();
@@ -2591,9 +2727,10 @@ async function sendImage(opt) {
     sessionId: current.value.id,
     contentType: 2,
     content: f.url,
-    extra: JSON.stringify({ name: f.name, size: f.size }),
+    extra: JSON.stringify({name: f.name, size: f.size}),
   });
 }
+
 async function sendFile(opt) {
   if (!ensureSessionSelected()) return;
   const fd = new FormData();
@@ -2603,28 +2740,30 @@ async function sendFile(opt) {
     sessionId: current.value.id,
     contentType: 3,
     content: f.name,
-    extra: JSON.stringify({ url: f.url, size: f.size }),
+    extra: JSON.stringify({url: f.url, size: f.size}),
   });
 }
+
 async function sendVideo(opt) {
   if (!ensureSessionSelected() || !validateUpload(opt.file, "video")) return;
   const fd = new FormData();
   fd.append("file", opt.file);
-  const f = await apiUpload(fd, { timeout: 120000 });
+  const f = await apiUpload(fd, {timeout: 120000});
   await apiSendMessage({
     sessionId: current.value.id,
     contentType: 5,
     content: f.url,
-    extra: JSON.stringify({ name: f.name, size: f.size }),
+    extra: JSON.stringify({name: f.name, size: f.size}),
   });
 }
+
 async function recall(m) {
   await apiRecall(m.id);
 }
 
 // 消息表情反应
 async function toggleReaction(messageId, emoji) {
-  await apiToggleReaction({ messageId, emoji });
+  await apiToggleReaction({messageId, emoji});
   // 刷新消息列表获取最新反应
   if (current.value)
     messages.value = (await apiMessages(current.value.id)).map(hydrateMessage);
@@ -2635,51 +2774,61 @@ async function uploadAvatar(opt) {
   const fd = new FormData();
   fd.append("file", opt.file);
   const f = await apiUpload(fd);
-  const u = await apiUpdateProfile({ avatar: f.url });
+  const u = await apiUpdateProfile({avatar: f.url});
   userStore.setUser(u);
   ElMessage.success("头像已更新");
 }
+
 function normalizePresence(value) {
   if (value === 2 || value === "busy") return "busy";
   if (value === 3 || value === "away") return "away";
   if (value === 4 || value === "offline") return "offline";
   return "online";
 }
+
 function storedPresence(userId) {
   if (userId === user.value?.id)
     return normalizePresence(user.value?.chatStatus);
   return normalizePresence(contactMap.value.get(userId)?.chatStatus);
 }
+
 function presenceClass(userId) {
   return storedPresence(userId);
 }
+
 function presenceTextById(userId) {
   return presenceLabelMap[presenceClass(userId)] || "在线";
 }
+
 function presenceTagType(userId) {
   return (
-    { online: "success", busy: "danger", away: "warning", offline: "info" }[
-      presenceClass(userId)
-    ] || "success"
+      {online: "success", busy: "danger", away: "warning", offline: "info"}[
+          presenceClass(userId)
+          ] || "success"
   );
 }
+
 async function changeMyStatus(status) {
   const nextValue = presenceValueMap[status];
   if (!user.value || !nextValue || user.value.chatStatus === nextValue) return;
-  const updated = await apiUpdateProfile({ chatStatus: nextValue });
+  const updated = await apiUpdateProfile({chatStatus: nextValue});
   userStore.setUser(updated);
   ElMessage.success("状态已保存");
 }
+
 function quoteMsg(m) {
   quoteRef.value = m;
 }
+
 function toggleEmojiPanel() {
   emojiPanelOpen.value = !emojiPanelOpen.value;
 }
+
 function insertEmoji(e) {
   draft.value += e;
   nextTick(() => inputRef.value?.focus?.());
 }
+
 function handleGlobalClick(event) {
   if (emojiWrapRef.value && !emojiWrapRef.value.contains(event.target))
     emojiPanelOpen.value = false;
@@ -2692,9 +2841,9 @@ function onWsMessage(msg) {
   msg = hydrateMessage(msg);
   // 追踪 @我 的会话
   if (
-    msg.atUserIds &&
-    user.value &&
-    String(msg.atUserIds).split(",").includes(String(user.value.id))
+      msg.atUserIds &&
+      user.value &&
+      String(msg.atUserIds).split(",").includes(String(user.value.id))
   ) {
     atMeSessions.value.add(msg.sessionId);
     atMeSessions.value = new Set(atMeSessions.value);
@@ -2708,11 +2857,13 @@ function onWsMessage(msg) {
     }
     if (msg.senderId !== user.value?.id) {
       apiMarkRead(current.value.id);
-      apiReadReceipt(current.value.id, msg.id).catch(() => {});
+      apiReadReceipt(current.value.id, msg.id).catch(() => {
+      });
     }
   }
   refreshSessionMeta(msg);
 }
+
 function onWsReceipt(data) {
   if (!current.value || data.sessionId !== current.value.id) return;
   if (data.readerId === user.value?.id) return;
@@ -2728,31 +2879,34 @@ function onWsReceipt(data) {
     });
   }
 }
+
 function onWsOnline(data) {
   if (data.online) onlineSet.value.add(data.userId);
   else onlineSet.value.delete(data.userId);
   onlineSet.value = new Set(onlineSet.value);
 }
+
 async function refreshSessionMeta(msg) {
   const s = sessions.value.find((x) => x.id === msg.sessionId);
   if (s) {
     s.lastMsg = msg.status === 0 ? "[消息已撤回]" : previewMsg(msg);
     s.lastTime = msg.createTime;
     if (
-      (!current.value || current.value.id !== msg.sessionId) &&
-      msg.senderId !== user.value?.id
+        (!current.value || current.value.id !== msg.sessionId) &&
+        msg.senderId !== user.value?.id
     )
       s.unread = (s.unread || 0) + 1;
     sessions.value.sort(
-      (a, b) =>
-        (b.isTop || 0) - (a.isTop || 0) ||
-        new Date(b.lastTime) - new Date(a.lastTime),
+        (a, b) =>
+            (b.isTop || 0) - (a.isTop || 0) ||
+            new Date(b.lastTime) - new Date(a.lastTime),
     );
     collabStore.setMessageUnreadFromSessions(sessions.value);
   } else await loadSessions();
 }
 
 let searchTimer = null;
+
 function onSearchInput() {
   clearTimeout(searchTimer);
   if (!keyword.value.trim()) {
@@ -2762,7 +2916,7 @@ function onSearchInput() {
   searchTimer = setTimeout(async () => {
     searchMode.value = true;
     searchContacts.value = contacts.value.filter((u) =>
-      (u.nickname || "").includes(keyword.value),
+        (u.nickname || "").includes(keyword.value),
     );
     try {
       searchMsgs.value = await apiSearchMessages(keyword.value);
@@ -2771,6 +2925,7 @@ function onSearchInput() {
     }
   }, 300);
 }
+
 async function jumpToMessage(m) {
   const s = sessions.value.find((x) => x.id === m.sessionId);
   if (s) {
@@ -2780,41 +2935,50 @@ async function jumpToMessage(m) {
     await openSession(s);
   }
 }
+
 async function showReaders(msgId) {
   readersList.value = await apiMessageReaders(msgId);
   readersDialog.value = true;
 }
+
 async function toggleTop(s) {
   ctxMenu.visible = false;
   await apiToggleTop(s.id);
   await loadSessions();
 }
+
 async function toggleMute(s) {
   ctxMenu.visible = false;
   await apiToggleMute(s.id);
   await loadSessions();
 }
+
 async function toggleStar(s) {
   ctxMenu.visible = false;
   await apiToggleStar(s.id);
   await loadSessions();
 }
+
 function onSessionMenu(e, s) {
   ctxMenu.visible = true;
   ctxMenu.x = e.clientX;
   ctxMenu.y = e.clientY;
   ctxMenu.session = s;
 }
+
 function formatCounter(value) {
   return value > 99 ? "99+" : String(value);
 }
+
 function workNoticeCategoryText(notice) {
   return notice.category === "ding" ? "DING" : "邮箱";
 }
+
 function formatWorkNoticeTime(value) {
   if (!value) return "";
   return fmtTime(value);
 }
+
 function openWorkNotice(notice) {
   if (!notice?.route) return;
   router.push(notice.route);
@@ -2822,13 +2986,14 @@ function openWorkNotice(notice) {
 
 // AI 助手
 const aiSessionId = ref(null);
+
 async function openAiAssistant() {
   chatFilter.value = "ai";
   // 找或创建 AI 助手虚拟会话
   let aiSession = sessions.value.find((s) => s.name === "AI 助手");
   if (!aiSession) {
     // 创建一个群聊作为AI助手会话
-    const { apiCreateGroup } = await import("../api");
+    const {apiCreateGroup} = await import("../api");
     const sid = await apiCreateGroup({
       name: "AI 助手",
       memberIds: [user.value.id],
@@ -2843,33 +3008,89 @@ async function openAiAssistant() {
 }
 
 // 调用AI 助手
+// 调用AI 助手（SSE流式新版）
 async function sendWithAi() {
-    const content = draft.value.trim();
-    if (!content) return;
-    draft.value = "";
-    // 先显示用户消息
-    const userMsg = hydrateMessage({
-      id: Date.now(),
-      sessionId: current.value.id,
-      senderId: user.value.id,
-      senderName: user.value.nickname,
-      contentType: 1,
-      content,
-      status: 1,
-      createTime: new Date().toISOString(),
-    });
-    messages.value.push(userMsg);
-    scrollBottom();
-    // 调后端 AI 回复
-    try {
-      await apiAiReply({ sessionId: current.value.id, content });
-    } catch (e) {
-      console.error("AI 回复失败", e);
-    }
-    send();
+  const content = draft.value.trim();
+  if (!content) return;
+  // 防止重复请求
+  if (aiLoading.value || aiEventSource) {
+    ElMessage.warning("AI正在回复中，请稍等");
     return;
+  }
+
+  // 清空输入框
+  draft.value = "";
+  aiLoading.value = true;
+
+  // 1. 先把用户消息立刻渲染到聊天列表
+  const userMsg = hydrateMessage({
+    id: Date.now(),
+    sessionId: current.value.id,
+    senderId: user.value.id,
+    senderName: user.value.nickname,
+    contentType: 1,
+    content,
+    status: 1,
+    createTime: new Date().toISOString(),
+  });
+  messages.value.push(userMsg);
+  scrollBottom();
+
+  // 2. 建立SSE长连接接收AI分片
+  try {
+    aiEventSource = await apiCreateAiSse({
+      sessionId: current.value.id,
+      content: content
+    });
+
+    // 接收每一段流式返回的 MessageVO
+    aiEventSource.onmessage = (event) => {
+      try {
+        const vo = JSON.parse(event.data);
+        // 查找当前会话的AI消息气泡
+        const targetIndex = messages.value.findIndex(
+            m => m.id === vo.id && m.sessionId === current.value.id
+        );
+        if (targetIndex > -1) {
+          // 已有气泡，直接覆盖最新完整文本
+          messages.value[targetIndex] = vo;
+        } else {
+          // 首次分片，新增AI消息
+          messages.value.push(vo);
+        }
+        scrollBottom();
+      } catch (err) {
+        console.error("解析SSE消息失败", err);
+      }
+    };
+
+    // SSE 流正常结束（大模型输出完毕）
+    aiEventSource.onclose = () => {
+      closeAiSse();
+    };
+
+    // SSE 异常断开、报错
+    aiEventSource.onerror = (err) => {
+      console.error("AI SSE 连接异常", err);
+      closeAiSse();
+      // 避免重复弹窗
+      ElMessage.error("AI 流式连接中断，请重新提问");
+    };
+  } catch (error) {
+    console.error("AI SSE 连接失败", error);
+    closeAiSse();
+    ElMessage.error("AI 回复失败: " + error.message);
+  }
 }
 
+/** 统一关闭SSE、重置状态 */
+function closeAiSse() {
+  if (aiEventSource) {
+    aiEventSource.close();
+    aiEventSource = null;
+  }
+  aiLoading.value = false;
+}
 // 消息收藏
 async function favoriteMsg(m) {
   try {
@@ -2886,14 +3107,16 @@ async function favoriteMsg(m) {
 }
 
 function openGroupCreate() {
-  groupForm.value = { name: "", memberIds: [] };
+  groupForm.value = {name: "", memberIds: []};
   groupDialog.value = true;
   closeAddPanel();
 }
+
 function openContactFinder() {
   closeAddPanel();
   switchContacts();
 }
+
 async function createGroup() {
   const sid = await apiCreateGroup(groupForm.value);
   groupDialog.value = false;
@@ -2905,30 +3128,36 @@ async function createGroup() {
     await openSession(s);
   }
 }
+
 async function openGroupSetting() {
   settingDrawer.value = true;
   groupMembers.value = await apiGroupMembers(current.value.id);
   const info = await apiGroupInfo(current.value.id);
   groupNotice.value = info.notice || "";
 }
+
 async function saveNotice() {
   await apiUpdateNotice(current.value.id, groupNotice.value);
   ElMessage.success("公告已更新");
 }
+
 function openAddMember() {
   addMemberIds.value = [];
   addMemberDialog.value = true;
 }
+
 async function confirmAddMember() {
   await apiAddGroupMembers(current.value.id, addMemberIds.value);
   addMemberDialog.value = false;
   groupMembers.value = await apiGroupMembers(current.value.id);
 }
+
 async function kick(m) {
   await ElMessageBox.confirm(`移除 ${m.nickname}?`);
   await apiRemoveGroupMember(current.value.id, m.userId);
   groupMembers.value = await apiGroupMembers(current.value.id);
 }
+
 async function quit() {
   await ElMessageBox.confirm("退出群聊?");
   await apiQuitGroup(current.value.id);
@@ -2936,11 +3165,13 @@ async function quit() {
   current.value = null;
   await loadSessions();
 }
+
 async function openAt() {
   if (!groupMembers.value.length)
     groupMembers.value = await apiGroupMembers(current.value.id);
   atDialog.value = true;
 }
+
 function pickAt(m) {
   draft.value += `@${m.nickname} `;
   atUserSet.value.add(m.userId);
@@ -2957,6 +3188,7 @@ function logout() {
 function previewImg(url) {
   previewUrl.value = url;
 }
+
 function triggerDownload(url, name) {
   if (!url) return;
   const link = document.createElement("a");
@@ -2967,10 +3199,12 @@ function triggerDownload(url, name) {
   link.click();
   link.remove();
 }
+
 function downloadFile(m) {
   const e = parseExtra(m.extra);
   if (e.url) triggerDownload(e.url, m.content);
 }
+
 function parseExtra(extra) {
   try {
     return JSON.parse(extra || "{}");
@@ -2978,72 +3212,89 @@ function parseExtra(extra) {
     return {};
   }
 }
+
 function isDocumentShareMessage(m) {
   const extra = parseExtra(m?.extra);
   return m?.contentType === 3 && extra.source === "documents" && !!extra.fileId;
 }
+
 function hydrateMessage(msg) {
   if (!msg) return msg;
   const extra = parseExtra(msg.extra);
   if (extra.quoteId)
-    msg._quote = { senderName: extra.quoteSender, content: extra.quoteContent };
+    msg._quote = {senderName: extra.quoteSender, content: extra.quoteContent};
   if (msg.contentType === 6) msg._card = extra;
   return msg;
 }
+
 function documentMeta(m) {
   return parseExtra(m?.extra);
 }
+
 function documentBadgeMeta(m) {
   return fileBadgeMeta(documentTitle(m) || m?.content || "");
 }
+
 function documentTitle(m) {
   return m?.content || documentMeta(m).name || "协作文档";
 }
+
 function documentScene(m) {
   return documentMeta(m).scene || "通用协作";
 }
+
 function documentStatus(m) {
   return documentMeta(m).status || "可用";
 }
+
 function documentDesc(m) {
   return documentMeta(m).description || "点击查看文档详情";
 }
+
 function openDocumentMessage(m) {
   const meta = documentMeta(m);
   if (meta.fileId) {
-    router.push({ path: "/documents", query: { file: String(meta.fileId) } });
+    router.push({path: "/documents", query: {file: String(meta.fileId)}});
     return;
   }
   if (meta.url) triggerDownload(meta.url, documentTitle(m));
 }
+
 function downloadDocumentFile(m) {
   const meta = documentMeta(m);
   if (meta.url) triggerDownload(meta.url, documentTitle(m));
 }
+
 function cardMeta(m) {
   return m?._card || parseExtra(m?.extra);
 }
+
 function cardTypeText(m) {
   return cardMeta(m).kind === "app" ? "工作台应用" : "网页链接";
 }
+
 function cardTitle(m) {
   return cardMeta(m).title || m.content || "链接卡片";
 }
+
 function cardDesc(m) {
   const card = cardMeta(m);
   return card.kind === "app"
-    ? card.description || card.path || ""
-    : card.description || card.url || "";
+      ? card.description || card.path || ""
+      : card.description || card.url || "";
 }
+
 function cardBadgeText(m) {
   return cardMeta(m).badge || (cardMeta(m).kind === "app" ? "应" : "链");
 }
+
 function cardBadgeStyle(m) {
   return {
     background:
-      cardMeta(m).color || (cardMeta(m).kind === "app" ? "#1677ff" : "#13c2c2"),
+        cardMeta(m).color || (cardMeta(m).kind === "app" ? "#1677ff" : "#13c2c2"),
   };
 }
+
 function openCardMessage(m) {
   const card = cardMeta(m);
   if (card.kind === "app" && card.path) {
@@ -3056,31 +3307,34 @@ function openCardMessage(m) {
 function showTime(i) {
   if (i === 0) return true;
   return (
-    new Date(messages.value[i].createTime) -
+      new Date(messages.value[i].createTime) -
       new Date(messages.value[i - 1].createTime) >
-    5 * 60 * 1000
+      5 * 60 * 1000
   );
 }
+
 function recallText(m) {
   return (
-    (m.senderId === user.value?.id ? "你" : m.senderName || "对方") +
-    " 撤回了一条消息"
+      (m.senderId === user.value?.id ? "你" : m.senderName || "对方") +
+      " 撤回了一条消息"
   );
 }
+
 function renderText(text) {
   if (!text) return "";
   const esc = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
   return esc.replace(/(@\S+)/g, '<span class="at">$1</span>');
 }
+
 function previewMsg(msg) {
   if (msg.contentType === 2) return "[图片]";
   if (msg.contentType === 3)
     return isDocumentShareMessage(msg)
-      ? `[文档] ${documentTitle(msg)}`.trim()
-      : "[文件]";
+        ? `[文档] ${documentTitle(msg)}`.trim()
+        : "[文件]";
   if (msg.contentType === 5) return "[视频]";
   if (msg.contentType === 6) {
     const card = cardMeta(msg);
@@ -3088,12 +3342,13 @@ function previewMsg(msg) {
   }
   return msg.content;
 }
+
 function displayMessageContent(msg) {
   if (msg.contentType === 2) return "[图片]";
   if (msg.contentType === 3) {
     return isDocumentShareMessage(msg)
-      ? `[文档] ${documentTitle(msg)}`
-      : `[文件] ${parseExtra(msg.extra).name || msg.content || ""}`.trim();
+        ? `[文档] ${documentTitle(msg)}`
+        : `[文件] ${parseExtra(msg.extra).name || msg.content || ""}`.trim();
   }
   if (msg.contentType === 5)
     return `[视频] ${parseExtra(msg.extra).name || "视频消息"}`;
@@ -3103,15 +3358,18 @@ function displayMessageContent(msg) {
   }
   return msg.content || "";
 }
+
 function fmtSize(size) {
   if (!size) return "";
   if (size < 1024) return size + "B";
   if (size < 1048576) return (size / 1024).toFixed(1) + "KB";
   return (size / 1048576).toFixed(1) + "MB";
 }
+
 function firstChar(name) {
   return name ? name.charAt(0) : "?";
 }
+
 function avatarStyle(name) {
   const colors = [
     "#1677ff",
@@ -3130,24 +3388,27 @@ function avatarStyle(name) {
     fontWeight: 500,
   };
 }
+
 function fmtTime(t) {
   if (!t) return "";
   const d = new Date(t),
-    now = new Date();
+      now = new Date();
   const hh = String(d.getHours()).padStart(2, "0"),
-    mm = String(d.getMinutes()).padStart(2, "0");
+      mm = String(d.getMinutes()).padStart(2, "0");
   if (d.toDateString() === now.toDateString()) return `${hh}:${mm}`;
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
+
 function fmtFullTime(t) {
   if (!t) return "";
   const d = new Date(t),
-    now = new Date();
+      now = new Date();
   const hh = String(d.getHours()).padStart(2, "0"),
-    mm = String(d.getMinutes()).padStart(2, "0");
+      mm = String(d.getMinutes()).padStart(2, "0");
   if (d.toDateString() === now.toDateString()) return `${hh}:${mm}`;
   return `${d.getMonth() + 1}月${d.getDate()}日 ${hh}:${mm}`;
 }
+
 function scrollBottom() {
   nextTick(() => {
     if (bodyRef.value) bodyRef.value.scrollTop = bodyRef.value.scrollHeight;
@@ -3171,6 +3432,7 @@ function scrollBottom() {
   flex-direction: column;
   user-select: none;
 }
+
 .org-header {
   display: flex;
   align-items: center;
@@ -3179,10 +3441,12 @@ function scrollBottom() {
   cursor: pointer;
   border-bottom: 1px solid var(--dt-border);
 }
+
 .org-header :deep(.el-avatar) {
   border-radius: 6px;
   flex-shrink: 0;
 }
+
 .org-name {
   flex: 1;
   font-size: 12px;
@@ -3192,6 +3456,7 @@ function scrollBottom() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .org-header .el-icon {
   color: var(--dt-text-secondary);
 }
@@ -3201,9 +3466,11 @@ function scrollBottom() {
   overflow-y: auto;
   padding: 6px 0;
 }
+
 .nav-list::-webkit-scrollbar {
   width: 3px;
 }
+
 .nav-list::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
@@ -3220,14 +3487,17 @@ function scrollBottom() {
   transition: all 0.15s;
   position: relative;
 }
+
 .nav-row:hover {
   background: var(--dt-hover);
 }
+
 .nav-row.active {
   color: var(--dt-primary);
   font-weight: 600;
   background: var(--dt-active);
 }
+
 .nav-row.active::before {
   content: "";
   position: absolute;
@@ -3239,12 +3509,14 @@ function scrollBottom() {
   background: var(--dt-primary);
   border-radius: 0 3px 3px 0;
 }
+
 .nav-icon {
   width: 20px;
   text-align: center;
   font-size: 14px;
   flex-shrink: 0;
 }
+
 .nav-badge {
   margin-left: auto;
   min-width: 18px;
@@ -3257,6 +3529,7 @@ function scrollBottom() {
   font-size: 10px;
   padding: 0 5px;
 }
+
 .nav-sep {
   height: 1px;
   background: var(--dt-border);
@@ -3267,6 +3540,7 @@ function scrollBottom() {
   border-top: 1px solid var(--dt-border);
   padding: 4px 0;
 }
+
 .nav-logout {
   color: #f56c6c !important;
 }
@@ -3279,6 +3553,7 @@ function scrollBottom() {
   display: flex;
   flex-direction: column;
 }
+
 .gp-header {
   display: flex;
   align-items: center;
@@ -3287,12 +3562,14 @@ function scrollBottom() {
   font-size: 12px;
   color: var(--dt-text-secondary);
 }
+
 .gp-close {
   margin-left: auto;
   cursor: pointer;
   padding: 2px;
   border-radius: 4px;
 }
+
 .gp-close:hover {
   background: var(--dt-hover);
   color: var(--dt-primary);
@@ -3310,6 +3587,7 @@ function scrollBottom() {
   color: var(--dt-text-secondary);
   transition: all 0.2s;
 }
+
 .gp-toggle:hover {
   background: var(--dt-hover);
   color: var(--dt-primary);
@@ -3321,6 +3599,7 @@ function scrollBottom() {
   transition: all 0.2s ease;
   overflow: hidden;
 }
+
 .gp-slide-enter-from,
 .gp-slide-leave-to {
   width: 0 !important;
@@ -3328,17 +3607,20 @@ function scrollBottom() {
   padding: 0 !important;
   opacity: 0;
 }
+
 .gp-title {
   padding: 8px 12px 4px;
   font-size: 13px;
   font-weight: 600;
   color: var(--dt-text);
 }
+
 .gp-list {
   flex: 1;
   overflow-y: auto;
   padding: 2px 0;
 }
+
 .gp-item {
   padding: 7px 12px;
   font-size: 13px;
@@ -3350,15 +3632,18 @@ function scrollBottom() {
   gap: 4px;
   position: relative;
 }
+
 .gp-item:hover {
   background: var(--dt-hover);
   color: var(--dt-primary);
 }
+
 .gp-item.active {
   color: var(--dt-primary);
   font-weight: 600;
   background: var(--dt-active);
 }
+
 .gp-item.active::before {
   content: "";
   position: absolute;
@@ -3370,6 +3655,7 @@ function scrollBottom() {
   background: var(--dt-primary);
   border-radius: 0 3px 3px 0;
 }
+
 .gp-badge {
   margin-left: auto;
   min-width: 16px;
@@ -3391,6 +3677,7 @@ function scrollBottom() {
   display: flex;
   flex-direction: column;
 }
+
 .mid-header {
   padding: 12px;
   display: flex;
@@ -3398,11 +3685,13 @@ function scrollBottom() {
   gap: 8px;
   border-bottom: 1px solid var(--dt-border);
 }
+
 .search-input :deep(.el-input__wrapper) {
   background: var(--dt-hover);
   box-shadow: none;
   border-radius: 8px;
 }
+
 .add-btn {
   background: var(--dt-hover);
   border: none;
@@ -3410,9 +3699,11 @@ function scrollBottom() {
   width: 32px;
   height: 32px;
 }
+
 .add-entry {
   position: relative;
 }
+
 .add-panel {
   position: absolute;
   top: 44px;
@@ -3427,27 +3718,32 @@ function scrollBottom() {
   z-index: 200;
   backdrop-filter: blur(18px);
 }
+
 .add-panel-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
+
 .add-panel-title {
   font-size: 26px;
   line-height: 1.2;
   font-weight: 700;
   color: var(--dt-text);
 }
+
 .add-panel-subtitle {
   font-size: 16px;
   color: #a8adb7;
   margin-top: 8px;
 }
+
 .add-panel-toolbox {
   position: relative;
   flex-shrink: 0;
 }
+
 .add-panel-settings {
   height: auto;
   border: none;
@@ -3462,11 +3758,13 @@ function scrollBottom() {
   align-items: center;
   line-height: 1.2;
 }
+
 .add-panel-settings:hover,
 .add-panel-settings.active {
   background: transparent;
   color: #5f6672;
 }
+
 .add-settings-menu {
   position: absolute;
   top: 34px;
@@ -3480,39 +3778,48 @@ function scrollBottom() {
   z-index: 4;
   backdrop-filter: blur(18px);
 }
+
 .add-settings-group {
   padding: 6px;
   border-radius: 16px;
   background: #f7f8fb;
   border: 1px solid #edf0f4;
 }
+
 .add-settings-group + .add-settings-group {
   margin-top: 8px;
 }
+
 .dark .add-settings-group {
   background: rgba(255, 255, 255, 0.03);
   border-color: rgba(255, 255, 255, 0.08);
 }
+
 .add-settings-label {
   padding: 5px 8px 8px;
   font-size: 11px;
   line-height: 1;
   color: #a7abb2;
 }
+
 .add-settings-card {
   border-radius: 14px;
   overflow: hidden;
   background: transparent;
 }
+
 .dark .add-settings-card {
   background: rgba(255, 255, 255, 0.03);
 }
+
 .add-settings-card .add-settings-item + .add-settings-item {
   border-top: 1px solid #edf0f4;
 }
+
 .dark .add-settings-card .add-settings-item + .add-settings-item {
   border-top-color: rgba(255, 255, 255, 0.06);
 }
+
 .add-settings-item {
   width: 100%;
   min-height: 54px;
@@ -3526,30 +3833,35 @@ function scrollBottom() {
   display: flex;
   align-items: center;
   gap: 10px;
-  transition:
-    background 0.16s ease,
-    box-shadow 0.16s ease;
+  transition: background 0.16s ease,
+  box-shadow 0.16s ease;
 }
+
 .add-settings-item:hover {
   background: #fff;
   box-shadow: inset 0 0 0 1px #eef2f6;
 }
+
 .dark .add-settings-item:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+
 .add-settings-item:hover .add-settings-item-arrow {
   opacity: 1;
   transform: translateX(1px);
 }
+
 .add-settings-item:hover .add-settings-item-icon {
   transform: scale(1.03);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
+
 .add-settings-item-main {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
+
 .add-settings-item-icon {
   width: 30px;
   height: 30px;
@@ -3558,33 +3870,38 @@ function scrollBottom() {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease;
+  transition: transform 0.16s ease,
+  box-shadow 0.16s ease;
 }
+
 .add-settings-item-icon.theme-link {
   background: rgba(64, 158, 255, 0.12);
   color: #409eff;
 }
+
 .add-settings-item-icon.theme-refresh {
   background: rgba(82, 196, 26, 0.12);
   color: #52c41a;
 }
+
 .add-settings-item-icon.theme-danger {
   background: rgba(245, 108, 108, 0.12);
   color: #f56c6c;
 }
+
 .add-settings-item-title {
   font-size: 13px;
   color: var(--dt-text);
   line-height: 1.3;
   font-weight: 500;
 }
+
 .add-settings-item-desc {
   font-size: 11px;
   color: #a7abb2;
   line-height: 1.35;
 }
+
 .add-settings-item-meta {
   margin-left: auto;
   font-size: 11px;
@@ -3592,24 +3909,28 @@ function scrollBottom() {
   white-space: nowrap;
   padding-left: 8px;
 }
+
 .add-settings-item-arrow {
   color: #b7bdc6;
   opacity: 0.58;
   flex-shrink: 0;
-  transition:
-    transform 0.16s ease,
-    opacity 0.16s ease;
+  transition: transform 0.16s ease,
+  opacity 0.16s ease;
 }
+
 .add-settings-item.danger {
   color: #f56c6c;
 }
+
 .add-settings-item.danger .add-settings-item-title {
   color: #f56c6c;
 }
+
 .add-settings-item:disabled {
   color: #c0c4cc;
   cursor: not-allowed;
 }
+
 .add-settings-item:disabled .add-settings-item-title,
 .add-settings-item:disabled .add-settings-item-desc,
 .add-settings-item:disabled .add-settings-item-meta,
@@ -3617,15 +3938,18 @@ function scrollBottom() {
   color: #c0c4cc;
   opacity: 0.72;
 }
+
 .add-settings-item:disabled .add-settings-item-icon {
   background: rgba(192, 196, 204, 0.18);
   color: #c0c4cc;
   box-shadow: none;
 }
+
 .add-settings-item:disabled:hover {
   background: transparent;
   transform: none;
 }
+
 .add-link-box {
   margin-top: 28px;
   border: 1px solid #dcdfe5;
@@ -3633,10 +3957,12 @@ function scrollBottom() {
   background: #fff;
   overflow: hidden;
 }
+
 .dark .add-link-box {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.12);
 }
+
 .add-link-trigger {
   width: 100%;
   height: 64px;
@@ -3648,24 +3974,29 @@ function scrollBottom() {
   font-weight: 600;
   text-align: center;
 }
+
 .add-link-trigger:hover {
   background: rgba(15, 23, 42, 0.03);
 }
+
 .add-link-editor {
   padding: 14px;
 }
+
 .add-link-input :deep(.el-input__wrapper) {
   border-radius: 12px;
   box-shadow: none;
   background: #f7f8fb;
   min-height: 44px;
 }
+
 .add-link-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 12px;
 }
+
 .add-link-cancel,
 .add-link-save {
   height: 34px;
@@ -3675,14 +4006,17 @@ function scrollBottom() {
   font-size: 14px;
   cursor: pointer;
 }
+
 .add-link-cancel {
   background: var(--dt-hover);
   color: var(--dt-text-secondary);
 }
+
 .add-link-save {
   background: var(--dt-primary);
   color: #fff;
 }
+
 .add-panel-section {
   font-size: 17px;
   font-weight: 600;
@@ -3692,26 +4026,32 @@ function scrollBottom() {
   align-items: center;
   justify-content: space-between;
 }
+
 .add-panel-count {
   font-size: 13px;
   color: #a7abb2;
   font-weight: 500;
 }
+
 .add-panel-list {
   max-height: 436px;
   overflow-y: auto;
   padding-right: 4px;
 }
+
 .add-panel-list::-webkit-scrollbar {
   width: 8px;
 }
+
 .add-panel-list::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .add-panel-list::-webkit-scrollbar-thumb {
   background: rgba(15, 23, 42, 0.12);
   border-radius: 999px;
 }
+
 .add-panel-item {
   display: flex;
   align-items: center;
@@ -3720,12 +4060,15 @@ function scrollBottom() {
   border-radius: 18px;
   transition: background 0.16s ease;
 }
+
 .add-panel-item.compact {
   min-height: 74px;
 }
+
 .add-panel-item:hover {
   background: rgba(15, 23, 42, 0.04);
 }
+
 .add-item-badge {
   width: 42px;
   height: 42px;
@@ -3738,6 +4081,7 @@ function scrollBottom() {
   justify-content: center;
   flex-shrink: 0;
 }
+
 .add-tile-icon {
   position: relative;
   width: 36px;
@@ -3748,9 +4092,11 @@ function scrollBottom() {
   justify-content: center;
   overflow: hidden;
 }
+
 .add-tile-icon.theme-stack {
   background: linear-gradient(180deg, #d5e9ff 0%, #bfe0ff 100%);
 }
+
 .add-tile-icon.theme-stack::before,
 .add-tile-icon.theme-stack::after,
 .add-tile-stack {
@@ -3762,25 +4108,30 @@ function scrollBottom() {
   background: #2b8cff;
   transform: rotate(-45deg) skewX(-10deg);
 }
+
 .add-tile-icon.theme-stack::before {
   top: 8px;
   left: 10px;
   opacity: 0.45;
 }
+
 .add-tile-icon.theme-stack::after {
   top: 12px;
   left: 10px;
   opacity: 0.75;
 }
+
 .add-tile-stack {
   top: 16px;
   left: 10px;
 }
+
 .add-tile-icon.theme-code {
   background: linear-gradient(135deg, #5ad7f1 0%, #28b4e2 100%);
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
+
 .add-tile-glyph {
   position: relative;
   z-index: 1;
@@ -3789,6 +4140,7 @@ function scrollBottom() {
   font-weight: 700;
   letter-spacing: 0;
 }
+
 .add-file-icon {
   position: relative;
   width: 34px;
@@ -3802,6 +4154,7 @@ function scrollBottom() {
   --file-border: #e8ebf2;
   --file-tint: rgba(144, 147, 153, 0.08);
 }
+
 .add-file-icon::after {
   content: "";
   position: absolute;
@@ -3811,20 +4164,23 @@ function scrollBottom() {
   width: 3px;
   background: var(--file-accent);
 }
+
 .add-file-icon::before {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    180deg,
-    var(--file-tint) 0%,
-    rgba(255, 255, 255, 0) 38%
+      180deg,
+      var(--file-tint) 0%,
+      rgba(255, 255, 255, 0) 38%
   );
 }
+
 .dark .add-file-icon {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.96);
 }
+
 .add-file-fold {
   position: absolute;
   top: 0;
@@ -3832,12 +4188,13 @@ function scrollBottom() {
   width: 11px;
   height: 11px;
   background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0) 46%,
-    rgba(0, 0, 0, 0.08) 47%,
-    #f4f7fb 48%
+      135deg,
+      rgba(255, 255, 255, 0) 46%,
+      rgba(0, 0, 0, 0.08) 47%,
+      #f4f7fb 48%
   );
 }
+
 .add-file-lines {
   position: absolute;
   left: 11px;
@@ -3845,11 +4202,11 @@ function scrollBottom() {
   width: 16px;
   height: 12px;
   border-radius: 4px;
-  background:
-    linear-gradient(#c9d2de, #c9d2de) 0 0 / 100% 2px no-repeat,
-    linear-gradient(#dbe2ec, #dbe2ec) 0 5px / 78% 2px no-repeat,
-    linear-gradient(#e6ebf2, #e6ebf2) 0 10px / 92% 2px no-repeat;
+  background: linear-gradient(#c9d2de, #c9d2de) 0 0 / 100% 2px no-repeat,
+  linear-gradient(#dbe2ec, #dbe2ec) 0 5px / 78% 2px no-repeat,
+  linear-gradient(#e6ebf2, #e6ebf2) 0 10px / 92% 2px no-repeat;
 }
+
 .add-file-type {
   position: absolute;
   left: 4px;
@@ -3867,43 +4224,52 @@ function scrollBottom() {
   letter-spacing: 0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
+
 .add-file-icon.theme-pdf {
   --file-accent: #f56c6c;
   --file-border: #f3d5d8;
   --file-tint: rgba(245, 108, 108, 0.16);
 }
+
 .add-file-icon.theme-word {
   --file-accent: #1677ff;
   --file-border: #d5e3ff;
   --file-tint: rgba(22, 119, 255, 0.16);
 }
+
 .add-file-icon.theme-excel {
   --file-accent: #52c41a;
   --file-border: #d6efc9;
   --file-tint: rgba(82, 196, 26, 0.16);
 }
+
 .add-file-icon.theme-ppt {
   --file-accent: #fa8c16;
   --file-border: #f5dfc6;
   --file-tint: rgba(250, 140, 22, 0.18);
 }
+
 .add-file-icon.theme-zip {
   --file-accent: #13c2c2;
   --file-border: #ccefee;
   --file-tint: rgba(19, 194, 194, 0.16);
 }
+
 .add-file-icon.theme-generic {
   --file-accent: #909399;
   --file-border: #e1e4ea;
   --file-tint: rgba(144, 147, 153, 0.14);
 }
+
 .add-file-icon .add-file-type {
   background: var(--file-accent);
 }
+
 .add-item-main {
   min-width: 0;
   flex: 1;
 }
+
 .add-item-title {
   font-size: 18px;
   font-weight: 500;
@@ -3912,6 +4278,7 @@ function scrollBottom() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .add-item-desc {
   margin-top: 4px;
   font-size: 13px;
@@ -3920,6 +4287,7 @@ function scrollBottom() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .add-item-action {
   border: none;
   background: transparent;
@@ -3930,22 +4298,27 @@ function scrollBottom() {
   padding: 4px 2px;
   flex-shrink: 0;
 }
+
 .add-item-action:hover {
   color: #606873;
   opacity: 1;
 }
+
 .add-item-actions {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
 }
+
 .add-item-action.ghost {
   color: var(--dt-text-secondary);
 }
+
 .add-item-action.delete {
   color: #f56c6c;
 }
+
 .add-panel-footer {
   margin-top: 16px;
   padding-top: 14px;
@@ -3955,9 +4328,11 @@ function scrollBottom() {
   justify-content: center;
   gap: 12px;
 }
+
 .dark .add-panel-footer {
   border-top-color: rgba(255, 255, 255, 0.08);
 }
+
 .add-footer-btn {
   border: none;
   background: transparent;
@@ -3966,18 +4341,22 @@ function scrollBottom() {
   font-size: 13px;
   padding: 2px 4px;
 }
+
 .add-footer-btn:hover {
   color: var(--dt-primary);
 }
+
 .add-footer-sep {
   width: 1px;
   height: 12px;
   background: var(--dt-border);
 }
+
 .list {
   flex: 1;
   overflow-y: auto;
 }
+
 .contact-section {
   padding: 14px 16px 6px;
   font-size: 12px;
@@ -3994,22 +4373,27 @@ function scrollBottom() {
   border-left: 3px solid transparent;
   position: relative;
 }
+
 .session-item:hover {
   background: var(--dt-hover);
 }
+
 .session-item.active {
   background: var(--dt-active);
   border-left-color: var(--dt-primary);
 }
+
 .session-item.topped {
   background: rgba(22, 119, 255, 0.03);
 }
+
 .pin-icon {
   position: absolute;
   top: 6px;
   right: 8px;
   color: var(--dt-primary);
 }
+
 .mute-icon {
   position: absolute;
   bottom: 6px;
@@ -4017,12 +4401,14 @@ function scrollBottom() {
   font-size: 10px;
   opacity: 0.6;
 }
+
 .star-icon {
   position: absolute;
   top: 6px;
   right: 24px;
   font-size: 10px;
 }
+
 .sess-badge :deep(.el-avatar) {
   border-radius: 9px;
 }
@@ -4031,10 +4417,12 @@ function scrollBottom() {
   position: relative;
   display: inline-block;
 }
+
 .avatar-wrap-sm {
   position: relative;
   display: inline-block;
 }
+
 .user-online {
   position: absolute;
   right: -1px;
@@ -4045,6 +4433,7 @@ function scrollBottom() {
   border: 2px solid var(--dt-list-bg);
   border-radius: 50%;
 }
+
 .user-online-sm {
   position: absolute;
   right: -1px;
@@ -4055,14 +4444,17 @@ function scrollBottom() {
   border: 2px solid var(--dt-list-bg);
   border-radius: 50%;
 }
+
 .user-online.busy,
 .user-online-sm.busy {
   background: #fa541c;
 }
+
 .user-online.away,
 .user-online-sm.away {
   background: #faad14;
 }
+
 .user-online.offline,
 .user-online-sm.offline {
   background: #bfbfbf;
@@ -4072,11 +4464,13 @@ function scrollBottom() {
   flex: 1;
   min-width: 0;
 }
+
 .line1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .name {
   font-size: 14px;
   color: var(--dt-text);
@@ -4086,11 +4480,13 @@ function scrollBottom() {
   white-space: nowrap;
   max-width: 140px;
 }
+
 .time {
   font-size: 11px;
   color: #bbb;
   flex-shrink: 0;
 }
+
 .line2 {
   font-size: 12px;
   color: var(--dt-text-secondary);
@@ -4102,6 +4498,7 @@ function scrollBottom() {
   align-items: center;
   gap: 4px;
 }
+
 .group-label {
   transform: scale(0.85);
   transform-origin: left center;
@@ -4111,18 +4508,21 @@ function scrollBottom() {
 .work-grid {
   padding: 16px;
 }
+
 .grid-title {
   font-size: 14px;
   font-weight: 600;
   color: var(--dt-text-secondary);
   margin-bottom: 14px;
 }
+
 .work-summary-row {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
   margin-bottom: 14px;
 }
+
 .work-summary-card {
   border: 1px solid var(--dt-border);
   background: var(--dt-bg);
@@ -4130,41 +4530,46 @@ function scrollBottom() {
   padding: 14px;
   text-align: left;
   cursor: pointer;
-  transition:
-    border-color 0.18s,
-    transform 0.18s,
-    box-shadow 0.18s;
+  transition: border-color 0.18s,
+  transform 0.18s,
+  box-shadow 0.18s;
 }
+
 .work-summary-card:hover {
   border-color: rgba(22, 119, 255, 0.3);
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
+
 .work-summary-card.mailbox {
   background: linear-gradient(
-    180deg,
-    rgba(95, 108, 248, 0.08) 0%,
-    var(--dt-bg) 100%
+      180deg,
+      rgba(95, 108, 248, 0.08) 0%,
+      var(--dt-bg) 100%
   );
 }
+
 .work-summary-card.ding {
   background: linear-gradient(
-    180deg,
-    rgba(255, 159, 26, 0.1) 0%,
-    var(--dt-bg) 100%
+      180deg,
+      rgba(255, 159, 26, 0.1) 0%,
+      var(--dt-bg) 100%
   );
 }
+
 .work-summary-card.feed {
   background: linear-gradient(
-    180deg,
-    rgba(22, 119, 255, 0.08) 0%,
-    var(--dt-bg) 100%
+      180deg,
+      rgba(22, 119, 255, 0.08) 0%,
+      var(--dt-bg) 100%
   );
 }
+
 .work-summary-label {
   font-size: 12px;
   color: var(--dt-text-secondary);
 }
+
 .work-summary-value {
   margin-top: 8px;
   font-size: 28px;
@@ -4172,6 +4577,7 @@ function scrollBottom() {
   font-weight: 700;
   color: var(--dt-text);
 }
+
 .work-summary-title {
   margin-top: 8px;
   font-size: 15px;
@@ -4179,17 +4585,20 @@ function scrollBottom() {
   font-weight: 600;
   color: var(--dt-text);
 }
+
 .work-summary-desc {
   margin-top: 8px;
   font-size: 12px;
   line-height: 1.6;
   color: var(--dt-text-secondary);
 }
+
 .app-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
+
 .app-card {
   display: flex;
   flex-direction: column;
@@ -4200,12 +4609,15 @@ function scrollBottom() {
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .app-card:hover {
   background: var(--dt-hover);
 }
+
 .app-icon-wrap {
   position: relative;
 }
+
 .app-icon {
   width: 44px;
   height: 44px;
@@ -4215,10 +4627,12 @@ function scrollBottom() {
   justify-content: center;
   font-size: 22px;
 }
+
 .app-card span {
   font-size: 12px;
   color: var(--dt-text-secondary);
 }
+
 .app-badge {
   position: absolute;
   top: -6px;
@@ -4234,6 +4648,7 @@ function scrollBottom() {
   text-align: center;
   box-shadow: 0 2px 6px rgba(245, 108, 108, 0.35);
 }
+
 .work-feed-card {
   margin-top: 14px;
   border-radius: 12px;
@@ -4241,6 +4656,7 @@ function scrollBottom() {
   background: var(--dt-bg);
   overflow: hidden;
 }
+
 .work-feed-head {
   display: flex;
   align-items: center;
@@ -4250,17 +4666,20 @@ function scrollBottom() {
   font-weight: 600;
   color: var(--dt-text);
 }
+
 .work-feed-meta {
   font-size: 12px;
   color: var(--dt-text-secondary);
   font-weight: 400;
 }
+
 .work-feed-list {
   display: flex;
   flex-direction: column;
   padding: 0 10px 10px;
   gap: 8px;
 }
+
 .work-feed-item {
   width: 100%;
   border: none;
@@ -4273,9 +4692,11 @@ function scrollBottom() {
   cursor: pointer;
   text-align: left;
 }
+
 .work-feed-item:hover {
   background: var(--dt-hover);
 }
+
 .work-feed-badge {
   min-width: 42px;
   height: 24px;
@@ -4287,36 +4708,43 @@ function scrollBottom() {
   font-weight: 600;
   flex-shrink: 0;
 }
+
 .work-feed-badge.mailbox {
   background: rgba(95, 108, 248, 0.12);
   color: #5f6cf8;
 }
+
 .work-feed-badge.ding {
   background: rgba(255, 159, 26, 0.16);
   color: #d97706;
 }
+
 .work-feed-main {
   min-width: 0;
   flex: 1;
 }
+
 .work-feed-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--dt-text);
   line-height: 1.5;
 }
+
 .work-feed-desc {
   margin-top: 4px;
   font-size: 12px;
   color: var(--dt-text-secondary);
   line-height: 1.6;
 }
+
 .work-feed-time {
   font-size: 11px;
   color: var(--dt-text-secondary);
   flex-shrink: 0;
   padding-top: 2px;
 }
+
 .work-feed-empty {
   padding: 0 16px 16px;
   font-size: 12px;
@@ -4330,6 +4758,7 @@ function scrollBottom() {
   flex-direction: column;
   background: var(--dt-chat-bg);
 }
+
 .chat-header {
   height: 58px;
   background: var(--dt-bg);
@@ -4339,6 +4768,7 @@ function scrollBottom() {
   justify-content: space-between;
   padding: 0 22px;
 }
+
 .ch-title {
   font-size: 16px;
   font-weight: 600;
@@ -4347,45 +4777,54 @@ function scrollBottom() {
   align-items: center;
   gap: 8px;
 }
+
 .ch-count {
   color: var(--dt-text-secondary);
   font-size: 13px;
   font-weight: 400;
 }
+
 .status-tag {
   font-size: 11px;
   padding: 1px 8px;
   border-radius: 10px;
   font-weight: 400;
 }
+
 .status-tag.online {
   background: #f6ffed;
   color: #52c41a;
   border: 1px solid #b7eb8f;
 }
+
 .status-tag.busy {
   background: #fff2f0;
   color: #fa541c;
   border: 1px solid #ffbb96;
 }
+
 .status-tag.away {
   background: #fffbe6;
   color: #faad14;
   border: 1px solid #ffe58f;
 }
+
 .status-tag.offline {
   background: #f5f5f5;
   color: #999;
   border: 1px solid #d9d9d9;
 }
+
 .ch-actions {
   display: flex;
   gap: 18px;
   color: var(--dt-text-secondary);
 }
+
 .ch-actions .el-icon {
   cursor: pointer;
 }
+
 .ch-actions .el-icon:hover {
   color: var(--dt-primary);
 }
@@ -4395,10 +4834,12 @@ function scrollBottom() {
   overflow-y: auto;
   padding: 20px 24px;
 }
+
 .time-divider {
   text-align: center;
   margin: 14px 0;
 }
+
 .time-divider span {
   font-size: 12px;
   color: #b0b3b8;
@@ -4406,6 +4847,7 @@ function scrollBottom() {
   padding: 2px 10px;
   border-radius: 10px;
 }
+
 .sys-msg {
   text-align: center;
   font-size: 12px;
@@ -4418,21 +4860,26 @@ function scrollBottom() {
   gap: 12px;
   margin-bottom: 16px;
 }
+
 .msg-row :deep(.el-avatar) {
   border-radius: 9px;
   flex-shrink: 0;
 }
+
 .msg-row.mine {
   flex-direction: row-reverse;
 }
+
 .msg-content {
   max-width: 56%;
 }
+
 .msg-sender {
   font-size: 12px;
   color: var(--dt-text-secondary);
   margin-bottom: 5px;
 }
+
 .quote-block {
   background: rgba(0, 0, 0, 0.04);
   border-left: 3px solid var(--dt-primary);
@@ -4442,18 +4889,22 @@ function scrollBottom() {
   font-size: 12px;
   color: var(--dt-text-secondary);
 }
+
 .q-name {
   color: var(--dt-primary);
 }
+
 .bubble-wrap {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: 8px;
 }
+
 .msg-row.mine .bubble-wrap {
   flex-direction: row-reverse;
 }
+
 .bubble {
   padding: 10px 14px;
   background: var(--dt-bubble-other);
@@ -4464,16 +4915,20 @@ function scrollBottom() {
   word-break: break-word;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
+
 .bubble :deep(.at) {
   color: #1677ff;
 }
+
 .msg-row.mine .bubble {
   background: var(--dt-bubble-me);
   color: #fff;
 }
+
 .img-bubble {
   padding: 4px;
 }
+
 .img-bubble img {
   max-width: 200px;
   max-height: 200px;
@@ -4481,6 +4936,7 @@ function scrollBottom() {
   display: block;
   cursor: pointer;
 }
+
 .file-bubble {
   display: flex;
   align-items: center;
@@ -4488,6 +4944,7 @@ function scrollBottom() {
   min-width: 200px;
   cursor: pointer;
 }
+
 .doc-card-bubble {
   min-width: 250px;
   max-width: 340px;
@@ -4500,16 +4957,19 @@ function scrollBottom() {
   border: 1px solid rgba(0, 0, 0, 0.06);
   padding: 12px 14px;
 }
+
 .msg-row.mine .doc-card-bubble {
   background: #fff;
   color: var(--dt-text);
 }
+
 .doc-card-head {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
 }
+
 .doc-card-icon {
   width: 42px;
   height: 42px;
@@ -4522,34 +4982,43 @@ function scrollBottom() {
   font-weight: 700;
   font-size: 11px;
 }
+
 .doc-card-icon.theme-pdf {
   background: linear-gradient(135deg, #ff7875, #cf1322);
 }
+
 .doc-card-icon.theme-word {
   background: linear-gradient(135deg, #69b1ff, #1d39c4);
 }
+
 .doc-card-icon.theme-excel {
   background: linear-gradient(135deg, #95de64, #237804);
 }
+
 .doc-card-icon.theme-ppt {
   background: linear-gradient(135deg, #ffbb96, #d46b08);
 }
+
 .doc-card-icon.theme-zip {
   background: linear-gradient(135deg, #d3adf7, #722ed1);
 }
+
 .doc-card-icon.theme-generic,
 .doc-card-icon.theme-stack,
 .doc-card-icon.theme-code {
   background: linear-gradient(135deg, #91a1b7, #475467);
 }
+
 .doc-card-title-wrap {
   min-width: 0;
   flex: 1;
 }
+
 .doc-card-type {
   font-size: 11px;
   color: var(--dt-text-secondary);
 }
+
 .doc-card-title {
   margin-top: 3px;
   font-size: 14px;
@@ -4559,6 +5028,7 @@ function scrollBottom() {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .doc-card-status {
   flex-shrink: 0;
   padding: 3px 8px;
@@ -4567,17 +5037,20 @@ function scrollBottom() {
   font-size: 11px;
   color: #475467;
 }
+
 .doc-card-desc {
   font-size: 12px;
   color: #667085;
   line-height: 1.6;
 }
+
 .doc-card-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
+
 .doc-card-meta {
   display: flex;
   flex-wrap: wrap;
@@ -4585,6 +5058,7 @@ function scrollBottom() {
   font-size: 11px;
   color: #98a2b3;
 }
+
 .doc-card-action {
   height: 28px;
   padding: 0 12px;
@@ -4596,10 +5070,12 @@ function scrollBottom() {
   cursor: pointer;
   transition: all 0.18s;
 }
+
 .doc-card-action:hover {
   border-color: #bcd4ff;
   color: #1677ff;
 }
+
 .link-card-bubble {
   min-width: 240px;
   max-width: 320px;
@@ -4611,10 +5087,12 @@ function scrollBottom() {
   color: var(--dt-text);
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
+
 .msg-row.mine .link-card-bubble {
   background: #fff;
   color: var(--dt-text);
 }
+
 .card-badge {
   width: 40px;
   height: 40px;
@@ -4627,14 +5105,17 @@ function scrollBottom() {
   justify-content: center;
   flex-shrink: 0;
 }
+
 .card-main {
   min-width: 0;
   flex: 1;
 }
+
 .card-type {
   font-size: 11px;
   color: var(--dt-text-secondary);
 }
+
 .card-title {
   margin-top: 3px;
   font-size: 14px;
@@ -4644,6 +5125,7 @@ function scrollBottom() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .card-desc {
   margin-top: 4px;
   font-size: 12px;
@@ -4652,15 +5134,18 @@ function scrollBottom() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .card-arrow {
   color: #b7b7b7;
   flex-shrink: 0;
 }
+
 .msg-actions {
   display: flex;
   gap: 4px;
   font-size: 11px;
 }
+
 .msg-actions span {
   color: #999;
   cursor: pointer;
@@ -4669,9 +5154,11 @@ function scrollBottom() {
   border-radius: 4px;
   white-space: nowrap;
 }
+
 .msg-actions span:hover {
   color: var(--dt-primary);
 }
+
 .read-status {
   font-size: 11px;
   color: #bbb;
@@ -4690,6 +5177,7 @@ function scrollBottom() {
   color: var(--dt-text-secondary);
   border-top: 1px solid var(--dt-border);
 }
+
 .quote-bar .el-icon {
   cursor: pointer;
 }
@@ -4699,6 +5187,7 @@ function scrollBottom() {
   border-top: 1px solid var(--dt-border);
   padding: 0 18px 14px;
 }
+
 .input-toolbar {
   display: flex;
   gap: 18px;
@@ -4706,9 +5195,11 @@ function scrollBottom() {
   color: var(--dt-text-secondary);
   align-items: center;
 }
+
 .toolbar-emoji {
   position: relative;
 }
+
 .toolbar-btn {
   width: 28px;
   height: 28px;
@@ -4722,11 +5213,13 @@ function scrollBottom() {
   padding: 0;
   cursor: pointer;
 }
+
 .toolbar-btn:hover,
 .toolbar-btn.active {
   background: var(--dt-hover);
   color: var(--dt-primary);
 }
+
 .emoji-pop {
   position: absolute;
   left: 0;
@@ -4739,17 +5232,20 @@ function scrollBottom() {
   padding: 12px;
   z-index: 160;
 }
+
 .emoji-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
+
 .emoji-panel-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--dt-text);
 }
+
 .emoji-close {
   width: 24px;
   height: 24px;
@@ -4763,28 +5259,34 @@ function scrollBottom() {
   cursor: pointer;
   padding: 0;
 }
+
 .emoji-close:hover {
   background: var(--dt-hover);
   color: var(--dt-primary);
 }
+
 .input-toolbar .el-icon {
   cursor: pointer;
 }
+
 .input-toolbar .el-icon:hover {
   color: var(--dt-primary);
 }
+
 .msg-textarea :deep(.el-textarea__inner) {
   box-shadow: none;
   resize: none;
   padding: 4px 2px;
   font-size: 14px;
 }
+
 .input-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 6px;
 }
+
 .foot-tip {
   font-size: 12px;
   color: #c0c4cc;
@@ -4794,6 +5296,7 @@ function scrollBottom() {
 .emoji-panel {
   max-height: 320px;
 }
+
 .emoji-tabs {
   display: flex;
   gap: 2px;
@@ -4801,23 +5304,28 @@ function scrollBottom() {
   padding-bottom: 6px;
   margin-bottom: 6px;
 }
+
 .emoji-tab {
   font-size: 18px;
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 6px;
 }
+
 .emoji-tab:hover {
   background: var(--dt-hover);
 }
+
 .emoji-tab.active {
   background: var(--dt-active);
 }
+
 .emoji-tab-title {
   font-size: 12px;
   color: var(--dt-text-secondary);
   margin-bottom: 6px;
 }
+
 .emoji-grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -4825,10 +5333,12 @@ function scrollBottom() {
   max-height: 200px;
   overflow-y: auto;
 }
+
 .sticker-grid {
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
+
 .emoji-item {
   font-size: 22px;
   cursor: pointer;
@@ -4836,14 +5346,17 @@ function scrollBottom() {
   padding: 4px;
   border-radius: 6px;
 }
+
 .emoji-item:hover {
   background: var(--dt-hover);
 }
+
 .sticker-item {
   font-size: 28px;
   padding: 10px 0;
   background: var(--dt-hover);
 }
+
 .sticker-item:hover {
   background: var(--dt-active);
   transform: translateY(-1px);
@@ -4853,12 +5366,14 @@ function scrollBottom() {
 .video-bubble {
   padding: 6px;
 }
+
 .chat-video {
   max-width: 280px;
   max-height: 200px;
   border-radius: 6px;
   display: block;
 }
+
 .video-name {
   font-size: 11px;
   color: var(--dt-text-secondary);
@@ -4871,22 +5386,26 @@ function scrollBottom() {
   flex-wrap: wrap;
   gap: 6px;
 }
+
 .reaction-emoji {
   font-size: 24px;
   cursor: pointer;
   padding: 4px;
   border-radius: 6px;
 }
+
 .reaction-emoji:hover {
   background: var(--dt-hover);
   transform: scale(1.2);
 }
+
 .reaction-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   margin-top: 4px;
 }
+
 .reaction-tag {
   display: inline-flex;
   align-items: center;
@@ -4898,9 +5417,11 @@ function scrollBottom() {
   cursor: pointer;
   border: 1px solid transparent;
 }
+
 .reaction-tag:hover {
   border-color: var(--dt-primary);
 }
+
 .reaction-tag.mine {
   background: #e6f0ff;
   border-color: var(--dt-primary);
@@ -4913,9 +5434,11 @@ function scrollBottom() {
   display: inline-block;
   cursor: pointer;
 }
+
 .pp-avatar-clickable {
   cursor: pointer;
 }
+
 .pp-avatar-overlay {
   position: absolute;
   inset: 0;
@@ -4929,6 +5452,7 @@ function scrollBottom() {
   opacity: 0;
   transition: opacity 0.2s;
 }
+
 .pp-avatar-upload:hover .pp-avatar-overlay {
   opacity: 1;
 }
@@ -4938,6 +5462,7 @@ function scrollBottom() {
   position: relative;
   display: inline-block;
 }
+
 .nav-status-dot {
   position: absolute;
   right: -2px;
@@ -4947,15 +5472,19 @@ function scrollBottom() {
   border-radius: 50%;
   border: 1.5px solid var(--dt-list-bg);
 }
+
 .nav-status-dot.online {
   background: #52c41a;
 }
+
 .nav-status-dot.busy {
   background: #fa541c;
 }
+
 .nav-status-dot.away {
   background: #faad14;
 }
+
 .nav-status-dot.offline {
   background: #bfbfbf;
 }
@@ -4968,6 +5497,7 @@ function scrollBottom() {
   justify-content: center;
   gap: 10px;
 }
+
 .empty-illustration {
   width: 96px;
   height: 96px;
@@ -4978,6 +5508,7 @@ function scrollBottom() {
   align-items: center;
   justify-content: center;
 }
+
 .chat-empty p {
   color: var(--dt-text-secondary);
 }
@@ -4987,6 +5518,7 @@ function scrollBottom() {
   max-height: 320px;
   overflow-y: auto;
 }
+
 .pick-item {
   padding: 8px 4px;
   cursor: pointer;
@@ -4995,16 +5527,20 @@ function scrollBottom() {
   align-items: center;
   gap: 8px;
 }
+
 .pick-item:hover {
   background: var(--dt-hover);
 }
+
 .pick-name {
   margin-left: 8px;
   font-size: 14px;
 }
+
 .setting-block {
   margin-bottom: 24px;
 }
+
 .block-title {
   font-size: 14px;
   font-weight: 600;
@@ -5012,15 +5548,18 @@ function scrollBottom() {
   display: flex;
   justify-content: space-between;
 }
+
 .member-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 0;
 }
+
 .m-name {
   font-size: 14px;
 }
+
 .spacer {
   flex: 1;
 }
@@ -5036,12 +5575,14 @@ function scrollBottom() {
   padding: 4px 0;
   min-width: 100px;
 }
+
 .ctx-item {
   padding: 8px 16px;
   cursor: pointer;
   font-size: 13px;
   color: var(--dt-text);
 }
+
 .ctx-item:hover {
   background: var(--dt-hover);
 }
@@ -5053,6 +5594,7 @@ function scrollBottom() {
   z-index: 9000;
   background: rgba(0, 0, 0, 0.25);
 }
+
 .pp-content {
   position: absolute;
   left: 0;
@@ -5064,19 +5606,23 @@ function scrollBottom() {
   padding: 24px 20px;
   overflow-y: auto;
 }
+
 .pp-header {
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 18px;
 }
+
 .pp-header :deep(.el-avatar) {
   border-radius: 12px;
   flex-shrink: 0;
 }
+
 .pp-info {
   flex: 1;
 }
+
 .pp-name {
   font-size: 18px;
   font-weight: 600;
@@ -5086,14 +5632,17 @@ function scrollBottom() {
   gap: 6px;
   cursor: pointer;
 }
+
 .pp-name:hover {
   color: var(--dt-primary);
 }
+
 .pp-dept {
   font-size: 12px;
   color: var(--dt-text-secondary);
   margin-top: 4px;
 }
+
 .pp-status {
   display: inline-flex;
   align-items: center;
@@ -5106,26 +5655,33 @@ function scrollBottom() {
   cursor: pointer;
   margin-bottom: 12px;
 }
+
 .pp-status:hover {
   background: var(--dt-active);
 }
+
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
 }
+
 .status-dot.online {
   background: #52c41a;
 }
+
 .status-dot.busy {
   background: #fa541c;
 }
+
 .status-dot.away {
   background: #faad14;
 }
+
 .status-dot.offline {
   background: #bfbfbf;
 }
+
 .status-option-dot {
   width: 8px;
   height: 8px;
@@ -5134,23 +5690,29 @@ function scrollBottom() {
   margin-right: 8px;
   vertical-align: middle;
 }
+
 .status-option-dot.online {
   background: #52c41a;
 }
+
 .status-option-dot.busy {
   background: #fa541c;
 }
+
 .status-option-dot.away {
   background: #faad14;
 }
+
 .status-option-dot.offline {
   background: #bfbfbf;
 }
+
 .pp-divider {
   height: 1px;
   background: var(--dt-border);
   margin: 12px 0;
 }
+
 .pp-menu-item {
   display: flex;
   align-items: center;
@@ -5162,12 +5724,15 @@ function scrollBottom() {
   cursor: pointer;
   transition: background 0.15s;
 }
+
 .pp-menu-item:hover {
   background: var(--dt-hover);
 }
+
 .pp-menu-item .el-icon {
   color: var(--dt-text-secondary);
 }
+
 .pp-tag {
   margin-left: auto;
   font-size: 11px;
@@ -5176,29 +5741,37 @@ function scrollBottom() {
   background: var(--dt-hover);
   color: var(--dt-text-secondary);
 }
+
 .pp-logout {
   color: #f56c6c;
 }
+
 .pp-logout .el-icon {
   color: #f56c6c;
 }
+
 .panel-slide-enter-active,
 .panel-slide-leave-active {
   transition: all 0.25s ease;
 }
+
 .panel-slide-enter-active .pp-content,
 .panel-slide-leave-active .pp-content {
   transition: transform 0.25s ease;
 }
+
 .panel-slide-enter-from {
   opacity: 0;
 }
+
 .panel-slide-enter-from .pp-content {
   transform: translateX(-100%);
 }
+
 .panel-slide-leave-to {
   opacity: 0;
 }
+
 .panel-slide-leave-to .pp-content {
   transform: translateX(-100%);
 }

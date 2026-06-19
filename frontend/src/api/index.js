@@ -1,4 +1,5 @@
 import request from './request'
+import { apiAiReplyStream } from './request'
 
 // ===== 认证 =====
 export const apiLogin = (data) => request.post('/auth/login', data)
@@ -15,6 +16,11 @@ export const apiSendMessage = (data) => request.post('/chat/messages', data)
 export const apiRecall = (messageId) => request.post('/chat/recall', null, { params: { messageId } })
 export const apiMarkRead = (sessionId) => request.post('/chat/read', null, { params: { sessionId } })
 export const apiSingleChat = (targetUserId) => request.post('/chat/single', null, { params: { targetUserId } })
+
+// ===== AI助手 =====
+export const apiAiReply = (data) => request.post('/chat/ai-reply', data)
+export const apiCreateAiSse = apiAiReplyStream  // 专用的 SSE API 函数
+
 
 // ===== 群聊 =====
 export const apiCreateGroup = (data) => request.post('/chat/group', data)
@@ -135,9 +141,6 @@ export const apiToggleStar = (sessionId) => request.post('/chat/toggle-star', nu
 // ===== 消息反应 =====
 export const apiGetReactions = (messageId) => request.get(`/reaction/${messageId}`)
 export const apiToggleReaction = (data) => request.post('/reaction', data)
-
-// ===== AI助手 =====
-export const apiAiReply = (data) => request.post('/chat/ai-reply', data)
 
 // ===== 收藏 =====
 export const apiFavoriteList = () => request.get('/favorite/list')

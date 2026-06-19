@@ -10,7 +10,9 @@ import com.example.dingtalk.vo.MemberVO;
 import com.example.dingtalk.vo.MessageVO;
 import com.example.dingtalk.vo.SessionVO;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
@@ -99,11 +101,13 @@ public class ChatController {
     }
 
     /* ---- AI助手 ---- */
-    @PostMapping("/ai-reply")
-    public Result<com.example.dingtalk.vo.MessageVO> aiReply(@RequestBody java.util.Map<String, Object> body) {
+    @PostMapping(value = "/ai-reply", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<MessageVO> aiReplyStream(@RequestBody Map<String, Object> body) {
+        Long userId = SecurityUtils.getUserId();
         Long sessionId = Long.parseLong(body.get("sessionId").toString());
         String question = (String) body.get("content");
-        return Result.ok(chatService.aiReply(SecurityUtils.getUserId(), sessionId, question));
+        // 返回流式 Flux
+        return chatService.aiReply(userId, sessionId, question);
     }
 
     /* ---- 群聊管理 ---- */

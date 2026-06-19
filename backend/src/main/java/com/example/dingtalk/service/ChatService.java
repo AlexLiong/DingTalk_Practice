@@ -9,15 +9,20 @@ import com.example.dingtalk.mapper.MessageReadMapper;
 import com.example.dingtalk.vo.MemberVO;
 import com.example.dingtalk.vo.MessageVO;
 import com.example.dingtalk.vo.SessionVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ChatService {
 
     private final ChatSessionMapper sessionMapper;
@@ -283,11 +288,85 @@ public class ChatService {
     }
 
     /** AI 助手自动回复 */
-    @Transactional
-    public MessageVO aiReply(Long userId, Long sessionId, String question) {
+    public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question) {
+        // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
+        ChatMessage userMsg = saveUserQuestion(sessionId, userId, question);
 
-        // 先保存用户的问题消息
+        // 2. 先创建一条空的AI消息记录，后续流式更新内容
+        ChatMessage aiMsg = initEmptyAiMessage(sessionId);
+        messageMapper.insert(aiMsg);
+        Long aiMsgId = aiMsg.getId();
+        LocalDateTime aiCreateTime = aiMsg.getCreateTime();
+
+        // 3. 调用流式RAG接口，返回Flux<String>分片
+        Flux<String> contentFlux = aiRagService.answer(userId, question);
+
+        // 4. 累积流式文本、分段推送WS、实时更新数据库content字段
+        return contentFlux
+                // 累积拼接完整AI回答文本
+                .scan(new StringBuilder(), StringBuilder::append)
+                // 每次分片生成VO推送给前端
+                .map(StringBuilder::toString)
+                .map(fullContent -> {
+                    // 构造流式VO，content为当前已生成全部文本
+                    MessageVO vo = new MessageVO();
+                    vo.setId(aiMsgId);
+                    vo.setSessionId(sessionId);
+                    vo.setSenderId(0L);
+                    vo.setSenderName("AI 助手");
+                    vo.setContentType(1);
+                    vo.setContent(fullContent);
+                    vo.setStatus(1);
+                    vo.setCreateTime(aiCreateTime);
+                    return vo;
+                })
+                // 每一段分片异步更新数据库AI消息内容（用线程池避免阻塞reactor）
+                .doOnNext(vo -> Mono.fromRunnable(() -> {
+                    ChatMessage updateMsg = new ChatMessage();
+                    updateMsg.setId(aiMsgId);
+                    updateMsg.setContent(vo.getContent());
+                    messageMapper.updateById(updateMsg);
+                }).subscribeOn(Schedulers.boundedElastic()).subscribe())
+                // 逐段推送WebSocket给前端
+                .doOnNext(vo -> messagingTemplate.convertAndSendToUser(
+                        String.valueOf(userId), "/queue/message", vo
+                ))
+                // 流结束后：更新会话最后消息、最后时间（取最终完整文本）
+                .doOnComplete(() -> {
+                    // 查询最终完整AI内容
+                    ChatMessage finalAiMsg = messageMapper.selectById(aiMsgId);
+                    String fullReply = finalAiMsg.getContent();
+                    String shortLastMsg = fullReply.length() > 50
+                            ? fullReply.substring(0, 50)
+                            : fullReply;
+                    session.setLastMsg(shortLastMsg);
+                    session.setLastTime(aiCreateTime);
+                    sessionMapper.updateById(session);
+                })
+                // 异常兜底：推送错误信息分片
+                .onErrorResume(e -> {
+                    log.error("流式AI对话异常 userId:{}, sessionId:{}", userId, sessionId, e);
+                    String errMsg = "AI 服务调用失败，请检查模型地址、密钥和网络后重试。";
+                    MessageVO errVo = new MessageVO();
+                    errVo.setId(aiMsgId);
+                    errVo.setSessionId(sessionId);
+                    errVo.setSenderId(0L);
+                    errVo.setSenderName("AI 助手");
+                    errVo.setContentType(1);
+                    errVo.setContent(errMsg);
+                    errVo.setStatus(1);
+                    errVo.setCreateTime(aiCreateTime);
+                    messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/message", errVo);
+                    return Flux.just(errVo);
+                });
+    }
+
+    /**
+     * 子方法：事务保存用户提问消息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ChatMessage saveUserQuestion(Long sessionId, Long userId, String question) {
         ChatMessage userMsg = new ChatMessage();
         userMsg.setSessionId(sessionId);
         userMsg.setSenderId(userId);
@@ -296,36 +375,21 @@ public class ChatService {
         userMsg.setStatus(1);
         userMsg.setCreateTime(LocalDateTime.now());
         messageMapper.insert(userMsg);
+        return userMsg;
+    }
 
-        // 生成AI回复
-        String reply = aiRagService.answer(userId, question);
+    /**
+     * 初始化一条空AI消息，预留ID用于流式更新
+     */
+    private ChatMessage initEmptyAiMessage(Long sessionId) {
         ChatMessage aiMsg = new ChatMessage();
         aiMsg.setSessionId(sessionId);
-        aiMsg.setSenderId(0L);   // 0=系统/AI
+        aiMsg.setSenderId(0L);
         aiMsg.setContentType(1);
-        aiMsg.setContent(reply);
+        aiMsg.setContent(""); // 初始空文本
         aiMsg.setStatus(1);
         aiMsg.setCreateTime(LocalDateTime.now().plusSeconds(1));
-        messageMapper.insert(aiMsg);
-
-        // 更新会话最后消息
-        session.setLastMsg(reply.length() > 50 ? reply.substring(0, 50) : reply);
-        session.setLastTime(aiMsg.getCreateTime());
-        sessionMapper.updateById(session);
-
-        // 通过WS推送AI回复
-        MessageVO vo = new MessageVO();
-        vo.setId(aiMsg.getId());
-        vo.setSessionId(sessionId);
-        vo.setSenderId(0L);
-        vo.setSenderName("AI 助手");
-        vo.setContentType(1);
-        vo.setContent(reply);
-        vo.setStatus(1);
-        vo.setCreateTime(aiMsg.getCreateTime());
-        messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/message", vo);
-
-        return vo;
+        return aiMsg;
     }
 
     /* ===================== 单聊 ===================== */

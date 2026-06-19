@@ -12,6 +12,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,47 +55,49 @@ public class AiRagService {
         this.chatClientBuilderProvider = chatClientBuilderProvider;
     }
 
-    public String answer(Long userId, String question) {
+    public Flux<String> answer(Long userId, String question) {
         String normalizedQuestion = question == null ? "" : question.trim();
         if (normalizedQuestion.isEmpty()) {
-            return "请先输入一个问题。";
+            return Flux.just("请先输入问题。");
         }
         if (!isAiReady()) {
-            return "AI 未配置，请设置 SPRING_AI_OPENAI_API_KEY 后重试。";
+            return Flux.just("AI 未配置，请设置 SPRING_AI_OPENAI_API_KEY 后重试。");
         }
 
         aiDocumentIngestService.reindexMissingFiles(userId, 20);
-        if (!aiDocumentIngestService.hasIndexedContent(userId)) {
-            return "当前还没有可检索的文档内容。先上传 TXT、MD、PDF、DOCX 等文档，再来问我。";
-        }
 
         EmbeddingModel embeddingModel = embeddingModelProvider.getIfAvailable();
         ChatClient.Builder chatClientBuilder = chatClientBuilderProvider.getIfAvailable();
         if (embeddingModel == null || chatClientBuilder == null) {
-            return "AI 客户端未初始化，请检查 Spring AI 配置。";
+            return Flux.just("AI 客户端未初始化，请检查 Spring AI 配置。");
         }
 
         try {
+            // 检索相关文档
             float[] queryEmbedding = embeddingModel.embed(normalizedQuestion);
             List<AiFileChunk> allChunks = aiFileChunkMapper.selectList(new LambdaQueryWrapper<AiFileChunk>()
                     .eq(AiFileChunk::getUserId, userId));
             List<ScoredChunk> relevantChunks = rankChunks(allChunks, queryEmbedding);
-            if (relevantChunks.isEmpty()) {
-                return "在当前文档中没有找到直接依据。你可以换个问法，或者补充上传更相关的文档。";
+
+            // 构建提示词
+            String prompt;
+            if (!relevantChunks.isEmpty()) {
+                // 有相关文档，使用 RAG
+                prompt = buildPrompt(relevantChunks, normalizedQuestion);
+            } else {
+                // 没有相关文档，但不阻塞，让大模型直接回答
+                prompt = buildSimplePrompt(normalizedQuestion);
             }
 
-            String prompt = buildPrompt(relevantChunks, normalizedQuestion);
-            String content = chatClientBuilder.build()
-                    .prompt(prompt)
-                    .call()
-                    .content();
-            if (content == null || content.isBlank()) {
-                return "AI 没有返回有效内容，请稍后重试。";
-            }
-            return content.trim();
+            // 流式调用大模型
+            ChatClient chatClient = chatClientBuilder.build();
+            return chatClient.prompt(prompt)
+                    .stream()
+                    .content()
+                    .doOnError(e -> log.error("AI RAG stream failed for user {}", userId, e));
         } catch (Exception e) {
             log.error("AI RAG answer failed for user {}", userId, e);
-            return "AI 服务调用失败，请检查模型地址、密钥和网络后重试。";
+            return Flux.just("AI 服务调用失败，请检查模型地址、密钥和网络后重试。");
         }
     }
 
@@ -139,7 +142,7 @@ public class AiRagService {
         }
         return """
                 你是企业协作平台里的文档问答助手，请严格基于提供的文档片段回答，并使用中文。
-                如果文档中没有直接答案，就明确回复“在当前文档中没有找到直接依据”，不要编造。
+                如果文档中没有直接答案，就明确回复"在当前文档中没有找到直接依据"，不要编造。
                 如能回答，优先给出结论，再补充来自哪些文档片段。
 
                 文档片段:
@@ -149,12 +152,21 @@ public class AiRagService {
                 """.formatted(contextBuilder.toString().trim(), question);
     }
 
+    private String buildSimplePrompt(String question) {
+        return """
+                你是企业协作平台里的通用助手，请使用中文回答用户的问题，并提供有价值的见解。
+                用户问题:
+                %s
+                """.formatted(question);
+    }
+
     private float[] parseEmbedding(String json) {
         if (json == null || json.isBlank()) {
             return new float[0];
         }
         try {
-            return OBJECT_MAPPER.readValue(json, new TypeReference<float[]>() {});
+            return OBJECT_MAPPER.readValue(json, new TypeReference<>() {
+            });
         } catch (IOException e) {
             log.warn("Parse embedding failed", e);
             return new float[0];
