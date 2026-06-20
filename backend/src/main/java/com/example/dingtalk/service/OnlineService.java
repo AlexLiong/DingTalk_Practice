@@ -186,4 +186,38 @@ public class OnlineService {
             log.error("[WS] broadcastStatus failed userId=" + userId, e);
         }
     }
+
+    /**
+     * 强制用户下线（账号被停用/删除时调用）。
+     * 1. 向该用户所有 WebSocket 连接推送「你已被管理员停用，请重新登录」消息
+     * 2. 从在线状态缓存中移除该用户，并广播下线通知给其他在线用户
+     */
+    public void kickUser(Long userId, String reason) {
+        if (userId == null) return;
+        Set<String> sessions = userSessions.get(userId);
+        if (sessions == null || sessions.isEmpty()) {
+            log.info("[WS kick] userId=" + userId + " not online, skip websocket push");
+            return;
+        }
+        log.info("[WS kick] userId=" + userId + " sessions=" + sessions.size() + " reason=" + reason);
+        // 复制一份快照再遍历，避免并发修改异常
+        Set<String> sessionSnapshot = new HashSet<>(sessions);
+        Map<String, Object> kickPayload = new HashMap<>();
+        kickPayload.put("type", "kick");
+        kickPayload.put("userId", userId);
+        kickPayload.put("reason", reason == null ? "账号已被管理员停用" : reason);
+        for (String sessionId : sessionSnapshot) {
+            try {
+                // 向该用户的具体 session 推送踢人消息
+                messagingTemplate.convertAndSendToUser(
+                        String.valueOf(userId), "/queue/kick", kickPayload);
+                log.info("[WS kick] pushed kick to sessionId=" + sessionId + " userId=" + userId);
+            } catch (Exception e) {
+                log.error("[WS kick] push failed userId=" + userId + " sessionId=" + sessionId, e);
+            }
+            // 立即清理 session 映射，避免被误认为在线
+            offline(userId, sessionId);
+        }
+        log.info("[WS kick] userId=" + userId + " forced offline completed");
+    }
 }

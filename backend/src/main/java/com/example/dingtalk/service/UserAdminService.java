@@ -9,6 +9,8 @@ import com.example.dingtalk.entity.SysUser;
 import com.example.dingtalk.mapper.DeptMapper;
 import com.example.dingtalk.mapper.UserMapper;
 import com.example.dingtalk.mapper.UserRoleMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,19 +19,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class UserAdminService {
 
     private final UserMapper userMapper;
     private final DeptMapper deptMapper;
     private final UserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
+    private final OnlineService onlineService;
 
     public UserAdminService(UserMapper userMapper, DeptMapper deptMapper,
-                            UserRoleMapper userRoleMapper, PasswordEncoder passwordEncoder) {
+                            UserRoleMapper userRoleMapper, PasswordEncoder passwordEncoder,
+                            @Lazy OnlineService onlineService) {
         this.userMapper = userMapper;
         this.deptMapper = deptMapper;
         this.userRoleMapper = userRoleMapper;
         this.passwordEncoder = passwordEncoder;
+        this.onlineService = onlineService;
     }
 
     public IPage<SysUser> page(int pageNum, int pageSize, String keyword, Long deptId) {
@@ -59,6 +65,13 @@ public class UserAdminService {
     @Transactional
     public void update(SysUser user, List<Long> roleIds) {
         if (user.getId() == null) throw new BizException("用户id不能为空");
+        // 记录旧状态，以便判断是否需要踢人
+        Integer oldStatus = null;
+        try {
+            SysUser old = userMapper.selectById(user.getId());
+            if (old != null) oldStatus = old.getStatus();
+        } catch (Exception ignore) {
+        }
         user.setPassword(null);   // 不在此处改密码
         user.setUsername(null);   // 不允许改账号
         fillDeptName(user);
@@ -67,12 +80,20 @@ public class UserAdminService {
             userRoleMapper.deleteByUserId(user.getId());
             saveRoles(user.getId(), roleIds);
         }
+        // 如果用户从正常状态变为停用，立即踢该用户下线
+        if (user.getStatus() != null && user.getStatus() == 0
+                && (oldStatus == null || oldStatus == 1)) {
+            log.info("[Admin] user=" + user.getId() + " status changed from " + oldStatus + " -> disabled, kicking user offLine");
+            onlineService.kickUser(user.getId(), "账号已被管理员停用");
+        }
     }
 
     @Transactional
     public void delete(Long id) {
         userRoleMapper.deleteByUserId(id);
         userMapper.deleteById(id);
+        // 删除用户时，如果在线也立即踢下线
+        onlineService.kickUser(id, "账号已被管理员删除");
     }
 
     public void resetPassword(Long id, String password) {

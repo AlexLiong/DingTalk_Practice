@@ -2270,12 +2270,12 @@ onMounted(async () => {
   } catch (error) {
     console.warn("[Online] failed to load online users", error);
   }
-  connectWs(userStore.token, onWsMessage, onWsReceipt, onWsOnline);
+  connectWs(userStore.token, onWsMessage, onWsReceipt, onWsOnline, null, null, onWsKick);
 });
 onUnmounted(() => {
   closeAiSse();
   document.removeEventListener("click", handleGlobalClick);
-  removeWsListeners(onWsMessage, onWsReceipt, onWsOnline);
+  removeWsListeners(onWsMessage, onWsReceipt, onWsOnline, null, null, onWsKick);
 });
 
 function syncWorkbenchViewFromRoute() {
@@ -2974,6 +2974,23 @@ function onWsOnline(data) {
   if (isOnline) onlineSet.value.add(uid);
   else onlineSet.value.delete(uid);
   onlineSet.value = new Set(onlineSet.value);
+}
+
+function onWsKick(data) {
+  console.log("[WS kick] forced offline", data);
+  const reason = data?.reason || "账号已被管理员停用";
+  // 立即断开 WS、清理 token、跳转登录
+  disconnectWs();
+  userStore.logout();
+  ElMessageBox.alert(reason, "账号已下线", {
+    confirmButtonText: "重新登录",
+    type: "warning",
+    showClose: false,
+  }).then(() => {
+    router.push("/login");
+  }).catch(() => {
+    router.push("/login");
+  });
 }
 
 async function refreshSessionMeta(msg) {

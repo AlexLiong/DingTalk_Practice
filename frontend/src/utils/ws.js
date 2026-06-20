@@ -9,7 +9,8 @@ const listeners = {
   receipt: new Set(),
   online: new Set(),
   workNotice: new Set(),
-  sessionUnread: new Set()
+  sessionUnread: new Set(),
+  kick: new Set()
 }
 
 function addListener(type, handler) {
@@ -73,9 +74,17 @@ function makeSubscriptions(c) {
       emit('sessionUnread', data)
     } catch (e) { console.error('[WS] session unread parse error', e) }
   })
+  // 管理员踢人下线消息
+  c.subscribe('/user/queue/kick', (frame) => {
+    try {
+      const data = JSON.parse(frame.body)
+      console.log('[WS] /user/queue/kick received', data)
+      emit('kick', data)
+    } catch (e) { console.error('[WS] kick parse error', e) }
+  })
 }
 
-export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNotice, onSessionUnread) {
+export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNotice, onSessionUnread, onKick) {
   if (!token) {
     console.warn('[WS] connect called without token')
     return null
@@ -87,6 +96,7 @@ export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNot
   addListener('online', onOnlineStatus)
   addListener('workNotice', onWorkNotice)
   addListener('sessionUnread', onSessionUnread)
+  addListener('kick', onKick)
 
   // 若已存在同一 token 的活跃连接，直接复用
   if (client && boundToken === token && client.active) {
@@ -135,12 +145,13 @@ export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNot
   return client
 }
 
-export function removeWsListeners(onMessage, onReceipt, onOnlineStatus, onWorkNotice, onSessionUnread) {
+export function removeWsListeners(onMessage, onReceipt, onOnlineStatus, onWorkNotice, onSessionUnread, onKick) {
   removeListener('message', onMessage)
   removeListener('receipt', onReceipt)
   removeListener('online', onOnlineStatus)
   removeListener('workNotice', onWorkNotice)
   removeListener('sessionUnread', onSessionUnread)
+  removeListener('kick', onKick)
 }
 
 export function disconnectWs() {
