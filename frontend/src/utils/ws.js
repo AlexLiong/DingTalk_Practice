@@ -13,7 +13,11 @@ const listeners = {
 }
 
 function addListener(type, handler) {
-  if (typeof handler === 'function') listeners[type].add(handler)
+  if (typeof handler === 'function') {
+    if (!listeners[type].has(handler)) {
+      listeners[type].add(handler)
+    }
+  }
 }
 
 function removeListener(type, handler) {
@@ -21,26 +25,78 @@ function removeListener(type, handler) {
 }
 
 function emit(type, payload) {
+  console.log(`[WS] emit ${type} listeners=${listeners[type].size}`, payload)
   listeners[type].forEach((handler) => {
     try { handler(payload) } catch (error) { console.error(`[WS] ${type} handler error`, error) }
   })
 }
 
+function makeSubscriptions(c) {
+  console.log('[WS] subscribing to destinations')
+  // 消息
+  c.subscribe('/user/queue/message', (frame) => {
+    try {
+      const data = JSON.parse(frame.body)
+      console.log('[WS] /user/queue/message received', data)
+      emit('message', data)
+    } catch (e) { console.error('[WS] message parse error', e) }
+  })
+  // 已读回执
+  c.subscribe('/user/queue/receipt', (frame) => {
+    try {
+      const data = JSON.parse(frame.body)
+      console.log('[WS] /user/queue/receipt received', data)
+      emit('receipt', data)
+    } catch (e) { console.error('[WS] receipt parse error', e) }
+  })
+  // 在线状态广播
+  c.subscribe('/topic/online-status', (frame) => {
+    try {
+      const data = JSON.parse(frame.body)
+      console.log('[WS] /topic/online-status received', data)
+      emit('online', data)
+    } catch (e) { console.error('[WS] online parse error', e) }
+  })
+  // 工作台协同提醒
+  c.subscribe('/user/queue/work-notice', (frame) => {
+    try {
+      const data = JSON.parse(frame.body)
+      console.log('[WS] /user/queue/work-notice received', data)
+      emit('workNotice', data)
+    } catch (e) { console.error('[WS] work notice parse error', e) }
+  })
+  // 会话未读总数
+  c.subscribe('/user/queue/session-unread', (frame) => {
+    try {
+      const data = JSON.parse(frame.body)
+      console.log('[WS] /user/queue/session-unread received', data)
+      emit('sessionUnread', data)
+    } catch (e) { console.error('[WS] session unread parse error', e) }
+  })
+}
+
 export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNotice, onSessionUnread) {
-  if (!token) return null
+  if (!token) {
+    console.warn('[WS] connect called without token')
+    return null
+  }
 
-  // 若已存在同一 token 的连接，直接复用，避免重复添加监听器
-  if (client && boundToken === token) return client
-
-  // 只有在新建/重连时才添加监听器
+  // 注册监听器（无论是否复用连接，都要确保监听器存在）
   addListener('message', onMessage)
   addListener('receipt', onReceipt)
   addListener('online', onOnlineStatus)
   addListener('workNotice', onWorkNotice)
   addListener('sessionUnread', onSessionUnread)
 
+  // 若已存在同一 token 的活跃连接，直接复用
+  if (client && boundToken === token && client.active) {
+    console.log('[WS] reusing existing connection for same token')
+    return client
+  }
+
+  // 先清理旧连接
   if (client) {
-    client.deactivate()
+    try { client.deactivate() } catch (e) { console.warn('[WS] deactivate old client failed', e) }
     client = null
   }
   boundToken = token
@@ -49,37 +105,30 @@ export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNot
     webSocketFactory: () => new SockJS('/ws'),
     connectHeaders: { Authorization: `Bearer ${token}` },
     reconnectDelay: 3000,
-    debug: () => {},
-    onConnect: () => {
-      console.log('[WS] connected')
-      // 消息
-      client.subscribe('/user/queue/message', (frame) => {
-        try { emit('message', JSON.parse(frame.body)) }
-        catch (e) { console.error('[WS] parse error', e) }
-      })
-      // 已读回执
-      client.subscribe('/user/queue/receipt', (frame) => {
-        try { emit('receipt', JSON.parse(frame.body)) }
-        catch (e) { console.error('[WS] receipt parse error', e) }
-      })
-      // 在线状态广播
-      client.subscribe('/topic/online-status', (frame) => {
-        try { emit('online', JSON.parse(frame.body)) }
-        catch (e) { console.error('[WS] online parse error', e) }
-      })
-      // 工作台协同提醒
-      client.subscribe('/user/queue/work-notice', (frame) => {
-        try { emit('workNotice', JSON.parse(frame.body)) }
-        catch (e) { console.error('[WS] work notice parse error', e) }
-      })
-      // 会话未读总数
-      client.subscribe('/user/queue/session-unread', (frame) => {
-        try { emit('sessionUnread', JSON.parse(frame.body)) }
-        catch (e) { console.error('[WS] session unread parse error', e) }
-      })
+    heartbeatIncoming: 10000,
+    heartbeatOutgoing: 10000,
+    debug: (str) => {
+      // 仅记录关键调试信息，避免刷屏
+      if (str && (str.includes('connected') || str.includes('DISCONNECT') || str.includes('ERROR'))) {
+        console.log('[WS] debug', str)
+      }
     },
-    onStompError: (frame) => console.error('[WS] stomp error', frame),
-    onWebSocketClose: () => console.log('[WS] closed')
+    onConnect: () => {
+      console.log('[WS] CONNECTED - subscribing to queues')
+      makeSubscriptions(client)
+    },
+    onDisconnect: () => {
+      console.log('[WS] DISCONNECTED - will auto-reconnect')
+    },
+    onStompError: (frame) => {
+      console.error('[WS] STOMP error', frame.headers, frame.body)
+    },
+    onWebSocketClose: (event) => {
+      console.log('[WS] WebSocket closed', event?.code, event?.reason)
+    },
+    onWebSocketError: (event) => {
+      console.error('[WS] WebSocket error', event)
+    }
   })
 
   client.activate()
@@ -96,7 +145,7 @@ export function removeWsListeners(onMessage, onReceipt, onOnlineStatus, onWorkNo
 
 export function disconnectWs() {
   if (client) {
-    client.deactivate()
+    try { client.deactivate() } catch (e) { console.warn('[WS] deactivate failed', e) }
     client = null
   }
   boundToken = ''

@@ -3,6 +3,7 @@ package com.example.dingtalk.service;
 import com.example.dingtalk.entity.SysUser;
 import com.example.dingtalk.mapper.UserMapper;
 import com.example.dingtalk.vo.UserStatusVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** 在线状态管理 (按 WS session 维护, chatStatus 从数据库读取) */
 @Service
+@Slf4j
 public class OnlineService {
 
     /** 用户手动设置状态的内存缓存（key: userId, value: chatStatus 1-4），避免每次查库 */
@@ -136,6 +138,7 @@ public class OnlineService {
         boolean online = isOnline(userId);
         LocalDateTime now = LocalDateTime.now();
         lastActiveCache.put(userId, now);
+        log.info("[WS] status change userId=" + userId + " chatStatus=" + chatStatus + " online=" + online + " broadcasting to /topic/online-status");
         broadcastStatus(userId, online, chatStatus);
     }
 
@@ -176,6 +179,11 @@ public class OnlineService {
         if (lastActive != null) {
             payload.put("lastActiveAt", lastActive);
         }
-        messagingTemplate.convertAndSend("/topic/online-status", payload);
+        try {
+            messagingTemplate.convertAndSend("/topic/online-status", payload);
+            log.info("[WS] broadcastStatus sent userId=" + userId + " online=" + online + " chatStatus=" + status);
+        } catch (Exception e) {
+            log.error("[WS] broadcastStatus failed userId=" + userId, e);
+        }
     }
 }

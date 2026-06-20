@@ -3114,13 +3114,29 @@ async function sendMessage() {
     draft.value = "";
     atUserSet.value = new Set();
     quoteRef.value = null;
-    await apiSendMessage({
-      sessionId: current.value.id,
-      content,
-      contentType: 1,
-      atUserIds: atIds,
-      extra,
-    });
+    try {
+      const savedMsg = await apiSendMessage({
+        sessionId: current.value.id,
+        content,
+        contentType: 1,
+        atUserIds: atIds,
+        extra,
+      });
+      console.log("[chat] apiSendMessage returned", savedMsg);
+      if (savedMsg && current.value) {
+        const hydrated = hydrateMessage(savedMsg);
+        const existingIdx = messages.value.findIndex((m) => m.id === hydrated.id);
+        if (existingIdx < 0) {
+          messages.value.push(hydrated);
+        } else {
+          messages.value[existingIdx] = hydrated;
+        }
+        scrollBottom();
+        refreshSessionMeta(hydrated);
+      }
+    } catch (e) {
+      console.error("[chat] sendMessage failed", e);
+    }
   }
 }
 

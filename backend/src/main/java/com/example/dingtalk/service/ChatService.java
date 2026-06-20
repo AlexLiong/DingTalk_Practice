@@ -10,6 +10,7 @@ import com.example.dingtalk.vo.MemberVO;
 import com.example.dingtalk.vo.MessageVO;
 import com.example.dingtalk.vo.SessionVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public class ChatService {
                        ChatMessageMapper messageMapper, UserMapper userMapper,
                        MessageReadMapper messageReadMapper,
                        ReactionMapper reactionMapper,
-                       SimpMessagingTemplate messagingTemplate,
+                       @Lazy SimpMessagingTemplate messagingTemplate,
                        AiRagService aiRagService) {
         this.sessionMapper = sessionMapper;
         this.memberMapper = memberMapper;
@@ -125,14 +126,20 @@ public class ChatService {
                 new LambdaQueryWrapper<ChatSessionMember>()
                         .eq(ChatSessionMember::getSessionId, dto.getSessionId()));
         MessageVO vo = toVO(msg);
+        log.info("[WS] session=" + dto.getSessionId() + " msgId=" + msg.getId() + " sender=" + userId + " pushing to " + members.size() + " members");
         for (ChatSessionMember m : members) {
             if (!m.getUserId().equals(userId)) {
                 m.setUnread((m.getUnread() == null ? 0 : m.getUnread()) + 1);
                 memberMapper.updateById(m);
             }
-            messagingTemplate.convertAndSendToUser(
-                    String.valueOf(m.getUserId()), "/queue/message", vo);
-            pushSessionUnread(m.getUserId());
+            try {
+                messagingTemplate.convertAndSendToUser(
+                        String.valueOf(m.getUserId()), "/queue/message", vo);
+                pushSessionUnread(m.getUserId());
+                log.debug("[WS] pushed message to user=" + m.getUserId());
+            } catch (Exception e) {
+                log.error("[WS] failed to push message to user=" + m.getUserId(), e);
+            }
         }
         return vo;
     }
