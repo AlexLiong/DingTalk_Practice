@@ -9,6 +9,7 @@ import com.example.dingtalk.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,13 +20,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final PermissionService permissionService;
+    private final OnlineService onlineService;
 
     public AuthService(UserMapper userMapper, PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil, PermissionService permissionService) {
+                       JwtUtil jwtUtil, PermissionService permissionService,
+                       OnlineService onlineService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.permissionService = permissionService;
+        this.onlineService = onlineService;
     }
 
     public Map<String, Object> login(LoginDTO dto) {
@@ -37,6 +41,8 @@ public class AuthService {
             throw new BizException("密码错误");
         }
         if (user.getChatStatus() == null) user.setChatStatus(1);
+        onlineService.cacheChatStatus(user.getId(), user.getChatStatus());
+        onlineService.cacheLastActive(user.getId(), LocalDateTime.now());
         String token = jwtUtil.generate(user.getId(), user.getUsername());
         user.setPassword(null);
         Map<String, Object> result = new HashMap<>();
@@ -58,6 +64,7 @@ public class AuthService {
         user.setStatus(1);
         user.setChatStatus(1);
         userMapper.insert(user);
+        onlineService.cacheChatStatus(user.getId(), 1);
         user.setPassword(null);
         return user;
     }
@@ -66,6 +73,9 @@ public class AuthService {
         SysUser user = userMapper.selectById(userId);
         if (user == null) throw new BizException("用户不存在");
         if (user.getChatStatus() == null) user.setChatStatus(1);
+        onlineService.cacheChatStatus(user.getId(), user.getChatStatus());
+        onlineService.cacheLastActive(user.getId(), LocalDateTime.now());
+        user.setOnline(onlineService.isOnline(userId));
         user.setPassword(null);
         Map<String, Object> result = new HashMap<>();
         result.put("user", user);

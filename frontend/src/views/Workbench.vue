@@ -3,7 +3,7 @@
     <!-- ========== 1. 左侧导航栏 (仿钉钉宽版文字导航 ~130px) ========== -->
     <div class="side-nav">
       <!-- 组织选择器 -->
-      <div class="org-header" @click="profilePanel = !profilePanel">
+      <div class="org-header" @click.stop="togglePanel">
         <div class="nav-avatar-wrap">
           <el-avatar
               :size="28"
@@ -141,7 +141,7 @@
       <div
           v-if="profilePanel"
           class="profile-panel"
-          @click.self="profilePanel = false"
+          @click.self="closePanel"
       >
         <div class="pp-content">
           <div class="pp-header">
@@ -180,27 +180,27 @@
               </div>
             </div>
           </div>
-          <el-dropdown trigger="click" @command="changeMyStatus">
-            <div class="pp-status">
+          <div class="pp-status-selector">
+            <div class="pp-status" @click.stop="statusDropdownOpen = !statusDropdownOpen">
               <span class="status-dot" :class="myStatusClass"></span
               >{{ statusText }}
-              <el-icon :size="12">
+              <el-icon :size="12" :class="{rotate: statusDropdownOpen}">
                 <ArrowDown/>
               </el-icon>
             </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item
-                    v-for="item in statusOptions"
-                    :key="item.value"
-                    :command="item.value"
-                >
-                  <span class="status-option-dot" :class="item.value"></span
-                  >{{ item.label }}
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+            <div v-if="statusDropdownOpen" class="pp-status-dropdown" @click.stop>
+              <div
+                  v-for="item in statusOptions"
+                  :key="item.value"
+                  class="pp-status-option"
+                  :class="{active: myStatusClass === item.value}"
+                  @click.stop="handleSelectStatus(item.value)"
+              >
+                <span class="status-option-dot" :class="item.value"></span>
+                <span>{{ item.label }}</span>
+              </div>
+            </div>
+          </div>
           <div class="pp-divider"></div>
           <div
               class="pp-menu-item"
@@ -1674,6 +1674,7 @@ const atUserSet = ref(new Set());
 const previewUrl = ref("");
 const quoteRef = ref(null);
 const profilePanel = ref(false);
+const statusDropdownOpen = ref(false);
 const groupPanelOpen = ref(true);
 const chatFilter = ref("all");
 const statusOptions = [
@@ -1684,6 +1685,8 @@ const statusOptions = [
 ];
 
 const onlineSet = ref(new Set());
+// 用户状态缓存：key=userId, value={chatStatus, online, lastActiveAt}
+const userStatusMap = ref(new Map());
 const readReceipts = ref({});
 const readCounts = ref({});
 const readersDialog = ref(false);
@@ -2019,7 +2022,20 @@ const atMeSessions = ref(new Set());
 const activeEmojiCategory = computed(
     () => emojiCategories[emojiTab.value] || emojiCategories[0],
 );
-const myStatusClass = computed(() => normalizePresence(user.value?.chatStatus));
+// 当前用户自己的状态显示：
+// 1. 优先从 user.value.chatStatus 读取（来自 /auth/info，数据库值，刷新后也正确）
+// 2. 同时检查 userStatusMap 的 chatStatus（用户刚修改了状态但还没刷新时使用）
+// chatStatus 优先级：userStatusMap(刚修改) > user.value.chatStatus(数据库值)
+// online 始终视为 true（自己已登录）
+const myStatusClass = computed(() => {
+  if (!user.value) return "offline";
+  let chatStatus = user.value.chatStatus ?? 1;
+  const cached = userStatusMap.value.get(user.value.id);
+  if (cached && cached.chatStatus != null) {
+    chatStatus = cached.chatStatus;
+  }
+  return normalizePresence(chatStatus, true);
+});
 const statusText = computed(
     () => presenceLabelMap[myStatusClass.value] || "在线",
 );
@@ -2205,6 +2221,19 @@ watch([tab, chatFilter, keyword, () => current.value?.id ?? null], () => {
   });
 });
 
+watch(profilePanel, (val) => {
+  if (!val) statusDropdownOpen.value = false;
+});
+
+function closePanel() {
+  profilePanel.value = false;
+}
+
+function togglePanel() {
+  profilePanel.value = !profilePanel.value;
+  if (!profilePanel.value) statusDropdownOpen.value = false;
+}
+
 onMounted(async () => {
   document.addEventListener("click", handleGlobalClick);
   themeStore.init();
@@ -2213,9 +2242,33 @@ onMounted(async () => {
   contacts.value = await apiUserList();
   if (workbenchStateReady.value && keyword.value.trim()) onSearchInput();
   try {
-    const ids = await apiOnlineUsers();
-    onlineSet.value = new Set(ids);
-  } catch {
+    // 后端现在返回 Set<UserStatusVO> = [{userId, chatStatus, online, lastActiveAt}]
+    const statusList = await apiOnlineUsers();
+    onlineSet.value = new Set();
+    if (Array.isArray(statusList) || statusList instanceof Set) {
+      statusList.forEach((s) => {
+        const uid = s.userId != null ? Number(s.userId) : (typeof s === "number" ? s : null);
+        if (uid == null) return;
+        const isOnline = s.online != null ? Boolean(s.online) : true;
+        const chatStatus = s.chatStatus != null ? s.chatStatus : 1;
+        userStatusMap.value.set(uid, {
+          chatStatus: chatStatus,
+          online: isOnline,
+          lastActiveAt: s.lastActiveAt,
+        });
+        if (isOnline) onlineSet.value.add(uid);
+        // 同步更新 contacts 中的对应项
+        const contact = contacts.value.find((u) => u.id === uid);
+        if (contact) {
+          contact.online = isOnline;
+          if (s.chatStatus != null) contact.chatStatus = chatStatus;
+        }
+      });
+      userStatusMap.value = new Map(userStatusMap.value);
+    }
+    onlineSet.value = new Set(onlineSet.value);
+  } catch (error) {
+    console.warn("[Online] failed to load online users", error);
   }
   connectWs(userStore.token, onWsMessage, onWsReceipt, onWsOnline);
 });
@@ -2757,17 +2810,36 @@ async function uploadAvatar(opt) {
   ElMessage.success("头像已更新");
 }
 
-function normalizePresence(value) {
-  if (value === 2 || value === "busy") return "busy";
-  if (value === 3 || value === "away") return "away";
-  if (value === 4 || value === "offline") return "offline";
+function normalizePresence(chatStatus, online) {
+  // online=false/null/undefined -> 一律离线
+  if (online === false || online == null) return "offline";
+  // online=true 时，根据 chatStatus 决定
+  if (chatStatus === 2 || chatStatus === "busy") return "busy";
+  if (chatStatus === 3 || chatStatus === "away") return "away";
+  if (chatStatus === 4 || chatStatus === "offline") return "offline";
   return "online";
 }
 
 function storedPresence(userId) {
-  if (userId === user.value?.id)
-    return normalizePresence(user.value?.chatStatus);
-  return normalizePresence(contactMap.value.get(userId)?.chatStatus);
+  if (!userId) return "offline";
+  // 1. 优先从 userStatusMap（WebSocket 推送 + 在线接口）获取最新状态
+  const cached = userStatusMap.value.get(userId);
+  if (cached && typeof cached.online === "boolean") {
+    return normalizePresence(cached.chatStatus, cached.online);
+  }
+  // 2. 当前登录用户：从 user store 取 + 自己默认在线
+  if (userId === user.value?.id) {
+    return normalizePresence(user.value?.chatStatus ?? 1, true);
+  }
+  // 3. 其他用户：从 contactMap（通讯录接口）取 online 和 chatStatus
+  const contact = contactMap.value.get(userId);
+  if (contact) {
+    return normalizePresence(
+        contact.chatStatus ?? 1,
+        contact.online === true || onlineSet.value.has(userId)
+    );
+  }
+  return "offline";
 }
 
 function presenceClass(userId) {
@@ -2775,23 +2847,44 @@ function presenceClass(userId) {
 }
 
 function presenceTextById(userId) {
-  return presenceLabelMap[presenceClass(userId)] || "在线";
+  return presenceLabelMap[presenceClass(userId)] || "离线";
 }
 
 function presenceTagType(userId) {
   return (
       {online: "success", busy: "danger", away: "warning", offline: "info"}[
           presenceClass(userId)
-          ] || "success"
+          ] || "info"
   );
+}
+
+function handleSelectStatus(status) {
+  statusDropdownOpen.value = false;
+  changeMyStatus(status);
 }
 
 async function changeMyStatus(status) {
   const nextValue = presenceValueMap[status];
-  if (!user.value || !nextValue || user.value.chatStatus === nextValue) return;
-  const updated = await apiUpdateProfile({chatStatus: nextValue});
-  userStore.setUser(updated);
-  ElMessage.success("状态已保存");
+  if (!user.value || !nextValue) return;
+  // 当前 chatStatus 与新值相同则无操作（兼容数字/字符串比较）
+  if (Number(user.value.chatStatus) === Number(nextValue)) {
+    ElMessage.info("当前已是该状态");
+    return;
+  }
+  try {
+    const updated = await apiUpdateProfile({chatStatus: nextValue});
+    userStore.setUser(updated);
+    // 同步更新 userStatusMap，UI 立即响应
+    userStatusMap.value.set(user.value.id, {
+      chatStatus: Number(nextValue),
+      online: true,
+    });
+    userStatusMap.value = new Map(userStatusMap.value);
+    ElMessage.success("状态已更新");
+  } catch (err) {
+    console.error("更新状态失败", err);
+    ElMessage.error("状态更新失败，请重试");
+  }
 }
 
 function quoteMsg(m) {
@@ -2859,8 +2952,27 @@ function onWsReceipt(data) {
 }
 
 function onWsOnline(data) {
-  if (data.online) onlineSet.value.add(data.userId);
-  else onlineSet.value.delete(data.userId);
+  // 兼容两种格式：{userId, online} 或 {userId, online, chatStatus, lastActiveAt}
+  if (!data || data.userId == null) return;
+  const uid = Number(data.userId);
+  const isOnline = Boolean(data.online);
+  const chatStatus = data.chatStatus != null ? data.chatStatus : userStatusMap.value.get(uid)?.chatStatus;
+  // 更新 userStatusMap（优先级最高）
+  userStatusMap.value.set(uid, {
+    chatStatus: chatStatus ?? 1,
+    online: isOnline,
+    lastActiveAt: data.lastActiveAt,
+  });
+  userStatusMap.value = new Map(userStatusMap.value);
+  // 同时同步更新 contacts 中的对应项（保证 contactMap 计算属性一致）
+  const contact = contacts.value.find((u) => u.id === uid);
+  if (contact) {
+    contact.online = isOnline;
+    if (chatStatus != null) contact.chatStatus = chatStatus;
+  }
+  // 更新 onlineSet（向后兼容）
+  if (isOnline) onlineSet.value.add(uid);
+  else onlineSet.value.delete(uid);
   onlineSet.value = new Set(onlineSet.value);
 }
 
@@ -5709,6 +5821,58 @@ function scrollBottom() {
 
 .status-option-dot.offline {
   background: #bfbfbf;
+}
+
+.pp-status-selector {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.pp-status-selector .pp-status {
+  margin-bottom: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.pp-status-selector .pp-status .el-icon {
+  transition: transform 0.2s;
+}
+
+.pp-status-selector .pp-status .el-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.pp-status-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: var(--dt-bg-elevated, #fff);
+  border: 1px solid var(--dt-border);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 120px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 10000;
+}
+
+.pp-status-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--dt-text);
+}
+
+.pp-status-option:hover {
+  background: var(--dt-hover);
+}
+
+.pp-status-option.active {
+  background: var(--dt-primary-light, #ecf5ff);
+  color: var(--dt-primary, #409eff);
 }
 
 .pp-divider {

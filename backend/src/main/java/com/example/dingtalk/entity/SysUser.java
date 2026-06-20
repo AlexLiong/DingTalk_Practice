@@ -26,5 +26,7 @@ public class SysUser {
     private LocalDateTime createTime;
 
     @TableField(exist = false)
+    private Boolean online;
+    @TableField(exist = false)
     private List<Long> roleIds;
 }

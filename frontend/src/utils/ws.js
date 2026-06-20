@@ -28,13 +28,16 @@ function emit(type, payload) {
 
 export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNotice, onSessionUnread) {
   if (!token) return null
+
+  // 若已存在同一 token 的连接，直接复用，避免重复添加监听器
+  if (client && boundToken === token) return client
+
+  // 只有在新建/重连时才添加监听器
   addListener('message', onMessage)
   addListener('receipt', onReceipt)
   addListener('online', onOnlineStatus)
   addListener('workNotice', onWorkNotice)
   addListener('sessionUnread', onSessionUnread)
-
-  if (client && boundToken === token) return client
 
   if (client) {
     client.deactivate()

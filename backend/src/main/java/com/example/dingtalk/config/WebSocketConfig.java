@@ -14,7 +14,9 @@ import org.springframework.web.socket.config.annotation.*;
 
 import java.security.Principal;
 
-/** WebSocket (STOMP) 配置, 握手时用 JWT 鉴权并绑定 Principal=userId */
+/** WebSocket (STOMP) 配置, 握手时用 JWT 鉴权并绑定 Principal=userId
+ *  注意: 在线状态的连接/断开事件由 {@link WebSocketEventListener} 处理，
+ *  避免本配置类直接依赖 OnlineService 造成循环依赖。*/
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
