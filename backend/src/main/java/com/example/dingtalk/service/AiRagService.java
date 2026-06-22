@@ -154,7 +154,7 @@ public class AiRagService {
 
     private String buildSimplePrompt(String question) {
         return """
-                你是企业协作平台里的通用助手，请使用中文回答用户的问题，并提供有价值的见解。
+                你是企业协作平台里的通用助手，请使用中文，不加带特殊语法（如md，katex）的，模仿人类办公对话的语气回答用户的问题，并提供有价值的见解。
                 用户问题:
                 %s
                 """.formatted(question);
