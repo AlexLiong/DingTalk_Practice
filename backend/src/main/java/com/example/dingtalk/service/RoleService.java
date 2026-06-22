@@ -47,7 +47,18 @@ public class RoleService {
     @Transactional
     public void update(SysRole role) {
         if (role.getId() == null) throw new BizException("角色id不能为空");
-        roleMapper.updateById(role);
+        // 判断是否有需要更新的主表字段
+        boolean hasUpdateField = role.getName() != null
+                || role.getRoleKey() != null
+                || role.getSort() != null
+                || role.getStatus() != null
+                || role.getRemark() != null
+                || role.getCreateTime() != null;
+
+        // 只有存在要更新的字段才执行updateById，避免空SET报错
+        if (hasUpdateField) {
+            roleMapper.updateById(role);
+        }
         if (role.getMenuIds() != null) {
             roleMenuMapper.deleteByRoleId(role.getId());
             saveMenus(role.getId(), role.getMenuIds());
