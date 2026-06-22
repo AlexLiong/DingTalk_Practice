@@ -305,7 +305,7 @@ async function submitAdd() {
       content: addForm.content,
       startTime: addForm.startTime,
       endTime: addForm.allDay ? addForm.startTime : addForm.endTime,
-      allDay: addForm.allDay,
+      allDay: addForm.allDay?1:0,
       color: addForm.color
     })
     ElMessage.success('日程已创建')
