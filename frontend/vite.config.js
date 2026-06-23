@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 // 前端开发服务器 5173, 把 /api 和 /ws 反向代理到后端 8080
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(),vueDevTools()],
   define: {
     global: 'window'
   },
