@@ -61,7 +61,7 @@
           <div class="scenario-desc">{{ scene.description }}</div>
           <div class="scenario-target">{{ scene.targetTitle }}</div>
           <div class="scenario-actions">
-            <el-button size="small" type="primary" @click="focusScenario(scene)">打开用例</el-button>
+            <el-button size="small" type="primary" @click="focusScenario(scene)">打开提醒</el-button>
             <el-button size="small" @click="applyScenario(scene)">{{ scene.actionLabel }}</el-button>
           </div>
         </div>
@@ -189,7 +189,7 @@
             </div>
 
             <div class="detail-section">
-              <div class="section-title">快捷处理用例</div>
+              <div class="section-title">快捷处理</div>
               <div class="usecase-list">
                 <div v-for="item in currentDing.useCases" :key="item.title" class="usecase-card">
                   <div class="usecase-title">{{ item.title }}</div>

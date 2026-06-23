@@ -218,7 +218,7 @@
               </div>
               <div class="reply-actions">
                 <el-button @click="saveDraft">保存草稿</el-button>
-                <el-button type="primary" @click="sendReply">发送模拟回复</el-button>
+                <el-button type="primary" @click="sendReply">发送回复</el-button>
               </div>
             </div>
 
