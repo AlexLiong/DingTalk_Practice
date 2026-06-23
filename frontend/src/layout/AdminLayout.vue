@@ -65,7 +65,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Setting, User, Avatar, Menu, OfficeBuilding, Document,
-  Location, ChatDotRound, ArrowDown
+  Location, ChatDotRound, ArrowDown,DataBoard
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../store/user'
 
@@ -75,7 +75,7 @@ const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const menus = computed(() => userStore.menus)
 
-const iconMap = { Setting, User, Avatar, Menu, OfficeBuilding, Document }
+const iconMap = { Setting, User, Avatar, Menu, OfficeBuilding, Document,DataBoard }
 
 const activeMenu = computed(() => route.path)
 const titleMap = {
