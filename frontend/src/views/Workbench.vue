@@ -1015,9 +1015,6 @@
               <Setting
               />
             </el-icon>
-            <el-icon :size="18">
-              <MoreFilled/>
-            </el-icon>
           </div>
         </div>
 
@@ -1157,18 +1154,6 @@
                   <div v-if="hoverId === m.id" class="msg-actions">
                     <span @click="quoteMsg(m)">引用</span>
                     <span @click="favoriteMsg(m)">收藏</span>
-                    <el-popover trigger="click" :width="200" placement="top">
-                      <template #reference><span>😀</span></template>
-                      <div class="reaction-picker">
-                        <span
-                            v-for="e in quickReactions"
-                            :key="e"
-                            class="reaction-emoji"
-                            @click="toggleReaction(m.id, e)"
-                        >{{ e }}</span
-                        >
-                      </div>
-                    </el-popover>
                     <span v-if="m.senderId === user?.id" @click="recall(m)"
                     >撤回</span
                     >
@@ -1715,6 +1700,7 @@ const recentUsageKeys = ref([]);
 const workbenchStateReady = ref(false);
 const preferredSessionId = ref(null);
 const emojiTab = ref(0);
+const reactionVisible = ref(false);
 const aiLoading = ref(false);
 let aiEventSource = null;
 const emojiCategories = [
@@ -2906,6 +2892,13 @@ function handleGlobalClick(event) {
   if (addWrapRef.value && !addWrapRef.value.contains(event.target))
     closeAddPanel();
   if (ctxMenu.visible) ctxMenu.visible = false;
+  if (reactionVisible.value) {
+    const reactionContent = document.querySelector('.reaction-popover-content');
+    const reactionBtn = document.querySelector('.msg-actions span:first-of-type + span + span');
+    if (!reactionContent?.contains(event.target) && !reactionBtn?.contains(event.target)) {
+      reactionVisible.value = false;
+    }
+  }
 }
 
 function onWsMessage(msg) {
@@ -5066,7 +5059,7 @@ function scrollBottom() {
 }
 
 .bubble :deep(.at) {
-  color: #1677ff;
+  color: #e32107;
 }
 
 .msg-row.mine .bubble {
