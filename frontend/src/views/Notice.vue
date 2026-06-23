@@ -247,4 +247,38 @@ async function toggle(item) {
     padding: 16px;
   }
 }
+@media (max-width: 768px) {
+  .notice-top {
+    padding: 10px 12px 8px;
+  }
+  .notice-top-inner {
+    flex-wrap: wrap;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .notice-body {
+    padding: 10px 12px;
+    padding-bottom: calc(12px + var(--dt-bottom-tab-height));
+  }
+  .card-list {
+    gap: 8px;
+  }
+  .notice-card {
+    padding: 12px 14px;
+  }
+  .card-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+  }
+}
 </style>

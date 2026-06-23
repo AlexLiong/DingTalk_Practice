@@ -1641,6 +1641,41 @@ function triggerDownload(url, name) {
   .file-side {
     align-items: flex-start;
   }
+  .documents-top {
+    padding: 10px 12px 8px;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .documents-body {
+    padding: 10px 12px;
+    padding-bottom: calc(12px + var(--dt-bottom-tab-height));
+  }
+  .workspace-panel {
+    flex-direction: column;
+  }
+  .workspace-left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .workspace-right {
+    display: none;
+  }
+  .workspace-panel.detail-active .workspace-left {
+    display: none;
+  }
+  .workspace-panel.detail-active .workspace-right {
+    display: block;
+  }
 }
 @media (max-width: 960px) {
   .documents-top {

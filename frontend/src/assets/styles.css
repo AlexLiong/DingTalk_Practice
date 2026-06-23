@@ -56,3 +56,43 @@ body {
   transition: background .3s, color .3s;
 }
 ul { list-style: none; }
+
+/* ========== 移动端全局适配 ========== */
+:root {
+  --dt-mobile-breakpoint: 768px;
+  --dt-side-nav-width: 130px;
+  --dt-bottom-tab-height: 56px;
+}
+
+/* 移动端隐藏侧边导航，显示底部Tab */
+@media (max-width: 768px) {
+  html, body, #app {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-size: 13px;
+  }
+  /* Element Plus 弹窗/抽屉移动端适配 */
+  .el-dialog {
+    width: 92vw !important;
+    max-width: 420px !important;
+    margin: auto !important;
+  }
+  .el-dialog__body {
+    padding: 16px !important;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .el-drawer {
+    width: 80vw !important;
+    max-width: 320px !important;
+  }
+  .el-table {
+    font-size: 12px;
+  }
+  .el-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

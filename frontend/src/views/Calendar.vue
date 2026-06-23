@@ -580,4 +580,47 @@ onMounted(() => {
     padding: 16px;
   }
 }
+@media (max-width: 768px) {
+  .calendar-top {
+    padding: 10px 12px 8px;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .calendar-body {
+    flex-direction: column;
+    padding: 10px 12px;
+    padding-bottom: calc(12px + var(--dt-bottom-tab-height));
+    overflow-y: auto;
+  }
+  .calendar-left {
+    width: 100%;
+    min-width: 0;
+  }
+  .calendar-right {
+    margin-top: 12px;
+  }
+  .cal-cell {
+    padding: 6px 0;
+  }
+  .cell-num {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 13px;
+  }
+  .cal-cell.is-today .cell-num {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+}
 </style>

@@ -165,4 +165,27 @@ async function remove(row) {
 .pager { margin-top: 16px; display: flex; justify-content: flex-end; }
 .read-cell { display: flex; align-items: center; gap: 8px; }
 .read-text { font-size: 12px; color: #666; white-space: nowrap; }
+
+@media (max-width: 768px) {
+  .page-card {
+    padding: 12px;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toolbar :deep(.el-input) {
+    width: 100% !important;
+  }
+  .toolbar :deep(.el-button) {
+    flex: 1;
+    min-width: calc(50% - 4px);
+  }
+  .spacer {
+    display: none;
+  }
+  .pager {
+    justify-content: center;
+  }
+}
 </style>

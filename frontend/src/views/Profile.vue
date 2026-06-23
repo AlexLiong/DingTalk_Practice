@@ -132,4 +132,22 @@ function avatarStyle(name) {
 .avatar-box { display: flex; flex-direction: column; align-items: center; padding: 10px 0 20px; border-bottom: 1px solid #f0f0f0; }
 .info-line { display: flex; justify-content: space-between; padding: 12px 4px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
 .info-line span { color: #999; }
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  .profile-body {
+    flex-direction: column;
+    padding: 12px;
+  }
+  .left-card {
+    width: 100%;
+  }
+  .right-card {
+    width: 100%;
+  }
+  .profile-top {
+    height: 48px;
+    padding: 0 12px;
+  }
+}
 </style>

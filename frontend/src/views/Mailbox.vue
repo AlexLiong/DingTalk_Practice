@@ -1514,5 +1514,41 @@ function mailMetaText(mail) {
   .stat-row {
     grid-template-columns: 1fr 1fr;
   }
+  .mailbox-top {
+    padding: 10px 12px 8px;
+  }
+  .mailbox-top-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .mailbox-body {
+    padding-bottom: var(--dt-bottom-tab-height);
+  }
+  .mailbox-layout {
+    flex-direction: column;
+  }
+  .mail-list-wrap {
+    width: 100%;
+  }
+  .mail-detail-wrap {
+    display: none;
+  }
+  .mailbox-layout.detail-active .mail-list-wrap {
+    display: none;
+  }
+  .mailbox-layout.detail-active .mail-detail-wrap {
+    display: block;
+  }
 }
 </style>

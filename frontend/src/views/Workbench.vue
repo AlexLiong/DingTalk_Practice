@@ -1,139 +1,166 @@
 <template>
-  <div class="workbench" :class="{ dark: isDark }">
-    <!-- ========== 1. 左侧导航栏 (仿钉钉宽版文字导航 ~130px) ========== -->
-    <div class="side-nav">
-      <!-- 组织选择器 -->
-      <div class="org-header" @click.stop="togglePanel">
-        <div class="nav-avatar-wrap">
-          <el-avatar
-            :size="28"
-            shape="square"
-            :src="user?.avatar"
-            :style="avatarStyle(user?.nickname)"
-            >{{ firstChar(user?.nickname) }}
-          </el-avatar>
-          <span class="nav-status-dot" :class="myStatusClass"></span>
-        </div>
-        <span class="org-name">{{ user?.deptName || "企业协作" }}</span>
-        <el-icon :size="12">
-          <ArrowDown />
-        </el-icon>
+  <div class="workbench-wrapper">
+    <!-- 移动端：底部Tab栏 -->
+    <div class="mobile-bottom-tab">
+      <div class="tab-item" :class="{ active: tab === 'chat' }" @click="tab = 'chat'; chatFilter = 'all'">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">消息</span>
+        <span v-if="unreadTotal > 0" class="tab-badge">{{ unreadTotal > 99 ? '99+' : unreadTotal }}</span>
       </div>
-
-      <!-- 导航菜单 (可滚动) -->
-      <div class="nav-list">
-        <div
-          class="nav-row"
-          :class="{ active: tab === 'chat' && chatFilter === 'all' }"
-          @click="
-            tab = 'chat';
-            chatFilter = 'all';
-          "
-        >
-          <span class="nav-icon">💬</span><span>消息</span>
-          <span v-if="unreadTotal > 0" class="nav-badge">{{
-            unreadTotal > 99 ? "99+" : unreadTotal
-          }}</span>
-        </div>
-        <div class="nav-row" @click="$router.push('/documents')">
-          <span class="nav-icon">📄</span><span>文档</span>
-        </div>
-        <div
-          class="nav-row"
-          :class="{ active: tab === 'work' }"
-          @click="tab = 'work'"
-        >
-          <span class="nav-icon">💼</span><span>工作台</span>
-        </div>
-        <div
-          class="nav-row"
-          :class="{ active: tab === 'contacts' }"
-          @click="switchContacts"
-        >
-          <span class="nav-icon">📇</span><span>通讯录</span>
-        </div>
-        <div
-          class="nav-row"
-          @click="
-            tab = 'chat';
-            chatFilter = 'atme';
-          "
-        >
-          <span class="nav-icon">@</span><span>@我</span>
-        </div>
-        <div class="nav-row" @click="$router.push('/calendar')">
-          <span class="nav-icon">📅</span><span>日历</span>
-        </div>
-
-        <div class="nav-sep"></div>
-
-        <div
-          class="nav-row"
-          :class="{ active: tab === 'chat' && chatFilter === 'single' }"
-          @click="
-            tab = 'chat';
-            chatFilter = 'single';
-          "
-        >
-          <span class="nav-icon">👤</span><span>单聊</span>
-        </div>
-        <div
-          class="nav-row"
-          :class="{ active: tab === 'chat' && chatFilter === 'group' }"
-          @click="
-            tab = 'chat';
-            chatFilter = 'group';
-          "
-        >
-          <span class="nav-icon">👥</span><span>群聊</span>
-        </div>
-        <div class="nav-row" @click="$router.push('/notice')">
-          <span class="nav-icon">🔔</span><span>通知</span>
-        </div>
-
-        <div class="nav-sep"></div>
-
-        <div class="nav-row" @click="$router.push('/mailbox')">
-          <span class="nav-icon">📧</span><span>邮箱</span>
-          <span v-if="collabCounts.mailboxUnread > 0" class="nav-badge">{{
-            formatCounter(collabCounts.mailboxUnread)
-          }}</span>
-        </div>
-        <div class="nav-row" @click="$router.push('/todo')">
-          <span class="nav-icon">📝</span><span>待办</span>
-        </div>
-        <div class="nav-row" @click="$router.push('/ding')">
-          <span class="nav-icon">🔔</span><span>DING</span>
-          <span v-if="collabCounts.dingPending > 0" class="nav-badge">{{
-            formatCounter(collabCounts.dingPending)
-          }}</span>
-        </div>
-        <div class="nav-row" @click="$router.push('/favorites')">
-          <span class="nav-icon">⭐</span><span>收藏</span>
-        </div>
-        <div
-          class="nav-row"
-          v-if="isAdmin"
-          @click="$router.push('/admin/dashboard')"
-        >
-          <span class="nav-icon">📊</span><span>数据</span>
-        </div>
-        <div class="nav-row" v-if="isAdmin" @click="$router.push('/admin')">
-          <span class="nav-icon">⚙️</span><span>管理</span>
-        </div>
+      <div class="tab-item" :class="{ active: false }" @click="$router.push('/documents')">
+        <span class="tab-icon">📄</span>
+        <span class="tab-label">文档</span>
       </div>
-
-      <!-- 底部按钮 -->
-      <div class="nav-footer">
-        <div class="nav-row" @click="themeStore.toggle()">
-          <span class="nav-icon">{{ isDark ? "☀️" : "🌙" }}</span
-          ><span>主题</span>
-        </div>
-        <div class="nav-row nav-logout" @click="logout">
-          <span class="nav-icon">🚪</span><span>退出</span>
-        </div>
+      <div class="tab-item" :class="{ active: tab === 'work' }" @click="tab = 'work'">
+        <span class="tab-icon">💼</span>
+        <span class="tab-label">工作台</span>
+      </div>
+      <div class="tab-item" :class="{ active: false }" @click="$router.push('/calendar')">
+        <span class="tab-icon">📅</span>
+        <span class="tab-label">日历</span>
+      </div>
+      <div class="tab-item" :class="{ active: tab === 'contacts' }" @click="tab = 'contacts'">
+        <span class="tab-icon">📇</span>
+        <span class="tab-label">通讯录</span>
       </div>
     </div>
+    
+    <!-- 主内容区域 -->
+    <div class="workbench" :class="{ dark: isDark, 'chat-active': isMobileChatActive }">
+      <!-- ========== 1. 左侧导航栏 (仿钉钉宽版文字导航 ~130px) ========== -->
+      <div class="side-nav">
+        <!-- 组织选择器 -->
+        <div class="org-header" @click.stop="togglePanel">
+          <div class="nav-avatar-wrap">
+            <el-avatar
+              :size="28"
+              shape="square"
+              :src="user?.avatar"
+              :style="avatarStyle(user?.nickname)"
+              >{{ firstChar(user?.nickname) }}
+            </el-avatar>
+            <span class="nav-status-dot" :class="myStatusClass"></span>
+          </div>
+          <span class="org-name">{{ user?.deptName || "企业协作" }}</span>
+          <el-icon :size="12">
+            <ArrowDown />
+          </el-icon>
+        </div>
+
+        <!-- 导航菜单 (可滚动) -->
+        <div class="nav-list">
+          <div
+            class="nav-row"
+            :class="{ active: tab === 'chat' && chatFilter === 'all' }"
+            @click="
+              tab = 'chat';
+              chatFilter = 'all';
+            "
+          >
+            <span class="nav-icon">💬</span><span>消息</span>
+            <span v-if="unreadTotal > 0" class="nav-badge">{{
+              unreadTotal > 99 ? "99+" : unreadTotal
+            }}</span>
+          </div>
+          <div class="nav-row" @click="$router.push('/documents')">
+            <span class="nav-icon">📄</span><span>文档</span>
+          </div>
+          <div
+            class="nav-row"
+            :class="{ active: tab === 'work' }"
+            @click="tab = 'work'"
+          >
+            <span class="nav-icon">💼</span><span>工作台</span>
+          </div>
+          <div
+            class="nav-row"
+            :class="{ active: tab === 'contacts' }"
+            @click="switchContacts"
+          >
+            <span class="nav-icon">📇</span><span>通讯录</span>
+          </div>
+          <div
+            class="nav-row"
+            @click="
+              tab = 'chat';
+              chatFilter = 'atme';
+            "
+          >
+            <span class="nav-icon">@</span><span>@我</span>
+          </div>
+          <div class="nav-row" @click="$router.push('/calendar')">
+            <span class="nav-icon">📅</span><span>日历</span>
+          </div>
+
+          <div class="nav-sep"></div>
+
+          <div
+            class="nav-row"
+            :class="{ active: tab === 'chat' && chatFilter === 'single' }"
+            @click="
+              tab = 'chat';
+              chatFilter = 'single';
+            "
+          >
+            <span class="nav-icon">👤</span><span>单聊</span>
+          </div>
+          <div
+            class="nav-row"
+            :class="{ active: tab === 'chat' && chatFilter === 'group' }"
+            @click="
+              tab = 'chat';
+              chatFilter = 'group';
+            "
+          >
+            <span class="nav-icon">👥</span><span>群聊</span>
+          </div>
+          <div class="nav-row" @click="$router.push('/notice')">
+            <span class="nav-icon">🔔</span><span>通知</span>
+          </div>
+
+          <div class="nav-sep"></div>
+
+          <div class="nav-row" @click="$router.push('/mailbox')">
+            <span class="nav-icon">📧</span><span>邮箱</span>
+            <span v-if="collabCounts.mailboxUnread > 0" class="nav-badge">{{
+              formatCounter(collabCounts.mailboxUnread)
+            }}</span>
+          </div>
+          <div class="nav-row" @click="$router.push('/todo')">
+            <span class="nav-icon">📝</span><span>待办</span>
+          </div>
+          <div class="nav-row" @click="$router.push('/ding')">
+            <span class="nav-icon">🔔</span><span>DING</span>
+            <span v-if="collabCounts.dingPending > 0" class="nav-badge">{{
+              formatCounter(collabCounts.dingPending)
+            }}</span>
+          </div>
+          <div class="nav-row" @click="$router.push('/favorites')">
+            <span class="nav-icon">⭐</span><span>收藏</span>
+          </div>
+          <div
+            class="nav-row"
+            v-if="isAdmin"
+            @click="$router.push('/admin/dashboard')"
+          >
+            <span class="nav-icon">📊</span><span>数据</span>
+          </div>
+          <div class="nav-row" v-if="isAdmin" @click="$router.push('/admin')">
+            <span class="nav-icon">⚙️</span><span>管理</span>
+          </div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="nav-footer">
+          <div class="nav-row" @click="themeStore.toggle()">
+            <span class="nav-icon">{{ isDark ? "☀️" : "🌙" }}</span
+            ><span>主题</span>
+          </div>
+          <div class="nav-row nav-logout" @click="logout">
+            <span class="nav-icon">🚪</span><span>退出</span>
+          </div>
+        </div>
+      </div>
 
     <!-- 个人信息侧边面板 (仿钉钉) -->
     <Transition name="panel-slide">
@@ -975,6 +1002,7 @@
     <div class="chat-panel">
       <template v-if="current">
         <div class="chat-header">
+          <el-button class="mobile-back-btn" text :icon="Back" @click="goBackToSessions" />
           <div class="ch-title">
             {{ current.name
             }}<span v-if="current.type === 2" class="ch-count">(群聊)</span>
@@ -1490,6 +1518,7 @@
       @close="previewUrl = ''"
     />
   </div>
+</div>
 </template>
 
 <script setup>
@@ -1534,6 +1563,7 @@ import {
   DArrowLeft,
   DArrowRight,
   VideoCamera,
+  Back,
 } from "@element-plus/icons-vue";
 import { useUserStore } from "../store/user";
 import { useThemeStore } from "../store/theme";
@@ -1586,6 +1616,10 @@ const preferenceStore = useUserPreferenceStore();
 const user = computed(() => userStore.user);
 const isAdmin = computed(() => userStore.isAdmin);
 const isDark = computed(() => themeStore.dark);
+
+// 移动端聊天导航
+const isMobileChatActive = ref(false)
+function goBackToSessions() { isMobileChatActive.value = false }
 
 const tab = ref("chat");
 const keyword = ref("");
@@ -2320,6 +2354,7 @@ async function hydrateAtMeSessions() {
 async function openSession(s) {
   closeAiSse();
   current.value = s;
+  isMobileChatActive.value = true;
   quoteRef.value = null;
   messages.value = (await apiMessages(s.id)).map(hydrateMessage);
   if (s.unread) {
@@ -3526,10 +3561,22 @@ function scrollBottom() {
 </script>
 
 <style scoped>
-.workbench {
+/* 桌面端隐藏底部Tab栏 */
+.mobile-bottom-tab {
+  display: none;
+}
+
+.workbench-wrapper {
   height: 100%;
   display: flex;
+  flex-direction: column;
+}
+
+.workbench {
+  flex: 1;
+  display: flex;
   background: var(--dt-bg);
+  overflow: hidden;
 }
 
 /* ========== 左侧导航栏 (仿钉钉宽版 ~130px) ========== */
@@ -5938,5 +5985,205 @@ function scrollBottom() {
 
 .panel-slide-leave-to .pp-content {
   transform: translateX(-100%);
+}
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  /* 整体布局容器 */
+  .workbench-wrapper {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: var(--dt-bottom-tab-height);
+  }
+  
+  .workbench {
+    flex-direction: column;
+    flex: 1;
+    padding-bottom: 0;
+    position: relative;
+    overflow: auto;
+  }
+  
+  /* 隐藏桌面端元素 */
+  .workbench > .side-nav {
+    display: none;
+  }
+  .workbench .group-panel,
+  .workbench .gp-toggle {
+    display: none;
+  }
+  
+  /* 移动端底部Tab栏样式 */
+  .mobile-bottom-tab {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--dt-bottom-tab-height);
+    background: var(--dt-list-bg);
+    border-top: 1px solid var(--dt-border);
+    z-index: 800;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--dt-text-secondary);
+    cursor: pointer;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab-item.active { color: var(--dt-primary); }
+  .tab-icon { font-size: 20px; line-height: 1; }
+  .tab-label { font-size: 10px; }
+  .tab-badge {
+    position: absolute;
+    top: 2px;
+    right: 50%;
+    transform: translateX(14px);
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 8px;
+    background: #f56c6c;
+    color: #fff;
+    font-size: 9px;
+    padding: 0 4px;
+  }
+  
+  /* 消息列表面板 - 默认显示 */
+  .workbench .mid-panel {
+    width: 100%;
+    border-right: none;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--dt-bg);
+  }
+  
+  /* 消息列表头部 */
+  .workbench .mid-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--dt-border);
+    background: var(--dt-bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  /* 搜索框 */
+  .workbench .search-input {
+    height: 36px;
+    font-size: 13px;
+  }
+  
+  /* 消息列表区域 - 留出底部空间 */
+  .workbench .chat-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: calc(16px + var(--dt-bottom-tab-height));
+  }
+  
+  /* 聊天面板 - 默认隐藏，选中会话时显示 */
+  .workbench .chat-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--dt-bottom-tab-height);
+    background: var(--dt-chat-bg);
+    z-index: 100;
+    flex-direction: column;
+  }
+  
+  /* 选中会话时切换显示 */
+  .workbench.chat-active .mid-panel {
+    display: none;
+  }
+  .workbench.chat-active .chat-panel {
+    display: flex;
+  }
+  
+  /* 聊天头部 */
+  .chat-header {
+    height: 48px;
+    padding: 0 12px;
+    background: var(--dt-bg);
+    border-bottom: 1px solid var(--dt-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* 返回按钮 - 移动端始终显示 */
+  .mobile-back-btn {
+    display: inline-flex !important;
+    margin-right: 8px;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ch-title { 
+    font-size: 14px; 
+    flex: 1;
+    text-align: center;
+  }
+  
+  /* 聊天内容区域 */
+  .chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px;
+    padding-bottom: calc(8px + var(--dt-bottom-tab-height));
+  }
+  
+  .chat-input-bar {
+    padding: 8px 10px;
+    padding-bottom: calc(8px + var(--dt-bottom-tab-height));
+  }
+  
+  .msg-list {
+    padding: 8px 10px;
+  }
+  
+  /* 工作台列表 */
+  .work-list {
+    padding-bottom: calc(16px + var(--dt-bottom-tab-height));
+  }
+  
+  /* 通讯录列表 */
+  .contacts-panel {
+    padding-bottom: calc(16px + var(--dt-bottom-tab-height));
+  }
+  
+  /* 个人信息面板 */
+  .workbench .profile-panel .pp-content {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+/* 桌面端隐藏返回按钮 */
+@media (min-width: 769px) {
+  .mobile-back-btn {
+    display: none !important;
+  }
 }
 </style>

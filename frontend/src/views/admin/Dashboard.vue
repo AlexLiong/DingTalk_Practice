@@ -153,4 +153,39 @@ onUnmounted(() => {
 }
 .chart-title { margin: 0 0 10px; font-size: 15px; font-weight: 600; color: #1d2129; }
 .chart-container { width: 100%; height: 400px; }
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 12px;
+  }
+  .stat-row {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    min-width: calc(50% - 5px);
+    padding: 14px 12px;
+  }
+  .stat-icon-box {
+    width: 36px;
+    height: 36px;
+  }
+  .stat-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .stat-num {
+    font-size: 20px;
+  }
+  .chart-row {
+    gap: 12px;
+  }
+  .chart-box {
+    min-width: 100%;
+    padding: 12px;
+  }
+  .chart-container {
+    height: 280px;
+  }
+}
 </style>

@@ -109,4 +109,21 @@ async function remove(row) {
 .toolbar { display: flex; align-items: center; margin-bottom: 16px; }
 .title { font-size: 16px; font-weight: 600; }
 .spacer { flex: 1; }
+
+@media (max-width: 768px) {
+  .page-card {
+    padding: 12px;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toolbar :deep(.el-button) {
+    flex: 1;
+    min-width: calc(50% - 4px);
+  }
+  .spacer {
+    display: none;
+  }
+}
 </style>

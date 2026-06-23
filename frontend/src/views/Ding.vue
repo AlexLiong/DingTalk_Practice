@@ -1262,5 +1262,44 @@ function contactLabel(user) {
   .stat-row {
     grid-template-columns: 1fr 1fr;
   }
+  .ding-top {
+    padding: 10px 12px 8px;
+  }
+  .ding-top-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .ding-body {
+    padding-bottom: var(--dt-bottom-tab-height);
+  }
+  .ding-layout {
+    flex-direction: column;
+  }
+  .ding-list-wrap {
+    width: 100%;
+  }
+  .ding-detail-wrap {
+    display: none;
+  }
+  .ding-layout.detail-active .ding-list-wrap {
+    display: none;
+  }
+  .ding-layout.detail-active .ding-detail-wrap {
+    display: block;
+  }
+  .scenario-strip {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

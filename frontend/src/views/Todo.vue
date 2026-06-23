@@ -377,4 +377,41 @@ function statusType(s) { return { 0: 'warning', 1: 'primary', 2: 'success' }[s] 
     padding: 16px;
   }
 }
+@media (max-width: 768px) {
+  .todo-top {
+    padding: 10px 12px 8px;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .todo-body {
+    padding: 10px 12px;
+    padding-bottom: calc(12px + var(--dt-bottom-tab-height));
+  }
+  .stat-row {
+    gap: 8px;
+  }
+  .stat-card {
+    padding: 12px 14px;
+  }
+  .stat-num {
+    font-size: 20px;
+  }
+  .todo-card {
+    padding: 12px 14px;
+  }
+  .todo-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+  }
+}
 </style>

@@ -306,4 +306,30 @@ onMounted(() => {
     padding: 16px;
   }
 }
+@media (max-width: 768px) {
+  .favorites-top {
+    padding: 10px 12px 8px;
+  }
+  .page-back-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .ptitle {
+    font-size: 17px;
+  }
+  .page-section-label {
+    display: none;
+  }
+  .favorites-body {
+    padding: 10px 12px;
+    padding-bottom: calc(12px + var(--dt-bottom-tab-height));
+  }
+  .fav-card {
+    padding: 14px 16px;
+  }
+  .fav-text {
+    font-size: 13px;
+  }
+}
 </style>

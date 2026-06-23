@@ -255,4 +255,28 @@ async function submit() {
   white-space: nowrap;
 }
 .tip-pwd { color: #999; }
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  .login-box {
+    width: 94vw;
+    max-width: 400px;
+    min-height: auto;
+    flex-direction: column;
+    border-radius: 12px;
+  }
+  .login-left {
+    display: none;
+  }
+  .login-right {
+    padding: 28px 24px;
+  }
+  .form-wrap {
+    max-width: 100%;
+  }
+  .tip-accounts {
+    grid-template-columns: 1fr;
+  }
+  .bg-deco { display: none; }
+}
 </style>

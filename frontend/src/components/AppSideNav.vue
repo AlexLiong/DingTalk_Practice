@@ -1,5 +1,6 @@
 <template>
-  <div class="side-nav">
+  <!-- 桌面端：左侧导航栏 -->
+  <div class="side-nav desktop-nav">
     <div class="org-header" @click="profilePanel = !profilePanel">
       <div class="nav-avatar-wrap">
         <el-avatar :size="28" shape="square" :src="user?.avatar" :style="avatarStyle(user?.nickname)">{{ firstChar(user?.nickname) }}</el-avatar>
@@ -75,6 +76,69 @@
       </div>
     </div>
   </div>
+
+  <!-- 移动端：底部Tab栏 -->
+  <div class="mobile-bottom-tab">
+    <div class="tab-item" :class="{ active: activeKey === 'chat' }" @click="navigateTo('chat')">
+      <span class="tab-icon">💬</span>
+      <span class="tab-label">消息</span>
+      <span v-if="messageUnread > 0" class="tab-badge">{{ formatCounter(messageUnread) }}</span>
+    </div>
+    <div class="tab-item" :class="{ active: activeKey === 'documents' }" @click="navigateTo('documents')">
+      <span class="tab-icon">📄</span>
+      <span class="tab-label">文档</span>
+    </div>
+    <div class="tab-item" :class="{ active: activeKey === 'work' }" @click="navigateTo('work')">
+      <span class="tab-icon">💼</span>
+      <span class="tab-label">工作台</span>
+    </div>
+    <div class="tab-item" :class="{ active: activeKey === 'calendar' }" @click="navigateTo('calendar')">
+      <span class="tab-icon">📅</span>
+      <span class="tab-label">日历</span>
+    </div>
+    <div class="tab-item" :class="{ active: ['notice','todo','mailbox','ding','favorites','contacts','atme','single','group','admin','admin-dashboard'].includes(activeKey) }" @click="mobileMenuOpen = true">
+      <span class="tab-icon">☰</span>
+      <span class="tab-label">更多</span>
+    </div>
+  </div>
+
+  <!-- 移动端：更多菜单抽屉 -->
+  <el-drawer v-model="mobileMenuOpen" direction="btt" size="auto" :show-close="false" class="mobile-menu-drawer">
+    <div class="mobile-menu-grid">
+      <div class="mobile-menu-item" @click="navigateTo('contacts'); mobileMenuOpen = false">
+        <span class="mm-icon">📇</span><span>通讯录</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('notice'); mobileMenuOpen = false">
+        <span class="mm-icon">🔔</span><span>通知</span>
+        <span v-if="collabStore.mailboxUnread > 0" class="mm-badge">{{ formatCounter(collabStore.mailboxUnread) }}</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('mailbox'); mobileMenuOpen = false">
+        <span class="mm-icon">📧</span><span>邮箱</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('todo'); mobileMenuOpen = false">
+        <span class="mm-icon">📝</span><span>待办</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('ding'); mobileMenuOpen = false">
+        <span class="mm-icon">🔔</span><span>DING</span>
+        <span v-if="collabStore.dingPending > 0" class="mm-badge">{{ formatCounter(collabStore.dingPending) }}</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('favorites'); mobileMenuOpen = false">
+        <span class="mm-icon">⭐</span><span>收藏</span>
+      </div>
+      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
+        <span class="mm-icon">📊</span><span>数据</span>
+      </div>
+      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin'); mobileMenuOpen = false">
+        <span class="mm-icon">⚙️</span><span>管理</span>
+      </div>
+      <div class="mobile-menu-item" @click="profilePanel = true; mobileMenuOpen = false">
+        <span class="mm-icon">👤</span><span>我的</span>
+      </div>
+      <div class="mobile-menu-item" @click="themeStore.toggle(); mobileMenuOpen = false">
+        <span class="mm-icon">{{ isDark ? '☀️' : '🌙' }}</span><span>主题</span>
+      </div>
+    </div>
+  </el-drawer>
 
   <Transition name="panel-slide">
     <div v-if="profilePanel" class="profile-panel" @click.self="profilePanel = false">
@@ -153,6 +217,7 @@ const themeStore = useThemeStore()
 const collabStore = useCollabStore()
 
 const profilePanel = ref(false)
+const mobileMenuOpen = ref(false)
 
 const user = computed(() => userStore.user)
 const isAdmin = computed(() => userStore.isAdmin)
@@ -266,6 +331,92 @@ function avatarStyle(name) {
   flex-direction: column;
   user-select: none;
   flex-shrink: 0;
+}
+
+/* 移动端隐藏桌面导航 */
+.mobile-bottom-tab { display: none; }
+@media (max-width: 768px) {
+  .desktop-nav { display: none; }
+  .mobile-bottom-tab {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--dt-bottom-tab-height);
+    background: var(--dt-list-bg);
+    border-top: 1px solid var(--dt-border);
+    z-index: 800;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--dt-text-secondary);
+    cursor: pointer;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab-item.active { color: var(--dt-primary); }
+  .tab-icon { font-size: 20px; line-height: 1; }
+  .tab-label { font-size: 10px; }
+  .tab-badge {
+    position: absolute;
+    top: 2px;
+    right: 50%;
+    transform: translateX(14px);
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 8px;
+    background: #f56c6c;
+    color: #fff;
+    font-size: 9px;
+    padding: 0 4px;
+  }
+}
+
+/* 移动端更多菜单 */
+.mobile-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 8px 24px;
+}
+.mobile-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 4px;
+  font-size: 12px;
+  color: var(--dt-text);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: background .15s;
+}
+.mobile-menu-item:active { background: var(--dt-hover); }
+.mm-icon { font-size: 24px; }
+.mm-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 8px;
+  background: #f56c6c;
+  color: #fff;
+  font-size: 9px;
+  padding: 0 4px;
 }
 .org-header {
   display: flex;
@@ -390,6 +541,12 @@ function avatarStyle(name) {
   box-shadow: 4px 0 24px rgba(0,0,0,.18);
   padding: 24px 20px;
   overflow-y: auto;
+}
+@media (max-width: 768px) {
+  .pp-content {
+    width: 100%;
+    max-width: 320px;
+  }
 }
 .pp-header {
   display: flex;
