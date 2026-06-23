@@ -4,6 +4,7 @@
     <header class="mobile-topbar">
       <el-button text :icon="Expand" @click="drawerOpen = true" />
       <span class="mobile-title">{{ currentTitle }}</span>
+      <el-button text :icon="ChatDotRound" @click="$router.push('/chat')" class="mobile-back-btn">返回协作</el-button>
       <el-dropdown @command="onCommand">
         <span class="user-drop">
           <el-avatar :size="26" shape="square" :style="avatarStyle(user?.nickname)">
@@ -193,7 +194,7 @@ function avatarStyle(name) {
   .mobile-topbar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     height: 48px;
     background: #fff;
     border-bottom: 1px solid #ededed;
@@ -205,6 +206,12 @@ function avatarStyle(name) {
     font-size: 16px;
     font-weight: 600;
     color: #333;
+    text-align: center;
+  }
+  .mobile-back-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--dt-primary);
   }
   .main { flex: 1; overflow: hidden; }
   .content { padding: 12px; }

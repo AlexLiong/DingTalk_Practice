@@ -2,7 +2,7 @@
   <div class="workbench-wrapper">
     <!-- 移动端：底部Tab栏 -->
     <div class="mobile-bottom-tab">
-      <div class="tab-item" :class="{ active: tab === 'chat' }" @click="tab = 'chat'; chatFilter = 'all'">
+      <div class="tab-item" :class="{ active: tab === 'chat' }" @click="tab = 'chat'; chatFilter = 'all'; isMobileChatActive = false">
         <span class="tab-icon">💬</span>
         <span class="tab-label">消息</span>
         <span v-if="unreadTotal > 0" class="tab-badge">{{ unreadTotal > 99 ? '99+' : unreadTotal }}</span>
@@ -19,12 +19,45 @@
         <span class="tab-icon">📅</span>
         <span class="tab-label">日历</span>
       </div>
-      <div class="tab-item" :class="{ active: tab === 'contacts' }" @click="tab = 'contacts'">
-        <span class="tab-icon">📇</span>
-        <span class="tab-label">通讯录</span>
+      <div class="tab-item" :class="{ active: ['notice','todo','mailbox','ding','favorites','contacts','atme','single','group','admin','admin-dashboard'].includes(activeKey) }" @click="mobileMenuOpen = true">
+        <span class="tab-icon">☰</span>
+        <span class="tab-label">更多</span>
       </div>
     </div>
-    
+    <!-- 移动端：更多菜单抽屉 -->
+  <el-drawer v-model="mobileMenuOpen" direction="btt" size="auto" :show-close="false" class="mobile-menu-drawer">
+    <div class="mobile-menu-grid">
+      <div class="mobile-menu-item" @click="navigateTo('contacts'); mobileMenuOpen = false">
+        <span class="mm-icon">📇</span><span>通讯录</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('notice'); mobileMenuOpen = false">
+        <span class="mm-icon">🔔</span><span>通知</span>
+        <span v-if="collabStore.mailboxUnread > 0" class="mm-badge">{{ formatCounter(collabStore.mailboxUnread) }}</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('mailbox'); mobileMenuOpen = false">
+        <span class="mm-icon">📧</span><span>邮箱</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('todo'); mobileMenuOpen = false">
+        <span class="mm-icon">📝</span><span>待办</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('ding'); mobileMenuOpen = false">
+        <span class="mm-icon">🔔</span><span>DING</span>
+        <span v-if="collabStore.dingPending > 0" class="mm-badge">{{ formatCounter(collabStore.dingPending) }}</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('favorites'); mobileMenuOpen = false">
+        <span class="mm-icon">⭐</span><span>收藏</span>
+      </div>
+      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
+        <span class="mm-icon">📊</span><span>数据</span>
+      </div>
+      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin'); mobileMenuOpen = false">
+        <span class="mm-icon">⚙️</span><span>管理</span>
+      </div>
+      <div class="mobile-menu-item" @click="profilePanel = true; mobileMenuOpen = false">
+        <span class="mm-icon">👤</span><span>我的</span>
+      </div>
+    </div>
+  </el-drawer>
     <!-- 主内容区域 -->
     <div class="workbench" :class="{ dark: isDark, 'chat-active': isMobileChatActive }">
       <!-- ========== 1. 左侧导航栏 (仿钉钉宽版文字导航 ~130px) ========== -->
@@ -152,10 +185,6 @@
 
         <!-- 底部按钮 -->
         <div class="nav-footer">
-          <!-- <div class="nav-row" @click="themeStore.toggle()">
-            <span class="nav-icon">{{ isDark ? "☀️" : "🌙" }}</span
-            ><span>主题</span>
-          </div> -->
           <div class="nav-row nav-logout" @click="logout">
             <span class="nav-icon">🚪</span><span>退出</span>
           </div>
@@ -1621,6 +1650,41 @@ const isDark = computed(() => themeStore.dark);
 const isMobileChatActive = ref(false)
 function goBackToSessions() { isMobileChatActive.value = false }
 
+// 移动端更多菜单抽屉
+const mobileMenuOpen = ref(false)
+
+// 当前激活的导航键
+const activeKey = computed(() => {
+  const tabVal = tab.value
+  if (tabVal === 'chat') return 'chat'
+  if (tabVal === 'work') return 'work'
+  if (tabVal === 'contacts') return 'contacts'
+  return route.query.tab || route.query.filter || 'chat'
+})
+
+// 导航函数
+function navigateTo(key) {
+  mobileMenuOpen.value = false
+  profilePanel.value = false
+  if (key === 'chat') {
+    tab.value = 'chat'
+    isMobileChatActive.value = false
+  } else if (key === 'documents') router.push('/documents')
+  else if (key === 'work') tab.value = 'work'
+  else if (key === 'contacts') tab.value = 'contacts'
+  else if (key === 'atme') chatFilter.value = 'atme'
+  else if (key === 'calendar') router.push('/calendar')
+  else if (key === 'single') chatFilter.value = 'single'
+  else if (key === 'group') chatFilter.value = 'group'
+  else if (key === 'notice') router.push('/notice')
+  else if (key === 'mailbox') router.push('/mailbox')
+  else if (key === 'todo') router.push('/todo')
+  else if (key === 'ding') router.push('/ding')
+  else if (key === 'favorites') router.push('/favorites')
+  else if (key === 'admin-dashboard') router.push('/admin/dashboard')
+  else if (key === 'admin') router.push('/admin')
+}
+
 const tab = ref("chat");
 const keyword = ref("");
 const sessions = ref([]);
@@ -2319,7 +2383,10 @@ async function loadSessions() {
   collabStore.setMessageUnreadFromSessions(sessions.value);
   await hydrateAtMeSessions();
   await openSessionFromRoute();
-  await openStoredSessionIfNeeded();
+  // 移动端不自动打开会话，保持在消息列表页面
+  if (typeof window !== 'undefined' && window.innerWidth > 768) {
+    await openStoredSessionIfNeeded();
+  }
 }
 
 async function switchContacts() {
@@ -6185,5 +6252,49 @@ function scrollBottom() {
   .mobile-back-btn {
     display: none !important;
   }
+}
+
+/* 移动端更多菜单抽屉样式 */
+.mobile-menu-drawer :deep(.el-drawer__wrapper) {
+  z-index: 1000;
+}
+.mobile-menu-drawer :deep(.el-drawer) {
+  border-radius: 16px 16px 0 0;
+  padding: 0;
+}
+.mobile-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 8px 24px;
+}
+.mobile-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 4px;
+  font-size: 12px;
+  color: var(--dt-text);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: background .15s;
+}
+.mobile-menu-item:active { background: var(--dt-hover); }
+.mm-icon { font-size: 24px; }
+.mm-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 8px;
+  background: #f56c6c;
+  color: #fff;
+  font-size: 10px;
+  padding: 0 4px;
 }
 </style>
