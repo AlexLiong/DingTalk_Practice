@@ -152,10 +152,10 @@
 
         <!-- 底部按钮 -->
         <div class="nav-footer">
-          <div class="nav-row" @click="themeStore.toggle()">
+          <!-- <div class="nav-row" @click="themeStore.toggle()">
             <span class="nav-icon">{{ isDark ? "☀️" : "🌙" }}</span
             ><span>主题</span>
-          </div>
+          </div> -->
           <div class="nav-row nav-logout" @click="logout">
             <span class="nav-icon">🚪</span><span>退出</span>
           </div>
