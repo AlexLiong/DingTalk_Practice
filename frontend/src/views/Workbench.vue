@@ -6,56 +6,55 @@
       <div class="org-header" @click.stop="togglePanel">
         <div class="nav-avatar-wrap">
           <el-avatar
-              :size="28"
-              shape="square"
-              :src="user?.avatar"
-              :style="avatarStyle(user?.nickname)"
-          >{{ firstChar(user?.nickname) }}
-          </el-avatar
-          >
+            :size="28"
+            shape="square"
+            :src="user?.avatar"
+            :style="avatarStyle(user?.nickname)"
+            >{{ firstChar(user?.nickname) }}
+          </el-avatar>
           <span class="nav-status-dot" :class="myStatusClass"></span>
         </div>
         <span class="org-name">{{ user?.deptName || "企业协作" }}</span>
         <el-icon :size="12">
-          <ArrowDown/>
+          <ArrowDown />
         </el-icon>
       </div>
 
       <!-- 导航菜单 (可滚动) -->
       <div class="nav-list">
         <div
-            class="nav-row"
-            :class="{ active: tab === 'chat' && chatFilter === 'all' }"
-            @click="
+          class="nav-row"
+          :class="{ active: tab === 'chat' && chatFilter === 'all' }"
+          @click="
             tab = 'chat';
             chatFilter = 'all';
           "
         >
           <span class="nav-icon">💬</span><span>消息</span>
           <span v-if="unreadTotal > 0" class="nav-badge">{{
-              unreadTotal > 99 ? "99+" : unreadTotal
-            }}</span>
+            unreadTotal > 99 ? "99+" : unreadTotal
+          }}</span>
         </div>
         <div class="nav-row" @click="$router.push('/documents')">
           <span class="nav-icon">📄</span><span>文档</span>
         </div>
         <div
-            class="nav-row"
-            :class="{ active: tab === 'work' }"
-            @click="tab = 'work'"
+          class="nav-row"
+          :class="{ active: tab === 'work' }"
+          @click="tab = 'work'"
         >
           <span class="nav-icon">💼</span><span>工作台</span>
         </div>
         <div
-            class="nav-row"
-            :class="{ active: tab === 'contacts' }"
-            @click="switchContacts"
+          class="nav-row"
+          :class="{ active: tab === 'contacts' }"
+          @click="switchContacts"
         >
           <span class="nav-icon">📇</span><span>通讯录</span>
         </div>
         <div
-            class="nav-row"
-            @click="
+          class="nav-row"
+          @click="
             tab = 'chat';
             chatFilter = 'atme';
           "
@@ -69,9 +68,9 @@
         <div class="nav-sep"></div>
 
         <div
-            class="nav-row"
-            :class="{ active: tab === 'chat' && chatFilter === 'single' }"
-            @click="
+          class="nav-row"
+          :class="{ active: tab === 'chat' && chatFilter === 'single' }"
+          @click="
             tab = 'chat';
             chatFilter = 'single';
           "
@@ -79,9 +78,9 @@
           <span class="nav-icon">👤</span><span>单聊</span>
         </div>
         <div
-            class="nav-row"
-            :class="{ active: tab === 'chat' && chatFilter === 'group' }"
-            @click="
+          class="nav-row"
+          :class="{ active: tab === 'chat' && chatFilter === 'group' }"
+          @click="
             tab = 'chat';
             chatFilter = 'group';
           "
@@ -97,8 +96,8 @@
         <div class="nav-row" @click="$router.push('/mailbox')">
           <span class="nav-icon">📧</span><span>邮箱</span>
           <span v-if="collabCounts.mailboxUnread > 0" class="nav-badge">{{
-              formatCounter(collabCounts.mailboxUnread)
-            }}</span>
+            formatCounter(collabCounts.mailboxUnread)
+          }}</span>
         </div>
         <div class="nav-row" @click="$router.push('/todo')">
           <span class="nav-icon">📝</span><span>待办</span>
@@ -106,16 +105,16 @@
         <div class="nav-row" @click="$router.push('/ding')">
           <span class="nav-icon">🔔</span><span>DING</span>
           <span v-if="collabCounts.dingPending > 0" class="nav-badge">{{
-              formatCounter(collabCounts.dingPending)
-            }}</span>
+            formatCounter(collabCounts.dingPending)
+          }}</span>
         </div>
         <div class="nav-row" @click="$router.push('/favorites')">
           <span class="nav-icon">⭐</span><span>收藏</span>
         </div>
         <div
-            class="nav-row"
-            v-if="isAdmin"
-            @click="$router.push('/admin/dashboard')"
+          class="nav-row"
+          v-if="isAdmin"
+          @click="$router.push('/admin/dashboard')"
         >
           <span class="nav-icon">📊</span><span>数据</span>
         </div>
@@ -138,41 +137,36 @@
 
     <!-- 个人信息侧边面板 (仿钉钉) -->
     <Transition name="panel-slide">
-      <div
-          v-if="profilePanel"
-          class="profile-panel"
-          @click.self="closePanel"
-      >
+      <div v-if="profilePanel" class="profile-panel" @click.self="closePanel">
         <div class="pp-content">
           <div class="pp-header">
             <el-upload
-                :show-file-list="false"
-                :http-request="uploadAvatar"
-                accept="image/*"
-                class="pp-avatar-upload"
+              :show-file-list="false"
+              :http-request="uploadAvatar"
+              accept="image/*"
+              class="pp-avatar-upload"
             >
               <el-avatar
-                  :size="56"
-                  shape="square"
-                  :src="user?.avatar"
-                  :style="avatarStyle(user?.nickname)"
-                  class="pp-avatar-clickable"
-              >{{ firstChar(user?.nickname) }}
-              </el-avatar
-              >
+                :size="56"
+                shape="square"
+                :src="user?.avatar"
+                :style="avatarStyle(user?.nickname)"
+                class="pp-avatar-clickable"
+                >{{ firstChar(user?.nickname) }}
+              </el-avatar>
               <div class="pp-avatar-overlay">换头像</div>
             </el-upload>
             <div class="pp-info">
               <div
-                  class="pp-name"
-                  @click="
+                class="pp-name"
+                @click="
                   $router.push('/profile');
                   profilePanel = false;
                 "
               >
                 {{ user?.nickname }}
                 <el-icon :size="14">
-                  <ArrowRight/>
+                  <ArrowRight />
                 </el-icon>
               </div>
               <div class="pp-dept">
@@ -181,20 +175,27 @@
             </div>
           </div>
           <div class="pp-status-selector">
-            <div class="pp-status" @click.stop="statusDropdownOpen = !statusDropdownOpen">
+            <div
+              class="pp-status"
+              @click.stop="statusDropdownOpen = !statusDropdownOpen"
+            >
               <span class="status-dot" :class="myStatusClass"></span
               >{{ statusText }}
-              <el-icon :size="12" :class="{rotate: statusDropdownOpen}">
-                <ArrowDown/>
+              <el-icon :size="12" :class="{ rotate: statusDropdownOpen }">
+                <ArrowDown />
               </el-icon>
             </div>
-            <div v-if="statusDropdownOpen" class="pp-status-dropdown" @click.stop>
+            <div
+              v-if="statusDropdownOpen"
+              class="pp-status-dropdown"
+              @click.stop
+            >
               <div
-                  v-for="item in statusOptions"
-                  :key="item.value"
-                  class="pp-status-option"
-                  :class="{active: myStatusClass === item.value}"
-                  @click.stop="handleSelectStatus(item.value)"
+                v-for="item in statusOptions"
+                :key="item.value"
+                class="pp-status-option"
+                :class="{ active: myStatusClass === item.value }"
+                @click.stop="handleSelectStatus(item.value)"
               >
                 <span class="status-option-dot" :class="item.value"></span>
                 <span>{{ item.label }}</span>
@@ -203,60 +204,60 @@
           </div>
           <div class="pp-divider"></div>
           <div
-              class="pp-menu-item"
-              @click="
+            class="pp-menu-item"
+            @click="
               $router.push('/profile');
               profilePanel = false;
             "
           >
             <el-icon :size="18">
-              <UserFilled/>
+              <UserFilled />
             </el-icon>
             个人中心
           </div>
           <div
-              class="pp-menu-item"
-              @click="
+            class="pp-menu-item"
+            @click="
               themeStore.toggle();
               profilePanel = false;
             "
           >
             <el-icon :size="18">
-              <Moon/>
+              <Moon />
             </el-icon>
             个性主题
             <span class="pp-tag">{{ isDark ? "深色" : "浅色" }}</span>
           </div>
           <div
-              class="pp-menu-item"
-              v-if="isAdmin"
-              @click="
+            class="pp-menu-item"
+            v-if="isAdmin"
+            @click="
               $router.push('/admin');
               profilePanel = false;
             "
           >
             <el-icon :size="18">
-              <Setting/>
+              <Setting />
             </el-icon>
             系统管理
           </div>
           <div class="pp-divider"></div>
           <div class="pp-menu-item" @click="profilePanel = false">
             <el-icon :size="18">
-              <QuestionFilled/>
+              <QuestionFilled />
             </el-icon>
             客服与帮助
           </div>
           <div class="pp-menu-item" @click="profilePanel = false">
             <el-icon :size="18">
-              <InfoFilled/>
+              <InfoFilled />
             </el-icon>
             关于
           </div>
           <div class="pp-divider"></div>
           <div class="pp-menu-item pp-logout" @click="logout">
             <el-icon :size="18">
-              <SwitchButton/>
+              <SwitchButton />
             </el-icon>
             退出登录
           </div>
@@ -269,81 +270,79 @@
       <div v-if="tab === 'chat' && groupPanelOpen" class="group-panel">
         <div class="gp-header">
           <el-icon :size="14">
-            <Operation/>
+            <Operation />
           </el-icon>
           <span>分组</span>
-          <el-icon :size="14" class="gp-close" @click="groupPanelOpen = false"
-          >
-            <DArrowLeft
-            />
+          <el-icon :size="14" class="gp-close" @click="groupPanelOpen = false">
+            <DArrowLeft />
           </el-icon>
         </div>
         <div class="gp-title">消息</div>
         <div class="gp-list">
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'all' }"
-              @click="chatFilter = 'all'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'all' }"
+            @click="chatFilter = 'all'"
           >
             消息
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'top' }"
-              @click="chatFilter = 'top'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'top' }"
+            @click="chatFilter = 'top'"
           >
             置顶
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'unread' }"
-              @click="chatFilter = 'unread'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'unread' }"
+            @click="chatFilter = 'unread'"
           >
             未读
             <span v-if="unreadTotal > 0" class="gp-badge">{{
-                unreadTotal > 99 ? "99+" : unreadTotal
-              }}</span>
+              unreadTotal > 99 ? "99+" : unreadTotal
+            }}</span>
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'atme' }"
-              @click="chatFilter = 'atme'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'atme' }"
+            @click="chatFilter = 'atme'"
           >
             @我
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'single' }"
-              @click="chatFilter = 'single'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'single' }"
+            @click="chatFilter = 'single'"
           >
             单聊
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'group' }"
-              @click="chatFilter = 'group'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'group' }"
+            @click="chatFilter = 'group'"
           >
             群聊
           </div>
           <div class="gp-item" @click="$router.push('/notice')">通知</div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'ai' }"
-              @click="openAiAssistant"
+            class="gp-item"
+            :class="{ active: chatFilter === 'ai' }"
+            @click="openAiAssistant"
           >
             AI 助手
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'mute' }"
-              @click="chatFilter = 'mute'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'mute' }"
+            @click="chatFilter = 'mute'"
           >
             免打扰
           </div>
           <div
-              class="gp-item"
-              :class="{ active: chatFilter === 'star' }"
-              @click="chatFilter = 'star'"
+            class="gp-item"
+            :class="{ active: chatFilter === 'star' }"
+            @click="chatFilter = 'star'"
           >
             特别关注
           </div>
@@ -352,12 +351,12 @@
     </Transition>
     <!-- 收起时的展开按钮 -->
     <div
-        v-if="tab === 'chat' && !groupPanelOpen"
-        class="gp-toggle"
-        @click="groupPanelOpen = true"
+      v-if="tab === 'chat' && !groupPanelOpen"
+      class="gp-toggle"
+      @click="groupPanelOpen = true"
     >
       <el-icon :size="14">
-        <DArrowRight/>
+        <DArrowRight />
       </el-icon>
     </div>
 
@@ -365,20 +364,20 @@
     <div class="mid-panel">
       <div class="mid-header">
         <el-input
-            v-model="keyword"
-            placeholder="搜索"
-            :prefix-icon="Search"
-            size="default"
-            clearable
-            class="search-input"
-            @input="onSearchInput"
+          v-model="keyword"
+          placeholder="搜索"
+          :prefix-icon="Search"
+          size="default"
+          clearable
+          class="search-input"
+          @input="onSearchInput"
         />
         <div class="add-entry" ref="addWrapRef">
           <el-button
-              class="add-btn"
-              :icon="Plus"
-              circle
-              @click.stop="toggleAddPanel"
+            class="add-btn"
+            :icon="Plus"
+            circle
+            @click.stop="toggleAddPanel"
           />
           <div v-if="addPanelOpen" class="add-panel" @click.stop>
             <div class="add-panel-head">
@@ -390,10 +389,10 @@
               </div>
               <div class="add-panel-toolbox">
                 <button
-                    type="button"
-                    class="add-panel-settings"
-                    :class="{ active: addSettingsOpen }"
-                    @click.stop="toggleAddSettings"
+                  type="button"
+                  class="add-panel-settings"
+                  :class="{ active: addSettingsOpen }"
+                  @click.stop="toggleAddSettings"
                 >
                   <span>设置</span>
                 </button>
@@ -402,19 +401,19 @@
                     <div class="add-settings-label">链接</div>
                     <div class="add-settings-card">
                       <button
-                          type="button"
-                          class="add-settings-item"
-                          @click="toggleSavedLinkManage"
+                        type="button"
+                        class="add-settings-item"
+                        @click="toggleSavedLinkManage"
                       >
                         <span class="add-settings-item-icon theme-link">
-                          <el-icon :size="14"><Link/></el-icon>
+                          <el-icon :size="14"><Link /></el-icon>
                         </span>
                         <div class="add-settings-item-main">
                           <div class="add-settings-item-title">
                             {{
                               manageSavedLinks
-                                  ? "完成链接管理"
-                                  : "管理已保存链接"
+                                ? "完成链接管理"
+                                : "管理已保存链接"
                             }}
                           </div>
                           <div class="add-settings-item-desc">
@@ -422,14 +421,12 @@
                           </div>
                         </div>
                         <span class="add-settings-item-meta">{{
-                            manageSavedLinks
-                                ? "编辑中"
-                                : `${savedLinkItems.length} 项`
-                          }}</span>
-                        <el-icon class="add-settings-item-arrow" :size="14"
-                        >
-                          <ArrowRight
-                          />
+                          manageSavedLinks
+                            ? "编辑中"
+                            : `${savedLinkItems.length} 项`
+                        }}</span>
+                        <el-icon class="add-settings-item-arrow" :size="14">
+                          <ArrowRight />
                         </el-icon>
                       </button>
                     </div>
@@ -438,12 +435,12 @@
                     <div class="add-settings-label">内容</div>
                     <div class="add-settings-card">
                       <button
-                          type="button"
-                          class="add-settings-item"
-                          @click="refreshAddFiles"
+                        type="button"
+                        class="add-settings-item"
+                        @click="refreshAddFiles"
                       >
                         <span class="add-settings-item-icon theme-refresh">
-                          <el-icon :size="14"><Refresh/></el-icon>
+                          <el-icon :size="14"><Refresh /></el-icon>
                         </span>
                         <div class="add-settings-item-main">
                           <div class="add-settings-item-title">
@@ -454,20 +451,18 @@
                           </div>
                         </div>
                         <span class="add-settings-item-meta">同步</span>
-                        <el-icon class="add-settings-item-arrow" :size="14"
-                        >
-                          <ArrowRight
-                          />
+                        <el-icon class="add-settings-item-arrow" :size="14">
+                          <ArrowRight />
                         </el-icon>
                       </button>
                       <button
-                          type="button"
-                          class="add-settings-item danger"
-                          :disabled="!recentUsageKeys.length"
-                          @click="clearRecentUsage"
+                        type="button"
+                        class="add-settings-item danger"
+                        :disabled="!recentUsageKeys.length"
+                        @click="clearRecentUsage"
                       >
                         <span class="add-settings-item-icon theme-danger">
-                          <el-icon :size="14"><Delete/></el-icon>
+                          <el-icon :size="14"><Delete /></el-icon>
                         </span>
                         <div class="add-settings-item-main">
                           <div class="add-settings-item-title">
@@ -478,10 +473,10 @@
                           </div>
                         </div>
                         <span class="add-settings-item-meta">{{
-                            recentUsageKeys.length
-                                ? `${recentUsageKeys.length} 条`
-                                : "空"
-                          }}</span>
+                          recentUsageKeys.length
+                            ? `${recentUsageKeys.length} 条`
+                            : "空"
+                        }}</span>
                       </button>
                     </div>
                   </div>
@@ -490,26 +485,26 @@
             </div>
             <div class="add-link-box">
               <button
-                  v-if="!linkEditorOpen"
-                  type="button"
-                  class="add-link-trigger"
-                  @click="openLinkEditor"
+                v-if="!linkEditorOpen"
+                type="button"
+                class="add-link-trigger"
+                @click="openLinkEditor"
               >
                 添加链接
               </button>
               <div v-else class="add-link-editor">
                 <el-input
-                    ref="addLinkInputRef"
-                    v-model="linkDraft"
-                    placeholder="输入网页链接，例如 https://example.com"
-                    class="add-link-input"
-                    @keyup.enter="saveLink"
+                  ref="addLinkInputRef"
+                  v-model="linkDraft"
+                  placeholder="输入网页链接，例如 https://example.com"
+                  class="add-link-input"
+                  @keyup.enter="saveLink"
                 />
                 <div class="add-link-actions">
                   <button
-                      type="button"
-                      class="add-link-cancel"
-                      @click="cancelLinkEdit"
+                    type="button"
+                    class="add-link-cancel"
+                    @click="cancelLinkEdit"
                   >
                     取消
                   </button>
@@ -526,38 +521,38 @@
               </div>
               <div class="add-panel-list">
                 <div
-                    v-for="item in savedLinkItems"
-                    :key="item.key"
-                    class="add-panel-item"
+                  v-for="item in savedLinkItems"
+                  :key="item.key"
+                  class="add-panel-item"
                 >
                   <div
-                      class="add-item-badge"
-                      :style="{ background: item.color }"
+                    class="add-item-badge"
+                    :style="{ background: item.color }"
                   >
                     <template v-if="item.kind === 'file'">
                       <div
-                          v-if="item.iconShape === 'tile'"
-                          class="add-tile-icon"
-                          :class="`theme-${item.iconTheme || 'stack'}`"
+                        v-if="item.iconShape === 'tile'"
+                        class="add-tile-icon"
+                        :class="`theme-${item.iconTheme || 'stack'}`"
                       >
                         <span
-                            v-if="item.iconTheme === 'stack'"
-                            class="add-tile-stack"
+                          v-if="item.iconTheme === 'stack'"
+                          class="add-tile-stack"
                         ></span>
                         <span v-else class="add-tile-glyph">{{
-                            item.iconBadge || item.badge
-                          }}</span>
+                          item.iconBadge || item.badge
+                        }}</span>
                       </div>
                       <div
-                          v-else
-                          class="add-file-icon"
-                          :class="`theme-${item.iconTheme || 'generic'}`"
+                        v-else
+                        class="add-file-icon"
+                        :class="`theme-${item.iconTheme || 'generic'}`"
                       >
                         <span class="add-file-fold"></span>
                         <span class="add-file-lines"></span>
                         <span class="add-file-type">{{
-                            item.iconBadge || item.badge
-                          }}</span>
+                          item.iconBadge || item.badge
+                        }}</span>
                       </div>
                     </template>
                     <template v-else>{{ item.badge }}</template>
@@ -568,66 +563,83 @@
                   </div>
                   <div class="add-item-actions">
                     <button
-                        type="button"
-                        class="add-item-action ghost"
-                        @click.stop="sendAddItem(item)"
+                      type="button"
+                      class="add-item-action ghost"
+                      @click.stop="sendAddItem(item)"
                     >
                       添加
                     </button>
                     <button
-                        type="button"
-                        class="add-item-action delete"
-                        @click.stop="removeSavedLink(item)"
+                      type="button"
+                      class="add-item-action delete"
+                      @click.stop="removeSavedLink(item)"
                     >
                       删除
                     </button>
                   </div>
                 </div>
                 <el-empty
-                    v-if="!savedLinkItems.length"
-                    description="暂无已保存链接"
-                    :image-size="56"
+                  v-if="!savedLinkItems.length"
+                  description="暂无已保存链接"
+                  :image-size="56"
                 />
               </div>
             </template>
             <template v-else>
+              <div class="add-panel-footer">
+                <button
+                  type="button"
+                  class="add-footer-btn"
+                  @click="openGroupCreate"
+                >
+                  发起群聊
+                </button>
+                <span class="add-footer-sep"></span>
+                <button
+                  type="button"
+                  class="add-footer-btn"
+                  @click="openContactFinder"
+                >
+                  找人单聊
+                </button>
+              </div>
               <div class="add-panel-section">
                 <span>最近使用</span>
               </div>
               <div class="add-panel-list">
                 <div
-                    v-for="item in addPanelItems"
-                    :key="item.key"
-                    class="add-panel-item compact"
+                  v-for="item in addPanelItems"
+                  :key="item.key"
+                  class="add-panel-item compact"
                 >
                   <div
-                      class="add-item-badge"
-                      :style="{ background: item.color }"
+                    class="add-item-badge"
+                    :style="{ background: item.color }"
                   >
                     <template v-if="item.kind === 'file'">
                       <div
-                          v-if="item.iconShape === 'tile'"
-                          class="add-tile-icon"
-                          :class="`theme-${item.iconTheme || 'stack'}`"
+                        v-if="item.iconShape === 'tile'"
+                        class="add-tile-icon"
+                        :class="`theme-${item.iconTheme || 'stack'}`"
                       >
                         <span
-                            v-if="item.iconTheme === 'stack'"
-                            class="add-tile-stack"
+                          v-if="item.iconTheme === 'stack'"
+                          class="add-tile-stack"
                         ></span>
                         <span v-else class="add-tile-glyph">{{
-                            item.iconBadge || item.badge
-                          }}</span>
+                          item.iconBadge || item.badge
+                        }}</span>
                       </div>
                       <div
-                          v-else
-                          class="add-file-icon"
-                          :class="`theme-${item.iconTheme || 'generic'}`"
+                        v-else
+                        class="add-file-icon"
+                        :class="`theme-${item.iconTheme || 'generic'}`"
                       >
                         <span class="add-file-fold"></span>
                         <span class="add-file-lines"></span>
                         <span class="add-file-type">{{
-                            item.iconBadge || item.badge
-                          }}</span>
+                          item.iconBadge || item.badge
+                        }}</span>
                       </div>
                     </template>
                     <template v-else>{{ item.badge }}</template>
@@ -639,37 +651,20 @@
                     </div>
                   </div>
                   <button
-                      type="button"
-                      class="add-item-action"
-                      @click.stop="sendAddItem(item)"
+                    type="button"
+                    class="add-item-action"
+                    @click.stop="sendAddItem(item)"
                   >
                     添加
                   </button>
                 </div>
                 <el-empty
-                    v-if="!addPanelItems.length"
-                    description="暂无可添加内容"
-                    :image-size="56"
+                  v-if="!addPanelItems.length"
+                  description="暂无可添加内容"
+                  :image-size="56"
                 />
               </div>
             </template>
-            <div class="add-panel-footer">
-              <button
-                  type="button"
-                  class="add-footer-btn"
-                  @click="openGroupCreate"
-              >
-                发起群聊
-              </button>
-              <span class="add-footer-sep"></span>
-              <button
-                  type="button"
-                  class="add-footer-btn"
-                  @click="openContactFinder"
-              >
-                找人单聊
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -678,18 +673,14 @@
       <div v-if="searchMode" class="list">
         <div class="contact-section">搜索结果 — 联系人</div>
         <div
-            v-for="u in searchContacts"
-            :key="'c' + u.id"
-            class="session-item"
-            @click="startChat(u)"
+          v-for="u in searchContacts"
+          :key="'c' + u.id"
+          class="session-item"
+          @click="startChat(u)"
         >
-          <el-avatar
-              :size="36"
-              shape="square"
-              :style="avatarStyle(u.nickname)"
-          >{{ firstChar(u.nickname) }}
-          </el-avatar
-          >
+          <el-avatar :size="36" shape="square" :style="avatarStyle(u.nickname)"
+            >{{ firstChar(u.nickname) }}
+          </el-avatar>
           <div class="session-info">
             <div class="line1">
               <span class="name">{{ u.nickname }}</span>
@@ -698,25 +689,24 @@
           </div>
         </div>
         <div
-            v-if="searchMsgs.length"
-            class="contact-section"
-            style="margin-top: 12px"
+          v-if="searchMsgs.length"
+          class="contact-section"
+          style="margin-top: 12px"
         >
           搜索结果 — 消息
         </div>
         <div
-            v-for="m in searchMsgs"
-            :key="'m' + m.id"
-            class="session-item"
-            @click="jumpToMessage(m)"
+          v-for="m in searchMsgs"
+          :key="'m' + m.id"
+          class="session-item"
+          @click="jumpToMessage(m)"
         >
           <el-avatar
-              :size="36"
-              shape="square"
-              :style="avatarStyle(m.senderName)"
-          >{{ firstChar(m.senderName) }}
-          </el-avatar
-          >
+            :size="36"
+            shape="square"
+            :style="avatarStyle(m.senderName)"
+            >{{ firstChar(m.senderName) }}
+          </el-avatar>
           <div class="session-info">
             <div class="line1">
               <span class="name">{{ m.senderName }}</span
@@ -726,41 +716,40 @@
           </div>
         </div>
         <el-empty
-            v-if="!searchContacts.length && !searchMsgs.length"
-            description="无结果"
-            :image-size="60"
+          v-if="!searchContacts.length && !searchMsgs.length"
+          description="无结果"
+          :image-size="60"
         />
       </div>
 
       <!-- 会话列表 -->
       <div v-else-if="tab === 'chat'" class="list">
         <div
-            v-for="s in displaySessions"
-            :key="s.id"
-            class="session-item"
-            :class="{ active: current?.id === s.id, topped: s.isTop === 1 }"
-            @click="openSession(s)"
-            @contextmenu.prevent="onSessionMenu($event, s)"
+          v-for="s in displaySessions"
+          :key="s.id"
+          class="session-item"
+          :class="{ active: current?.id === s.id, topped: s.isTop === 1 }"
+          @click="openSession(s)"
+          @contextmenu.prevent="onSessionMenu($event, s)"
         >
           <el-badge
-              :value="s.unread"
-              :hidden="!s.unread"
-              :max="99"
-              class="sess-badge"
+            :value="s.unread"
+            :hidden="!s.unread"
+            :max="99"
+            class="sess-badge"
           >
             <div class="avatar-wrap">
               <el-avatar
-                  :size="42"
-                  shape="square"
-                  :src="s.avatar"
-                  :style="avatarStyle(s.name)"
-              >{{ firstChar(s.name) }}
-              </el-avatar
-              >
+                :size="42"
+                shape="square"
+                :src="s.avatar"
+                :style="avatarStyle(s.name)"
+                >{{ firstChar(s.name) }}
+              </el-avatar>
               <span
-                  v-if="s.type === 1 && s.targetUserId"
-                  class="user-online"
-                  :class="presenceClass(s.targetUserId)"
+                v-if="s.type === 1 && s.targetUserId"
+                class="user-online"
+                :class="presenceClass(s.targetUserId)"
               ></span>
             </div>
           </el-badge>
@@ -771,31 +760,28 @@
             </div>
             <div class="line2">
               <el-tag
-                  v-if="s.type === 2"
-                  size="small"
-                  type="info"
-                  effect="plain"
-                  class="group-label"
-              >内部群
-              </el-tag
-              >
+                v-if="s.type === 2"
+                size="small"
+                type="info"
+                effect="plain"
+                class="group-label"
+                >内部群
+              </el-tag>
               {{ s.lastMsg || "暂无消息" }}
             </div>
           </div>
-          <el-icon v-if="s.isTop === 1" class="pin-icon" :size="12"
-          >
-            <Top
-            />
+          <el-icon v-if="s.isTop === 1" class="pin-icon" :size="12">
+            <Top />
           </el-icon>
           <span v-if="s.isMute === 1" class="mute-icon">🔕</span>
           <span v-if="s.isStar === 1" class="star-icon">⭐</span>
         </div>
         <el-empty
-            v-if="!displaySessions.length"
-            :description="
+          v-if="!displaySessions.length"
+          :description="
             chatFilter === 'all' ? '暂无会话' : '没有符合条件的会话'
           "
-            :image-size="80"
+          :image-size="80"
         />
       </div>
 
@@ -803,37 +789,31 @@
       <div v-else-if="tab === 'contacts'" class="list">
         <div class="contact-section">企业通讯录 ({{ contacts.length }})</div>
         <div
-            v-for="u in filteredContacts"
-            :key="u.id"
-            class="session-item"
-            @click="startChat(u)"
+          v-for="u in filteredContacts"
+          :key="u.id"
+          class="session-item"
+          @click="startChat(u)"
         >
           <div class="avatar-wrap">
             <el-avatar
-                :size="42"
-                shape="square"
-                :src="u.avatar"
-                :style="avatarStyle(u.nickname)"
-            >{{ firstChar(u.nickname) }}
-            </el-avatar
-            >
+              :size="42"
+              shape="square"
+              :src="u.avatar"
+              :style="avatarStyle(u.nickname)"
+              >{{ firstChar(u.nickname) }}
+            </el-avatar>
             <span
-                v-if="u.id"
-                class="user-online"
-                :class="presenceClass(u.id)"
+              v-if="u.id"
+              class="user-online"
+              :class="presenceClass(u.id)"
             ></span>
           </div>
           <div class="session-info">
             <div class="line1">
-              <span class="name">{{ u.nickname }}</span
-              >
-              <el-tag
-                  size="small"
-                  :type="presenceTagType(u.id)"
-                  effect="plain"
-              >{{ presenceTextById(u.id) }}
-              </el-tag
-              >
+              <span class="name">{{ u.nickname }}</span>
+              <el-tag size="small" :type="presenceTagType(u.id)" effect="plain"
+                >{{ presenceTextById(u.id) }}
+              </el-tag>
             </div>
             <div class="line2">{{ u.deptName }} · {{ u.jobTitle }}</div>
           </div>
@@ -845,9 +825,9 @@
         <div class="grid-title">工作台</div>
         <div class="work-summary-row">
           <button
-              type="button"
-              class="work-summary-card mailbox"
-              @click="$router.push('/mailbox')"
+            type="button"
+            class="work-summary-card mailbox"
+            @click="$router.push('/mailbox')"
           >
             <div class="work-summary-label">未读邮件</div>
             <div class="work-summary-value">
@@ -856,30 +836,30 @@
             <div class="work-summary-desc">
               {{
                 collabCounts.mailboxUnread
-                    ? "有新邮件待处理"
-                    : "当前没有未读邮件"
+                  ? "有新邮件待处理"
+                  : "当前没有未读邮件"
               }}
             </div>
           </button>
           <button
-              type="button"
-              class="work-summary-card ding"
-              @click="$router.push('/ding')"
+            type="button"
+            class="work-summary-card ding"
+            @click="$router.push('/ding')"
           >
             <div class="work-summary-label">待处理 DING</div>
             <div class="work-summary-value">{{ collabCounts.dingPending }}</div>
             <div class="work-summary-desc">
               {{
                 collabCounts.dingUrgent
-                    ? `${collabCounts.dingUrgent} 条紧急`
-                    : "处理状态已同步"
+                  ? `${collabCounts.dingUrgent} 条紧急`
+                  : "处理状态已同步"
               }}
             </div>
           </button>
           <button
-              type="button"
-              class="work-summary-card feed"
-              @click="openWorkNotice(latestWorkNotice)"
+            type="button"
+            class="work-summary-card feed"
+            @click="openWorkNotice(latestWorkNotice)"
           >
             <div class="work-summary-label">最新动态</div>
             <div class="work-summary-title">
@@ -906,8 +886,8 @@
             <div class="app-icon-wrap">
               <div class="app-icon" style="background: #5f6cf8">📧</div>
               <span v-if="collabCounts.mailboxUnread > 0" class="app-badge">{{
-                  formatCounter(collabCounts.mailboxUnread)
-                }}</span>
+                formatCounter(collabCounts.mailboxUnread)
+              }}</span>
             </div>
             <span>企业邮箱</span>
           </div>
@@ -919,8 +899,8 @@
             <div class="app-icon-wrap">
               <div class="app-icon" style="background: #ff9f1a">🔔</div>
               <span v-if="collabCounts.dingPending > 0" class="app-badge">{{
-                  formatCounter(collabCounts.dingPending)
-                }}</span>
+                formatCounter(collabCounts.dingPending)
+              }}</span>
             </div>
             <span>DING 提醒</span>
           </div>
@@ -937,17 +917,17 @@
             <span>收藏</span>
           </div>
           <div
-              v-if="isAdmin"
-              class="app-card"
-              @click="$router.push('/admin/dashboard')"
+            v-if="isAdmin"
+            class="app-card"
+            @click="$router.push('/admin/dashboard')"
           >
             <div class="app-icon" style="background: #722ed1">📊</div>
             <span>数据看板</span>
           </div>
           <div
-              v-if="isAdmin"
-              class="app-card"
-              @click="$router.push('/admin/notice')"
+            v-if="isAdmin"
+            class="app-card"
+            @click="$router.push('/admin/notice')"
           >
             <div class="app-icon" style="background: #eb2f96">📋</div>
             <span>公告管理</span>
@@ -961,27 +941,27 @@
           <div class="work-feed-head">
             <span>协同提醒</span>
             <span class="work-feed-meta">{{
-                workNotices.length ? `${workNotices.length} 条动态` : "实时刷新"
-              }}</span>
+              workNotices.length ? `${workNotices.length} 条动态` : "实时刷新"
+            }}</span>
           </div>
           <div v-if="workNotices.length" class="work-feed-list">
             <button
-                v-for="notice in workNotices"
-                :key="notice.id"
-                type="button"
-                class="work-feed-item"
-                @click="openWorkNotice(notice)"
+              v-for="notice in workNotices"
+              :key="notice.id"
+              type="button"
+              class="work-feed-item"
+              @click="openWorkNotice(notice)"
             >
               <span class="work-feed-badge" :class="notice.category">{{
-                  workNoticeCategoryText(notice)
-                }}</span>
+                workNoticeCategoryText(notice)
+              }}</span>
               <div class="work-feed-main">
                 <div class="work-feed-title">{{ notice.title }}</div>
                 <div class="work-feed-desc">{{ notice.summary }}</div>
               </div>
               <span class="work-feed-time">{{
-                  formatWorkNoticeTime(notice.createTime)
-                }}</span>
+                formatWorkNoticeTime(notice.createTime)
+              }}</span>
             </button>
           </div>
           <div v-else class="work-feed-empty">
@@ -996,24 +976,22 @@
       <template v-if="current">
         <div class="chat-header">
           <div class="ch-title">
-            {{
-              current.name
+            {{ current.name
             }}<span v-if="current.type === 2" class="ch-count">(群聊)</span>
             <span
-                v-if="current.type === 1"
-                class="status-tag"
-                :class="presenceClass(current.targetUserId)"
-            >{{ presenceTextById(current.targetUserId) }}</span
+              v-if="current.type === 1"
+              class="status-tag"
+              :class="presenceClass(current.targetUserId)"
+              >{{ presenceTextById(current.targetUserId) }}</span
             >
           </div>
           <div class="ch-actions">
             <el-icon
-                v-if="current.type === 2"
-                :size="20"
-                @click="openGroupSetting"
+              v-if="current.type === 2"
+              :size="20"
+              @click="openGroupSetting"
             >
-              <Setting
-              />
+              <Setting />
             </el-icon>
           </div>
         </div>
@@ -1027,24 +1005,23 @@
               {{ m.status === 0 ? recallText(m) : m.content }}
             </div>
             <div
-                v-else
-                class="msg-row"
-                :class="{ mine: m.senderId === user?.id }"
-                @mouseenter="hoverId = m.id"
-                @mouseleave="hoverId = null"
+              v-else
+              class="msg-row"
+              :class="{ mine: m.senderId === user?.id }"
+              @mouseenter="hoverId = m.id"
+              @mouseleave="hoverId = null"
             >
               <el-avatar
-                  :size="40"
-                  shape="square"
-                  :src="m.senderAvatar"
-                  :style="avatarStyle(m.senderName)"
-              >{{ firstChar(m.senderName) }}
-              </el-avatar
-              >
+                :size="40"
+                shape="square"
+                :src="m.senderAvatar"
+                :style="avatarStyle(m.senderName)"
+                >{{ firstChar(m.senderName) }}
+              </el-avatar>
               <div class="msg-content">
                 <div
-                    v-if="current.type === 2 && m.senderId !== user?.id"
-                    class="msg-sender"
+                  v-if="current.type === 2 && m.senderId !== user?.id"
+                  class="msg-sender"
                 >
                   {{ m.senderName }}
                 </div>
@@ -1054,29 +1031,29 @@
                 </div>
                 <div class="bubble-wrap">
                   <div
-                      v-if="m.contentType === 1"
-                      class="bubble"
-                      v-html="renderText(m.content)"
+                    v-if="m.contentType === 1"
+                    class="bubble"
+                    v-html="renderText(m.content)"
                   ></div>
                   <div
-                      v-else-if="m.contentType === 2"
-                      class="bubble img-bubble"
+                    v-else-if="m.contentType === 2"
+                    class="bubble img-bubble"
                   >
-                    <img :src="m.content" @click="previewImg(m.content)"/>
+                    <img :src="m.content" @click="previewImg(m.content)" />
                   </div>
                   <div
-                      v-else-if="m.contentType === 3 && isDocumentShareMessage(m)"
-                      class="bubble doc-card-bubble"
-                      @click="openDocumentMessage(m)"
+                    v-else-if="m.contentType === 3 && isDocumentShareMessage(m)"
+                    class="bubble doc-card-bubble"
+                    @click="openDocumentMessage(m)"
                   >
                     <div class="doc-card-head">
                       <div
-                          class="doc-card-icon"
-                          :class="`theme-${documentBadgeMeta(m).theme}`"
+                        class="doc-card-icon"
+                        :class="`theme-${documentBadgeMeta(m).theme}`"
                       >
                         <span class="doc-card-icon-label">{{
-                            documentBadgeMeta(m).badge
-                          }}</span>
+                          documentBadgeMeta(m).badge
+                        }}</span>
                       </div>
                       <div class="doc-card-title-wrap">
                         <div class="doc-card-type">协作文档</div>
@@ -1090,25 +1067,25 @@
                         <span>{{ documentScene(m) }}</span>
                         <span>{{ fmtSize(documentMeta(m).size) }}</span>
                         <span v-if="documentMeta(m).shareCount">{{
-                            `已分享${documentMeta(m).shareCount}次`
-                          }}</span>
+                          `已分享${documentMeta(m).shareCount}次`
+                        }}</span>
                       </div>
                       <button
-                          type="button"
-                          class="doc-card-action"
-                          @click.stop="downloadDocumentFile(m)"
+                        type="button"
+                        class="doc-card-action"
+                        @click.stop="downloadDocumentFile(m)"
                       >
                         下载
                       </button>
                     </div>
                   </div>
                   <div
-                      v-else-if="m.contentType === 3"
-                      class="bubble file-bubble"
-                      @click="downloadFile(m)"
+                    v-else-if="m.contentType === 3"
+                    class="bubble file-bubble"
+                    @click="downloadFile(m)"
                   >
                     <el-icon :size="32" color="#1677ff">
-                      <Document/>
+                      <Document />
                     </el-icon>
                     <div class="file-info">
                       <div class="file-name">{{ m.content }}</div>
@@ -1118,9 +1095,9 @@
                     </div>
                   </div>
                   <div
-                      v-else-if="m.contentType === 6"
-                      class="bubble link-card-bubble"
-                      @click="openCardMessage(m)"
+                    v-else-if="m.contentType === 6"
+                    class="bubble link-card-bubble"
+                    @click="openCardMessage(m)"
                   >
                     <div class="card-badge" :style="cardBadgeStyle(m)">
                       {{ cardBadgeText(m) }}
@@ -1130,22 +1107,20 @@
                       <div class="card-title">{{ cardTitle(m) }}</div>
                       <div class="card-desc">{{ cardDesc(m) }}</div>
                     </div>
-                    <el-icon :size="16" class="card-arrow"
-                    >
-                      <ArrowRight
-                      />
+                    <el-icon :size="16" class="card-arrow">
+                      <ArrowRight />
                     </el-icon>
                   </div>
                   <!-- 视频消息 contentType=5 -->
                   <div
-                      v-else-if="m.contentType === 5"
-                      class="bubble video-bubble"
+                    v-else-if="m.contentType === 5"
+                    class="bubble video-bubble"
                   >
                     <video
-                        :src="m.content"
-                        controls
-                        preload="metadata"
-                        class="chat-video"
+                      :src="m.content"
+                      controls
+                      preload="metadata"
+                      class="chat-video"
                     ></video>
                     <div class="video-name">
                       {{ parseExtra(m.extra).name || "视频" }}
@@ -1155,35 +1130,35 @@
                     <span @click="quoteMsg(m)">引用</span>
                     <span @click="favoriteMsg(m)">收藏</span>
                     <span v-if="m.senderId === user?.id" @click="recall(m)"
-                    >撤回</span
+                      >撤回</span
                     >
                   </div>
                 </div>
                 <!-- 消息反应展示 -->
                 <div
-                    v-if="m.reactions && m.reactions.length"
-                    class="reaction-bar"
+                  v-if="m.reactions && m.reactions.length"
+                  class="reaction-bar"
                 >
                   <span
-                      v-for="r in m.reactions"
-                      :key="r.emoji"
-                      class="reaction-tag"
-                      :class="{ mine: r.userIds?.includes(user?.id) }"
-                      @click="toggleReaction(m.id, r.emoji)"
+                    v-for="r in m.reactions"
+                    :key="r.emoji"
+                    class="reaction-tag"
+                    :class="{ mine: r.userIds?.includes(user?.id) }"
+                    @click="toggleReaction(m.id, r.emoji)"
                   >
                     {{ r.emoji }} {{ r.count }}
                   </span>
                 </div>
                 <div
-                    v-if="m.senderId === user?.id && current.type === 1"
-                    class="read-status"
+                  v-if="m.senderId === user?.id && current.type === 1"
+                  class="read-status"
                 >
                   {{ m.readCount > 0 || readReceipts[m.id] ? "已读" : "未读" }}
                 </div>
                 <div
-                    v-if="m.senderId === user?.id && current.type === 2"
-                    class="read-status"
-                    @click="showReaders(m.id)"
+                  v-if="m.senderId === user?.id && current.type === 2"
+                  class="read-status"
+                  @click="showReaders(m.id)"
                 >
                   {{ (m.readCount || 0) + (readCounts[m.id] || 0) }}人已读
                 </div>
@@ -1191,19 +1166,19 @@
             </div>
           </template>
           <el-empty
-              v-if="!messages.length"
-              description="发送第一条消息"
-              :image-size="90"
+            v-if="!messages.length"
+            description="发送第一条消息"
+            :image-size="90"
           />
         </div>
 
         <div v-if="quoteRef" class="quote-bar">
           <span
-          >回复 {{ quoteRef.senderName }}:
+            >回复 {{ quoteRef.senderName }}:
             {{ quoteRef.content?.substring(0, 40) }}</span
           >
           <el-icon @click="quoteRef = null">
-            <Close/>
+            <Close />
           </el-icon>
         </div>
 
@@ -1212,13 +1187,13 @@
             <div class="toolbar-emoji" ref="emojiWrapRef">
               <el-tooltip content="表情包" placement="top">
                 <button
-                    type="button"
-                    class="toolbar-btn"
-                    :class="{ active: emojiPanelOpen }"
-                    @click.stop="toggleEmojiPanel"
+                  type="button"
+                  class="toolbar-btn"
+                  :class="{ active: emojiPanelOpen }"
+                  @click.stop="toggleEmojiPanel"
                 >
                   <el-icon :size="20">
-                    <ChatDotRound/>
+                    <ChatDotRound />
                   </el-icon>
                 </button>
               </el-tooltip>
@@ -1226,120 +1201,113 @@
                 <div class="emoji-panel-header">
                   <span class="emoji-panel-title">表情包</span>
                   <button
-                      type="button"
-                      class="emoji-close"
-                      @click="emojiPanelOpen = false"
+                    type="button"
+                    class="emoji-close"
+                    @click="emojiPanelOpen = false"
                   >
                     <el-icon :size="14">
-                      <Close/>
+                      <Close />
                     </el-icon>
                   </button>
                 </div>
                 <div class="emoji-panel">
                   <div class="emoji-tabs">
                     <span
-                        v-for="(cat, i) in emojiCategories"
-                        :key="i"
-                        class="emoji-tab"
-                        :class="{ active: emojiTab === i }"
-                        @click="emojiTab = i"
-                    >{{ cat.icon }}</span
+                      v-for="(cat, i) in emojiCategories"
+                      :key="i"
+                      class="emoji-tab"
+                      :class="{ active: emojiTab === i }"
+                      @click="emojiTab = i"
+                      >{{ cat.icon }}</span
                     >
                   </div>
                   <div class="emoji-tab-title">
                     {{ activeEmojiCategory.name }}
                   </div>
                   <div
-                      class="emoji-grid"
-                      :class="{
+                    class="emoji-grid"
+                    :class="{
                       'sticker-grid': activeEmojiCategory.type === 'sticker',
                     }"
                   >
                     <span
-                        v-for="e in activeEmojiCategory.list"
-                        :key="e"
-                        class="emoji-item"
-                        :class="{
+                      v-for="e in activeEmojiCategory.list"
+                      :key="e"
+                      class="emoji-item"
+                      :class="{
                         'sticker-item': activeEmojiCategory.type === 'sticker',
                       }"
-                        @click="insertEmoji(e)"
-                    >{{ e }}</span
+                      @click="insertEmoji(e)"
+                      >{{ e }}</span
                     >
                   </div>
                 </div>
               </div>
             </div>
             <el-upload
-                :show-file-list="false"
-                :http-request="sendImage"
-                accept="image/*"
+              :show-file-list="false"
+              :http-request="sendImage"
+              accept="image/*"
             >
-              <el-tooltip content="图片" placement="top"
-              >
+              <el-tooltip content="图片" placement="top">
                 <el-icon :size="20">
-                  <Picture/>
-                </el-icon
-                >
+                  <Picture />
+                </el-icon>
               </el-tooltip>
             </el-upload>
             <el-upload
-                :show-file-list="false"
-                :http-request="sendVideo"
-                accept="video/*"
+              :show-file-list="false"
+              :http-request="sendVideo"
+              accept="video/*"
             >
-              <el-tooltip content="视频" placement="top"
-              >
+              <el-tooltip content="视频" placement="top">
                 <el-icon :size="20">
-                  <VideoCamera/>
-                </el-icon
-                >
+                  <VideoCamera />
+                </el-icon>
               </el-tooltip>
             </el-upload>
             <el-upload :show-file-list="false" :http-request="sendFile">
-              <el-tooltip content="文件" placement="top"
-              >
+              <el-tooltip content="文件" placement="top">
                 <el-icon :size="20">
-                  <Folder/>
-                </el-icon
-                >
+                  <Folder />
+                </el-icon>
               </el-tooltip>
             </el-upload>
             <el-tooltip
-                v-if="current.type === 2"
-                content="@提醒"
-                placement="top"
+              v-if="current.type === 2"
+              content="@提醒"
+              placement="top"
             >
               <el-icon :size="20" @click="openAt">
-                <Bell/>
+                <Bell />
               </el-icon>
             </el-tooltip>
           </div>
           <el-input
-              v-model="draft"
-              type="textarea"
-              :rows="4"
-              resize="none"
-              class="msg-textarea"
-              placeholder="输入消息, 回车发送"
-              ref="inputRef"
-              @keydown.enter.exact.prevent="aiLoading || sendMessage()"
+            v-model="draft"
+            type="textarea"
+            :rows="4"
+            resize="none"
+            class="msg-textarea"
+            placeholder="输入消息, 回车发送"
+            ref="inputRef"
+            @keydown.enter.exact.prevent="aiLoading || sendMessage()"
           />
           <div class="input-foot">
             <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
             <el-button
-                type="primary"
-                :disabled="!draft.trim() || aiLoading"
-                @click="sendMessage"
-            >{{ aiLoading ? "AI思考中..." : "发送" }}
-            </el-button
-            >
+              type="primary"
+              :disabled="!draft.trim() || aiLoading"
+              @click="sendMessage"
+              >{{ aiLoading ? "AI思考中..." : "发送" }}
+            </el-button>
           </div>
         </div>
       </template>
       <div v-else class="chat-empty">
         <div class="empty-illustration">
           <el-icon :size="56">
-            <ChatLineRound/>
+            <ChatLineRound />
           </el-icon>
         </div>
         <p>选择一个会话开始聊天</p>
@@ -1349,185 +1317,162 @@
     <!-- 弹窗区 -->
     <el-dialog v-model="groupDialog" title="发起群聊" width="460px">
       <el-input
-          v-model="groupForm.name"
-          placeholder="群名称(可选)"
-          style="margin-bottom: 12px"
+        v-model="groupForm.name"
+        placeholder="群名称(可选)"
+        style="margin-bottom: 12px"
       />
       <div class="member-pick">
         <el-checkbox-group v-model="groupForm.memberIds">
           <div v-for="u in contacts" :key="u.id" class="pick-item">
-            <el-checkbox :value="u.id"
-            >
+            <el-checkbox :value="u.id">
               <el-avatar
-                  :size="28"
-                  shape="square"
-                  :style="avatarStyle(u.nickname)"
-              >{{ firstChar(u.nickname) }}
-              </el-avatar
-              >
+                :size="28"
+                shape="square"
+                :style="avatarStyle(u.nickname)"
+                >{{ firstChar(u.nickname) }}
+              </el-avatar>
               <span class="pick-name">{{ u.nickname }}</span></el-checkbox
             >
           </div>
         </el-checkbox-group>
       </div>
-      <template #footer
-      >
-        <el-button @click="groupDialog = false">取消
-        </el-button
-        >
+      <template #footer>
+        <el-button @click="groupDialog = false">取消 </el-button>
         <el-button
-            type="primary"
-            :disabled="!groupForm.memberIds.length"
-            @click="createGroup"
-        >创建
-        </el-button
-        >
-      </template
-      >
+          type="primary"
+          :disabled="!groupForm.memberIds.length"
+          @click="createGroup"
+          >创建
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-drawer v-model="settingDrawer" title="群设置" size="340px">
       <div class="setting-block">
         <div class="block-title">群公告</div>
         <el-input
-            v-model="groupNotice"
-            type="textarea"
-            :rows="3"
-            :readonly="!isGroupOwner"
-            placeholder="暂无群公告"
+          v-model="groupNotice"
+          type="textarea"
+          :rows="3"
+          :readonly="!isGroupOwner"
+          placeholder="暂无群公告"
         />
         <el-button
-            v-if="isGroupOwner"
-            size="small"
-            type="primary"
-            style="margin-top: 8px"
-            @click="saveNotice"
-        >保存
-        </el-button
-        >
+          v-if="isGroupOwner"
+          size="small"
+          type="primary"
+          style="margin-top: 8px"
+          @click="saveNotice"
+          >保存
+        </el-button>
       </div>
       <div class="setting-block">
         <div class="block-title">
           群成员 ({{ groupMembers.length }})
           <el-button
-              v-if="isGroupOwner"
-              link
-              type="primary"
-              @click="openAddMember"
-          >+ 添加
-          </el-button
-          >
+            v-if="isGroupOwner"
+            link
+            type="primary"
+            @click="openAddMember"
+            >+ 添加
+          </el-button>
         </div>
         <div v-for="m in groupMembers" :key="m.userId" class="member-row">
           <div class="avatar-wrap-sm">
             <el-avatar
-                :size="32"
-                shape="square"
-                :src="m.avatar"
-                :style="avatarStyle(m.nickname)"
-            >{{ firstChar(m.nickname) }}
-            </el-avatar
-            >
+              :size="32"
+              shape="square"
+              :src="m.avatar"
+              :style="avatarStyle(m.nickname)"
+              >{{ firstChar(m.nickname) }}
+            </el-avatar>
             <span
-                v-if="m.userId"
-                class="user-online-sm"
-                :class="presenceClass(m.userId)"
+              v-if="m.userId"
+              class="user-online-sm"
+              :class="presenceClass(m.userId)"
             ></span>
           </div>
           <span class="m-name">{{ m.nickname }}</span>
           <el-tag v-if="m.memberRole === 1" size="small" type="warning"
-          >群主
-          </el-tag
-          >
+            >群主
+          </el-tag>
           <span class="spacer"></span>
           <el-button
-              v-if="isGroupOwner && m.memberRole !== 1"
-              link
-              type="danger"
-              size="small"
-              @click="kick(m)"
-          >移除
-          </el-button
-          >
+            v-if="isGroupOwner && m.memberRole !== 1"
+            link
+            type="danger"
+            size="small"
+            @click="kick(m)"
+            >移除
+          </el-button>
         </div>
       </div>
       <div class="setting-block">
         <el-button
-            v-if="!isGroupOwner"
-            type="danger"
-            plain
-            style="width: 100%"
-            @click="quit"
-        >退出群聊
-        </el-button
-        >
+          v-if="!isGroupOwner"
+          type="danger"
+          plain
+          style="width: 100%"
+          @click="quit"
+          >退出群聊
+        </el-button>
       </div>
     </el-drawer>
     <el-dialog v-model="addMemberDialog" title="添加成员" width="420px">
       <div class="member-pick">
         <el-checkbox-group v-model="addMemberIds">
           <div v-for="u in nonMembers" :key="u.id" class="pick-item">
-            <el-checkbox :value="u.id"
-            >
+            <el-checkbox :value="u.id">
               <el-avatar
-                  :size="28"
-                  shape="square"
-                  :style="avatarStyle(u.nickname)"
-              >{{ firstChar(u.nickname) }}
-              </el-avatar
-              >
+                :size="28"
+                shape="square"
+                :style="avatarStyle(u.nickname)"
+                >{{ firstChar(u.nickname) }}
+              </el-avatar>
               <span class="pick-name">{{ u.nickname }}</span></el-checkbox
             >
           </div>
         </el-checkbox-group>
       </div>
-      <template #footer
-      >
-        <el-button @click="addMemberDialog = false">取消
-        </el-button
-        >
+      <template #footer>
+        <el-button @click="addMemberDialog = false">取消 </el-button>
         <el-button
-            type="primary"
-            :disabled="!addMemberIds.length"
-            @click="confirmAddMember"
-        >添加
-        </el-button
-        >
-      </template
-      >
+          type="primary"
+          :disabled="!addMemberIds.length"
+          @click="confirmAddMember"
+          >添加
+        </el-button>
+      </template>
     </el-dialog>
     <el-dialog v-model="atDialog" title="选择要@的成员" width="380px">
       <div
-          v-for="m in groupMembers.filter((x) => x.userId !== user?.id)"
-          :key="m.userId"
-          class="pick-item"
-          @click="pickAt(m)"
+        v-for="m in groupMembers.filter((x) => x.userId !== user?.id)"
+        :key="m.userId"
+        class="pick-item"
+        @click="pickAt(m)"
       >
-        <el-avatar :size="28" shape="square" :style="avatarStyle(m.nickname)">{{
-            firstChar(m.nickname)
-          }}
-        </el-avatar
-        >
+        <el-avatar :size="28" shape="square" :style="avatarStyle(m.nickname)"
+          >{{ firstChar(m.nickname) }}
+        </el-avatar>
         <span class="pick-name">{{ m.nickname }}</span>
       </div>
     </el-dialog>
     <el-dialog v-model="readersDialog" title="已读成员" width="360px">
       <div v-for="r in readersList" :key="r.userId" class="pick-item">
-        <el-avatar :size="28" shape="square" :style="avatarStyle(r.nickname)">{{
-            firstChar(r.nickname)
-          }}
+        <el-avatar :size="28" shape="square" :style="avatarStyle(r.nickname)"
+          >{{ firstChar(r.nickname) }}
         </el-avatar>
         <span class="pick-name">{{ r.nickname }}</span>
         <span style="color: #999; margin-left: auto; font-size: 12px">{{
-            fmtFullTime(r.readTime)
-          }}</span>
+          fmtFullTime(r.readTime)
+        }}</span>
       </div>
     </el-dialog>
     <div
-        v-if="ctxMenu.visible"
-        class="ctx-menu"
-        :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
-        @mouseleave="ctxMenu.visible = false"
+      v-if="ctxMenu.visible"
+      class="ctx-menu"
+      :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
+      @mouseleave="ctxMenu.visible = false"
     >
       <div class="ctx-item" @click="toggleTop(ctxMenu.session)">
         {{ ctxMenu.session?.isTop === 1 ? "取消置顶" : "📌 置顶" }}
@@ -1540,9 +1485,9 @@
       </div>
     </div>
     <el-image-viewer
-        v-if="previewUrl"
-        :url-list="[previewUrl]"
-        @close="previewUrl = ''"
+      v-if="previewUrl"
+      :url-list="[previewUrl]"
+      @close="previewUrl = ''"
     />
   </div>
 </template>
@@ -1557,8 +1502,8 @@ import {
   nextTick,
   watch,
 } from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {ElMessage, ElMessageBox, ElImageViewer} from "element-plus";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage, ElMessageBox, ElImageViewer } from "element-plus";
 import {
   ChatDotRound,
   ChatLineRound,
@@ -1590,10 +1535,10 @@ import {
   DArrowRight,
   VideoCamera,
 } from "@element-plus/icons-vue";
-import {useUserStore} from "../store/user";
-import {useThemeStore} from "../store/theme";
-import {useCollabStore} from "../store/collab";
-import {useUserPreferenceStore} from "../store/userPreference";
+import { useUserStore } from "../store/user";
+import { useThemeStore } from "../store/theme";
+import { useCollabStore } from "../store/collab";
+import { useUserPreferenceStore } from "../store/userPreference";
 import {
   apiSessions,
   apiMessages,
@@ -1630,7 +1575,7 @@ import {
   apiToggleReaction,
   apiUpdateProfile,
 } from "../api";
-import {connectWs, disconnectWs, removeWsListeners} from "../utils/ws";
+import { connectWs, disconnectWs, removeWsListeners } from "../utils/ws";
 
 const router = useRouter();
 const route = useRoute();
@@ -1663,10 +1608,10 @@ const statusDropdownOpen = ref(false);
 const groupPanelOpen = ref(true);
 const chatFilter = ref("all");
 const statusOptions = [
-  {value: "online", label: "在线"},
-  {value: "busy", label: "忙碌"},
-  {value: "away", label: "离开"},
-  {value: "offline", label: "离线"},
+  { value: "online", label: "在线" },
+  { value: "busy", label: "忙碌" },
+  { value: "away", label: "离开" },
+  { value: "offline", label: "离线" },
 ];
 
 const onlineSet = ref(new Set());
@@ -1679,9 +1624,9 @@ const readersList = ref([]);
 const searchMode = ref(false);
 const searchContacts = ref([]);
 const searchMsgs = ref([]);
-const ctxMenu = reactive({visible: false, x: 0, y: 0, session: null});
+const ctxMenu = reactive({ visible: false, x: 0, y: 0, session: null });
 const groupDialog = ref(false);
-const groupForm = ref({name: "", memberIds: []});
+const groupForm = ref({ name: "", memberIds: [] });
 const settingDrawer = ref(false);
 const groupMembers = ref([]);
 const groupNotice = ref("");
@@ -1954,7 +1899,7 @@ const emojiCategories = [
   },
 ];
 const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🎉", "🔥", "👏"];
-const presenceValueMap = {online: 1, busy: 2, away: 3, offline: 4};
+const presenceValueMap = { online: 1, busy: 2, away: 3, offline: 4 };
 const presenceLabelMap = {
   online: "在线",
   busy: "忙碌",
@@ -1975,12 +1920,12 @@ const chatFilterSet = new Set([
 const collabCounts = collabStore;
 
 const filteredSessions = computed(() =>
-    sessions.value.filter(
-        (s) => !keyword.value || (s.name || "").includes(keyword.value),
-    ),
+  sessions.value.filter(
+    (s) => !keyword.value || (s.name || "").includes(keyword.value),
+  ),
 );
 const contactMap = computed(
-    () => new Map(contacts.value.map((u) => [u.id, u])),
+  () => new Map(contacts.value.map((u) => [u.id, u])),
 );
 const displaySessions = computed(() => {
   let list = filteredSessions.value;
@@ -2001,12 +1946,12 @@ const displaySessions = computed(() => {
   return list;
 });
 const unreadTotal = computed(() =>
-    sessions.value.reduce((sum, s) => sum + (s.unread || 0), 0),
+  sessions.value.reduce((sum, s) => sum + (s.unread || 0), 0),
 );
 // @我: 跟踪哪些会话最近@了当前用户
 const atMeSessions = ref(new Set());
 const activeEmojiCategory = computed(
-    () => emojiCategories[emojiTab.value] || emojiCategories[0],
+  () => emojiCategories[emojiTab.value] || emojiCategories[0],
 );
 // 当前用户自己的状态显示：
 // 1. 优先从 user.value.chatStatus 读取（来自 /auth/info，数据库值，刷新后也正确）
@@ -2023,12 +1968,12 @@ const myStatusClass = computed(() => {
   return normalizePresence(chatStatus, true);
 });
 const statusText = computed(
-    () => presenceLabelMap[myStatusClass.value] || "在线",
+  () => presenceLabelMap[myStatusClass.value] || "在线",
 );
 const filteredContacts = computed(() =>
-    contacts.value.filter(
-        (u) => !keyword.value || (u.nickname || "").includes(keyword.value),
-    ),
+  contacts.value.filter(
+    (u) => !keyword.value || (u.nickname || "").includes(keyword.value),
+  ),
 );
 const isGroupOwner = computed(() => {
   const me = groupMembers.value.find((m) => m.userId === user.value?.id);
@@ -2115,33 +2060,33 @@ const addAppItems = computed(() => {
   ];
   if (isAdmin.value) {
     items.push(
-        {
-          key: "app:/admin/dashboard",
-          kind: "app",
-          title: "数据看板",
-          description: "查看平台运营数据",
-          path: "/admin/dashboard",
-          badge: "数",
-          color: "#531dab",
-        },
-        {
-          key: "app:/admin/notice",
-          kind: "app",
-          title: "公告管理",
-          description: "维护平台公告内容",
-          path: "/admin/notice",
-          badge: "告",
-          color: "#eb2f96",
-        },
-        {
-          key: "app:/admin",
-          kind: "app",
-          title: "系统管理",
-          description: "进入后台管理中心",
-          path: "/admin",
-          badge: "管",
-          color: "#08979c",
-        },
+      {
+        key: "app:/admin/dashboard",
+        kind: "app",
+        title: "数据看板",
+        description: "查看平台运营数据",
+        path: "/admin/dashboard",
+        badge: "数",
+        color: "#531dab",
+      },
+      {
+        key: "app:/admin/notice",
+        kind: "app",
+        title: "公告管理",
+        description: "维护平台公告内容",
+        path: "/admin/notice",
+        badge: "告",
+        color: "#eb2f96",
+      },
+      {
+        key: "app:/admin",
+        kind: "app",
+        title: "系统管理",
+        description: "进入后台管理中心",
+        path: "/admin",
+        badge: "管",
+        color: "#08979c",
+      },
     );
   }
   return items;
@@ -2183,18 +2128,18 @@ const workNotices = computed(() => collabStore.workNotices);
 const latestWorkNotice = computed(() => collabStore.latestWorkNotice);
 
 watch(
-    () => preferenceStore.loaded,
-    (loaded) => {
-      if (!loaded || workbenchStateReady.value) return;
-      restoreWorkbenchState();
-    },
-    {immediate: true},
+  () => preferenceStore.loaded,
+  (loaded) => {
+    if (!loaded || workbenchStateReady.value) return;
+    restoreWorkbenchState();
+  },
+  { immediate: true },
 );
 
 watch(
-    () => [route.query.tab, route.query.filter, route.query.session],
-    syncWorkbenchViewFromRoute,
-    {immediate: true},
+  () => [route.query.tab, route.query.filter, route.query.session],
+  syncWorkbenchViewFromRoute,
+  { immediate: true },
 );
 
 watch([tab, chatFilter, keyword, () => current.value?.id ?? null], () => {
@@ -2233,7 +2178,12 @@ onMounted(async () => {
     onlineSet.value = new Set();
     if (Array.isArray(statusList) || statusList instanceof Set) {
       statusList.forEach((s) => {
-        const uid = s.userId != null ? Number(s.userId) : (typeof s === "number" ? s : null);
+        const uid =
+          s.userId != null
+            ? Number(s.userId)
+            : typeof s === "number"
+              ? s
+              : null;
         if (uid == null) return;
         const isOnline = s.online != null ? Boolean(s.online) : true;
         const chatStatus = s.chatStatus != null ? s.chatStatus : 1;
@@ -2256,7 +2206,15 @@ onMounted(async () => {
   } catch (error) {
     console.warn("[Online] failed to load online users", error);
   }
-  connectWs(userStore.token, onWsMessage, onWsReceipt, onWsOnline, null, null, onWsKick);
+  connectWs(
+    userStore.token,
+    onWsMessage,
+    onWsReceipt,
+    onWsOnline,
+    null,
+    null,
+    onWsKick,
+  );
 });
 onUnmounted(() => {
   closeAiSse();
@@ -2267,9 +2225,9 @@ onUnmounted(() => {
 function syncWorkbenchViewFromRoute() {
   const queryTab = typeof route.query.tab === "string" ? route.query.tab : "";
   const queryFilter =
-      typeof route.query.filter === "string" ? route.query.filter : "";
+    typeof route.query.filter === "string" ? route.query.filter : "";
   const hasExplicitRouteView =
-      Boolean(queryTab) || Boolean(queryFilter) || Boolean(route.query.session);
+    Boolean(queryTab) || Boolean(queryFilter) || Boolean(route.query.session);
 
   if (!hasExplicitRouteView && workbenchStateReady.value) {
     if (keyword.value.trim()) onSearchInput();
@@ -2301,9 +2259,9 @@ function syncWorkbenchViewFromRoute() {
 function restoreWorkbenchState() {
   const state = preferenceStore.getPageState("workbench");
   if (
-      state.tab === "work" ||
-      state.tab === "contacts" ||
-      state.tab === "chat"
+    state.tab === "work" ||
+    state.tab === "contacts" ||
+    state.tab === "chat"
   ) {
     tab.value = state.tab;
   }
@@ -2314,8 +2272,8 @@ function restoreWorkbenchState() {
     keyword.value = state.keyword;
   }
   if (
-      Number.isFinite(Number(state.currentSessionId)) &&
-      Number(state.currentSessionId) > 0
+    Number.isFinite(Number(state.currentSessionId)) &&
+    Number(state.currentSessionId) > 0
   ) {
     preferredSessionId.value = Number(state.currentSessionId);
   }
@@ -2341,20 +2299,20 @@ async function hydrateAtMeSessions() {
     return;
   }
   const hitSessionIds = await Promise.all(
-      sessions.value.map(async (session) => {
-        try {
-          const list = await apiMessages(session.id);
-          return list.some((msg) =>
-              String(msg.atUserIds || "")
-                  .split(",")
-                  .includes(String(user.value.id)),
-          )
-              ? session.id
-              : null;
-        } catch {
-          return null;
-        }
-      }),
+    sessions.value.map(async (session) => {
+      try {
+        const list = await apiMessages(session.id);
+        return list.some((msg) =>
+          String(msg.atUserIds || "")
+            .split(",")
+            .includes(String(user.value.id)),
+        )
+          ? session.id
+          : null;
+      } catch {
+        return null;
+      }
+    }),
   );
   atMeSessions.value = new Set(hitSessionIds.filter(Boolean));
 }
@@ -2371,8 +2329,7 @@ async function openSession(s) {
   }
   if (messages.value.length) {
     apiReadReceipt(s.id, messages.value[messages.value.length - 1].id).catch(
-        () => {
-        },
+      () => {},
     );
   }
   scrollBottom();
@@ -2383,28 +2340,28 @@ async function openSessionFromRoute() {
   if (!routeSessionId || !sessions.value.length) return;
   if (current.value?.id === routeSessionId) return;
   const target = sessions.value.find(
-      (session) => session.id === routeSessionId,
+    (session) => session.id === routeSessionId,
   );
   if (!target) return;
   tab.value = "chat";
   searchMode.value = false;
   keyword.value = "";
   await openSession(target);
-  const nextQuery = {...route.query};
+  const nextQuery = { ...route.query };
   delete nextQuery.session;
-  router.replace({path: "/chat", query: nextQuery});
+  router.replace({ path: "/chat", query: nextQuery });
 }
 
 async function openStoredSessionIfNeeded() {
   if (
-      route.query.session ||
-      !preferredSessionId.value ||
-      !sessions.value.length
+    route.query.session ||
+    !preferredSessionId.value ||
+    !sessions.value.length
   )
     return;
   if (current.value?.id === preferredSessionId.value) return;
   const target = sessions.value.find(
-      (session) => session.id === preferredSessionId.value,
+    (session) => session.id === preferredSessionId.value,
   );
   if (!target) return;
   await openSession(target);
@@ -2421,7 +2378,6 @@ async function startChat(u) {
     await openSession(s);
   }
 }
-
 
 function ensureSessionSelected() {
   if (current.value) return true;
@@ -2448,8 +2404,8 @@ function formatLinkDescription(url) {
   try {
     const parsed = new URL(url);
     return parsed.pathname && parsed.pathname !== "/"
-        ? `${parsed.host}${parsed.pathname}`
-        : parsed.host;
+      ? `${parsed.host}${parsed.pathname}`
+      : parsed.host;
   } catch {
     return url;
   }
@@ -2528,23 +2484,23 @@ function fileBadgeMeta(name) {
       iconBadge: "Z",
     };
   if (
-      [
-        "JS",
-        "TS",
-        "JSON",
-        "XML",
-        "HTML",
-        "CSS",
-        "SCSS",
-        "JAVA",
-        "PY",
-        "VUE",
-        "MD",
-        "YAML",
-        "YML",
-        "SH",
-        "SQL",
-      ].includes(ext)
+    [
+      "JS",
+      "TS",
+      "JSON",
+      "XML",
+      "HTML",
+      "CSS",
+      "SCSS",
+      "JAVA",
+      "PY",
+      "VUE",
+      "MD",
+      "YAML",
+      "YML",
+      "SH",
+      "SQL",
+    ].includes(ext)
   ) {
     return {
       badge: ext,
@@ -2573,22 +2529,22 @@ function fileBadgeMeta(name) {
 
 async function loadAddPanelData() {
   const [filesResult, linksResult, usageResult] = await Promise.allSettled([
-    apiFileList({limit: 8}),
+    apiFileList({ limit: 8 }),
     apiAddPanelLinks(),
     apiAddPanelRecentUsage(),
   ]);
   recentFiles.value =
-      filesResult.status === "fulfilled" && Array.isArray(filesResult.value)
-          ? filesResult.value
-          : [];
+    filesResult.status === "fulfilled" && Array.isArray(filesResult.value)
+      ? filesResult.value
+      : [];
   savedLinks.value =
-      linksResult.status === "fulfilled" && Array.isArray(linksResult.value)
-          ? linksResult.value
-          : [];
+    linksResult.status === "fulfilled" && Array.isArray(linksResult.value)
+      ? linksResult.value
+      : [];
   recentUsageKeys.value =
-      usageResult.status === "fulfilled" && Array.isArray(usageResult.value)
-          ? usageResult.value.filter((item) => typeof item === "string")
-          : [];
+    usageResult.status === "fulfilled" && Array.isArray(usageResult.value)
+      ? usageResult.value.filter((item) => typeof item === "string")
+      : [];
 }
 
 function closeAddPanel() {
@@ -2648,7 +2604,7 @@ async function removeSavedLink(item) {
   await apiAddPanelDeleteLink(item.id);
   savedLinks.value = savedLinks.value.filter((link) => link.id !== item.id);
   recentUsageKeys.value = recentUsageKeys.value.filter(
-      (key) => key !== item.key,
+    (key) => key !== item.key,
   );
   ElMessage.success("链接已删除");
 }
@@ -2694,7 +2650,7 @@ async function sendAddItem(item) {
       sessionId: current.value.id,
       contentType: 3,
       content: item.title,
-      extra: JSON.stringify({url: item.url, size: item.size}),
+      extra: JSON.stringify({ url: item.url, size: item.size }),
     });
   } else {
     await apiSendMessage({
@@ -2744,7 +2700,7 @@ async function sendImage(opt) {
     sessionId: current.value.id,
     contentType: 2,
     content: f.url,
-    extra: JSON.stringify({name: f.name, size: f.size}),
+    extra: JSON.stringify({ name: f.name, size: f.size }),
   });
 }
 
@@ -2757,7 +2713,7 @@ async function sendFile(opt) {
     sessionId: current.value.id,
     contentType: 3,
     content: f.name,
-    extra: JSON.stringify({url: f.url, size: f.size}),
+    extra: JSON.stringify({ url: f.url, size: f.size }),
   });
 }
 
@@ -2765,12 +2721,12 @@ async function sendVideo(opt) {
   if (!ensureSessionSelected() || !validateUpload(opt.file, "video")) return;
   const fd = new FormData();
   fd.append("file", opt.file);
-  const f = await apiUpload(fd, {timeout: 120000});
+  const f = await apiUpload(fd, { timeout: 120000 });
   await apiSendMessage({
     sessionId: current.value.id,
     contentType: 5,
     content: f.url,
-    extra: JSON.stringify({name: f.name, size: f.size}),
+    extra: JSON.stringify({ name: f.name, size: f.size }),
   });
 }
 
@@ -2780,7 +2736,7 @@ async function recall(m) {
 
 // 消息表情反应
 async function toggleReaction(messageId, emoji) {
-  await apiToggleReaction({messageId, emoji});
+  await apiToggleReaction({ messageId, emoji });
   // 刷新消息列表获取最新反应
   if (current.value)
     messages.value = (await apiMessages(current.value.id)).map(hydrateMessage);
@@ -2791,7 +2747,7 @@ async function uploadAvatar(opt) {
   const fd = new FormData();
   fd.append("file", opt.file);
   const f = await apiUpload(fd);
-  const u = await apiUpdateProfile({avatar: f.url});
+  const u = await apiUpdateProfile({ avatar: f.url });
   userStore.setUser(u);
   ElMessage.success("头像已更新");
 }
@@ -2821,8 +2777,8 @@ function storedPresence(userId) {
   const contact = contactMap.value.get(userId);
   if (contact) {
     return normalizePresence(
-        contact.chatStatus ?? 1,
-        contact.online === true || onlineSet.value.has(userId)
+      contact.chatStatus ?? 1,
+      contact.online === true || onlineSet.value.has(userId),
     );
   }
   return "offline";
@@ -2838,9 +2794,9 @@ function presenceTextById(userId) {
 
 function presenceTagType(userId) {
   return (
-      {online: "success", busy: "danger", away: "warning", offline: "info"}[
-          presenceClass(userId)
-          ] || "info"
+    { online: "success", busy: "danger", away: "warning", offline: "info" }[
+      presenceClass(userId)
+    ] || "info"
   );
 }
 
@@ -2858,7 +2814,7 @@ async function changeMyStatus(status) {
     return;
   }
   try {
-    const updated = await apiUpdateProfile({chatStatus: nextValue});
+    const updated = await apiUpdateProfile({ chatStatus: nextValue });
     userStore.setUser(updated);
     // 同步更新 userStatusMap，UI 立即响应
     userStatusMap.value.set(user.value.id, {
@@ -2893,9 +2849,14 @@ function handleGlobalClick(event) {
     closeAddPanel();
   if (ctxMenu.visible) ctxMenu.visible = false;
   if (reactionVisible.value) {
-    const reactionContent = document.querySelector('.reaction-popover-content');
-    const reactionBtn = document.querySelector('.msg-actions span:first-of-type + span + span');
-    if (!reactionContent?.contains(event.target) && !reactionBtn?.contains(event.target)) {
+    const reactionContent = document.querySelector(".reaction-popover-content");
+    const reactionBtn = document.querySelector(
+      ".msg-actions span:first-of-type + span + span",
+    );
+    if (
+      !reactionContent?.contains(event.target) &&
+      !reactionBtn?.contains(event.target)
+    ) {
       reactionVisible.value = false;
     }
   }
@@ -2905,9 +2866,9 @@ function onWsMessage(msg) {
   msg = hydrateMessage(msg);
   // 追踪 @我 的会话
   if (
-      msg.atUserIds &&
-      user.value &&
-      String(msg.atUserIds).split(",").includes(String(user.value.id))
+    msg.atUserIds &&
+    user.value &&
+    String(msg.atUserIds).split(",").includes(String(user.value.id))
   ) {
     atMeSessions.value.add(msg.sessionId);
     atMeSessions.value = new Set(atMeSessions.value);
@@ -2921,8 +2882,7 @@ function onWsMessage(msg) {
     }
     if (msg.senderId !== user.value?.id) {
       apiMarkRead(current.value.id);
-      apiReadReceipt(current.value.id, msg.id).catch(() => {
-      });
+      apiReadReceipt(current.value.id, msg.id).catch(() => {});
     }
   }
   refreshSessionMeta(msg);
@@ -2949,7 +2909,10 @@ function onWsOnline(data) {
   if (!data || data.userId == null) return;
   const uid = Number(data.userId);
   const isOnline = Boolean(data.online);
-  const chatStatus = data.chatStatus != null ? data.chatStatus : userStatusMap.value.get(uid)?.chatStatus;
+  const chatStatus =
+    data.chatStatus != null
+      ? data.chatStatus
+      : userStatusMap.value.get(uid)?.chatStatus;
   // 更新 userStatusMap（优先级最高）
   userStatusMap.value.set(uid, {
     chatStatus: chatStatus ?? 1,
@@ -2979,11 +2942,13 @@ function onWsKick(data) {
     confirmButtonText: "重新登录",
     type: "warning",
     showClose: false,
-  }).then(() => {
-    router.push("/login");
-  }).catch(() => {
-    router.push("/login");
-  });
+  })
+    .then(() => {
+      router.push("/login");
+    })
+    .catch(() => {
+      router.push("/login");
+    });
 }
 
 async function refreshSessionMeta(msg) {
@@ -2992,14 +2957,14 @@ async function refreshSessionMeta(msg) {
     s.lastMsg = msg.status === 0 ? "[消息已撤回]" : previewMsg(msg);
     s.lastTime = msg.createTime;
     if (
-        (!current.value || current.value.id !== msg.sessionId) &&
-        msg.senderId !== user.value?.id
+      (!current.value || current.value.id !== msg.sessionId) &&
+      msg.senderId !== user.value?.id
     )
       s.unread = (s.unread || 0) + 1;
     sessions.value.sort(
-        (a, b) =>
-            (b.isTop || 0) - (a.isTop || 0) ||
-            new Date(b.lastTime) - new Date(a.lastTime),
+      (a, b) =>
+        (b.isTop || 0) - (a.isTop || 0) ||
+        new Date(b.lastTime) - new Date(a.lastTime),
     );
     collabStore.setMessageUnreadFromSessions(sessions.value);
   } else await loadSessions();
@@ -3016,7 +2981,7 @@ function onSearchInput() {
   searchTimer = setTimeout(async () => {
     searchMode.value = true;
     searchContacts.value = contacts.value.filter((u) =>
-        (u.nickname || "").includes(keyword.value),
+      (u.nickname || "").includes(keyword.value),
     );
     try {
       searchMsgs.value = await apiSearchMessages(keyword.value);
@@ -3093,7 +3058,7 @@ async function openAiAssistant() {
   let aiSession = sessions.value.find((s) => s.name === "AI 助手");
   if (!aiSession) {
     // 创建一个群聊作为AI助手会话
-    const {apiCreateGroup} = await import("../api");
+    const { apiCreateGroup } = await import("../api");
     const sid = await apiCreateGroup({
       name: "AI 助手",
       memberIds: [user.value.id],
@@ -3115,12 +3080,12 @@ async function sendMessage() {
   } else {
     const atIds = [...atUserSet.value].join(",");
     const extra = quoteRef.value
-        ? JSON.stringify({
+      ? JSON.stringify({
           quoteId: quoteRef.value.id,
           quoteSender: quoteRef.value.senderName,
           quoteContent: quoteRef.value.content?.substring(0, 100),
         })
-        : undefined;
+      : undefined;
     draft.value = "";
     atUserSet.value = new Set();
     quoteRef.value = null;
@@ -3135,7 +3100,9 @@ async function sendMessage() {
       console.log("[chat] apiSendMessage returned", savedMsg);
       if (savedMsg && current.value) {
         const hydrated = hydrateMessage(savedMsg);
-        const existingIdx = messages.value.findIndex((m) => m.id === hydrated.id);
+        const existingIdx = messages.value.findIndex(
+          (m) => m.id === hydrated.id,
+        );
         if (existingIdx < 0) {
           messages.value.push(hydrated);
         } else {
@@ -3181,7 +3148,7 @@ async function sendWithAi(content) {
   try {
     aiEventSource = await apiCreateAiSse({
       sessionId: current.value.id,
-      content: content
+      content: content,
     });
 
     // 接收每一段流式返回的 MessageVO
@@ -3190,7 +3157,7 @@ async function sendWithAi(content) {
         const vo = JSON.parse(event.data);
         // 查找当前会话的AI消息气泡
         const targetIndex = messages.value.findIndex(
-            m => m.id === vo.id && m.sessionId === current.value.id
+          (m) => m.id === vo.id && m.sessionId === current.value.id,
         );
         if (targetIndex > -1) {
           // 已有气泡，直接覆盖最新完整文本
@@ -3249,7 +3216,7 @@ async function favoriteMsg(m) {
 }
 
 function openGroupCreate() {
-  groupForm.value = {name: "", memberIds: []};
+  groupForm.value = { name: "", memberIds: [] };
   groupDialog.value = true;
   closeAddPanel();
 }
@@ -3364,7 +3331,7 @@ function hydrateMessage(msg) {
   if (!msg) return msg;
   const extra = parseExtra(msg.extra);
   if (extra.quoteId)
-    msg._quote = {senderName: extra.quoteSender, content: extra.quoteContent};
+    msg._quote = { senderName: extra.quoteSender, content: extra.quoteContent };
   if (msg.contentType === 6) msg._card = extra;
   return msg;
 }
@@ -3396,7 +3363,7 @@ function documentDesc(m) {
 function openDocumentMessage(m) {
   const meta = documentMeta(m);
   if (meta.fileId) {
-    router.push({path: "/documents", query: {file: String(meta.fileId)}});
+    router.push({ path: "/documents", query: { file: String(meta.fileId) } });
     return;
   }
   if (meta.url) triggerDownload(meta.url, documentTitle(m));
@@ -3422,8 +3389,8 @@ function cardTitle(m) {
 function cardDesc(m) {
   const card = cardMeta(m);
   return card.kind === "app"
-      ? card.description || card.path || ""
-      : card.description || card.url || "";
+    ? card.description || card.path || ""
+    : card.description || card.url || "";
 }
 
 function cardBadgeText(m) {
@@ -3433,7 +3400,7 @@ function cardBadgeText(m) {
 function cardBadgeStyle(m) {
   return {
     background:
-        cardMeta(m).color || (cardMeta(m).kind === "app" ? "#1677ff" : "#13c2c2"),
+      cardMeta(m).color || (cardMeta(m).kind === "app" ? "#1677ff" : "#13c2c2"),
   };
 }
 
@@ -3449,25 +3416,25 @@ function openCardMessage(m) {
 function showTime(i) {
   if (i === 0) return true;
   return (
-      new Date(messages.value[i].createTime) -
+    new Date(messages.value[i].createTime) -
       new Date(messages.value[i - 1].createTime) >
-      5 * 60 * 1000
+    5 * 60 * 1000
   );
 }
 
 function recallText(m) {
   return (
-      (m.senderId === user.value?.id ? "你" : m.senderName || "对方") +
-      " 撤回了一条消息"
+    (m.senderId === user.value?.id ? "你" : m.senderName || "对方") +
+    " 撤回了一条消息"
   );
 }
 
 function renderText(text) {
   if (!text) return "";
   const esc = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
   return esc.replace(/(@\S+)/g, '<span class="at">$1</span>');
 }
 
@@ -3475,8 +3442,8 @@ function previewMsg(msg) {
   if (msg.contentType === 2) return "[图片]";
   if (msg.contentType === 3)
     return isDocumentShareMessage(msg)
-        ? `[文档] ${documentTitle(msg)}`.trim()
-        : "[文件]";
+      ? `[文档] ${documentTitle(msg)}`.trim()
+      : "[文件]";
   if (msg.contentType === 5) return "[视频]";
   if (msg.contentType === 6) {
     const card = cardMeta(msg);
@@ -3489,8 +3456,8 @@ function displayMessageContent(msg) {
   if (msg.contentType === 2) return "[图片]";
   if (msg.contentType === 3) {
     return isDocumentShareMessage(msg)
-        ? `[文档] ${documentTitle(msg)}`
-        : `[文件] ${parseExtra(msg.extra).name || msg.content || ""}`.trim();
+      ? `[文档] ${documentTitle(msg)}`
+      : `[文件] ${parseExtra(msg.extra).name || msg.content || ""}`.trim();
   }
   if (msg.contentType === 5)
     return `[视频] ${parseExtra(msg.extra).name || "视频消息"}`;
@@ -3534,9 +3501,9 @@ function avatarStyle(name) {
 function fmtTime(t) {
   if (!t) return "";
   const d = new Date(t),
-      now = new Date();
+    now = new Date();
   const hh = String(d.getHours()).padStart(2, "0"),
-      mm = String(d.getMinutes()).padStart(2, "0");
+    mm = String(d.getMinutes()).padStart(2, "0");
   if (d.toDateString() === now.toDateString()) return `${hh}:${mm}`;
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
@@ -3544,9 +3511,9 @@ function fmtTime(t) {
 function fmtFullTime(t) {
   if (!t) return "";
   const d = new Date(t),
-      now = new Date();
+    now = new Date();
   const hh = String(d.getHours()).padStart(2, "0"),
-      mm = String(d.getMinutes()).padStart(2, "0");
+    mm = String(d.getMinutes()).padStart(2, "0");
   if (d.toDateString() === now.toDateString()) return `${hh}:${mm}`;
   return `${d.getMonth() + 1}月${d.getDate()}日 ${hh}:${mm}`;
 }
@@ -3849,7 +3816,6 @@ function scrollBottom() {
 .add-panel {
   position: absolute;
   top: 44px;
-  right: -44px;
   width: min(548px, calc(100vw - 32px));
   max-height: min(720px, calc(100vh - 84px));
   background: var(--dt-bg);
@@ -3975,8 +3941,9 @@ function scrollBottom() {
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: background 0.16s ease,
-  box-shadow 0.16s ease;
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .add-settings-item:hover {
@@ -4012,8 +3979,9 @@ function scrollBottom() {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform 0.16s ease,
-  box-shadow 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .add-settings-item-icon.theme-link {
@@ -4056,8 +4024,9 @@ function scrollBottom() {
   color: #b7bdc6;
   opacity: 0.58;
   flex-shrink: 0;
-  transition: transform 0.16s ease,
-  opacity 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    opacity 0.16s ease;
 }
 
 .add-settings-item.danger {
@@ -4107,7 +4076,6 @@ function scrollBottom() {
 
 .add-link-trigger {
   width: 100%;
-  height: 64px;
   border: none;
   background: transparent;
   color: var(--dt-text);
@@ -4176,7 +4144,7 @@ function scrollBottom() {
 }
 
 .add-panel-list {
-  max-height: 436px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -4312,9 +4280,9 @@ function scrollBottom() {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-      180deg,
-      var(--file-tint) 0%,
-      rgba(255, 255, 255, 0) 38%
+    180deg,
+    var(--file-tint) 0%,
+    rgba(255, 255, 255, 0) 38%
   );
 }
 
@@ -4330,10 +4298,10 @@ function scrollBottom() {
   width: 11px;
   height: 11px;
   background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0) 46%,
-      rgba(0, 0, 0, 0.08) 47%,
-      #f4f7fb 48%
+    135deg,
+    rgba(255, 255, 255, 0) 46%,
+    rgba(0, 0, 0, 0.08) 47%,
+    #f4f7fb 48%
   );
 }
 
@@ -4344,9 +4312,10 @@ function scrollBottom() {
   width: 16px;
   height: 12px;
   border-radius: 4px;
-  background: linear-gradient(#c9d2de, #c9d2de) 0 0 / 100% 2px no-repeat,
-  linear-gradient(#dbe2ec, #dbe2ec) 0 5px / 78% 2px no-repeat,
-  linear-gradient(#e6ebf2, #e6ebf2) 0 10px / 92% 2px no-repeat;
+  background:
+    linear-gradient(#c9d2de, #c9d2de) 0 0 / 100% 2px no-repeat,
+    linear-gradient(#dbe2ec, #dbe2ec) 0 5px / 78% 2px no-repeat,
+    linear-gradient(#e6ebf2, #e6ebf2) 0 10px / 92% 2px no-repeat;
 }
 
 .add-file-type {
@@ -4672,9 +4641,10 @@ function scrollBottom() {
   padding: 14px;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.18s,
-  transform 0.18s,
-  box-shadow 0.18s;
+  transition:
+    border-color 0.18s,
+    transform 0.18s,
+    box-shadow 0.18s;
 }
 
 .work-summary-card:hover {
@@ -4685,25 +4655,25 @@ function scrollBottom() {
 
 .work-summary-card.mailbox {
   background: linear-gradient(
-      180deg,
-      rgba(95, 108, 248, 0.08) 0%,
-      var(--dt-bg) 100%
+    180deg,
+    rgba(95, 108, 248, 0.08) 0%,
+    var(--dt-bg) 100%
   );
 }
 
 .work-summary-card.ding {
   background: linear-gradient(
-      180deg,
-      rgba(255, 159, 26, 0.1) 0%,
-      var(--dt-bg) 100%
+    180deg,
+    rgba(255, 159, 26, 0.1) 0%,
+    var(--dt-bg) 100%
   );
 }
 
 .work-summary-card.feed {
   background: linear-gradient(
-      180deg,
-      rgba(22, 119, 255, 0.08) 0%,
-      var(--dt-bg) 100%
+    180deg,
+    rgba(22, 119, 255, 0.08) 0%,
+    var(--dt-bg) 100%
   );
 }
 
