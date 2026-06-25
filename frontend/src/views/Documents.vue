@@ -69,7 +69,7 @@
       </div>
       <div v-else class="scene-empty">上传文档后，这里会自动出现可直接演示的协作用例。</div>
 
-      <div class="workspace-panel">
+      <div class="workspace-panel" :class="{ 'detail-active': detailActive }">
         <div class="workspace-left">
           <div class="toolbar-row">
             <el-tabs v-model="activeTab" class="documents-tabs">
@@ -145,6 +145,7 @@
         <div class="workspace-right">
           <template v-if="currentFile">
             <div class="preview-head">
+              <button type="button" class="detail-back-btn" @click="closeDetail"><el-icon><ArrowLeft /></el-icon> 返回</button>
               <div class="preview-main">
                 <div class="preview-badge" :class="`theme-${badgeMeta(currentFile.name).theme}`">
                   <div class="file-badge-sheet">
@@ -346,7 +347,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Back, Refresh, Search, Upload } from '@element-plus/icons-vue'
+import { Back, Refresh, Search, Upload, ArrowLeft } from '@element-plus/icons-vue'
 import AppSideNav from '../components/AppSideNav.vue'
 import { useUserPreferenceStore } from '../store/userPreference'
 import {
@@ -369,6 +370,7 @@ const activeTab = ref('all')
 const keyword = ref('')
 const rawFiles = ref([])
 const selectedFileId = ref(null)
+const detailActive = ref(false)
 const documentsStateReady = ref(false)
 const users = ref([])
 const editDialogOpen = ref(false)
@@ -714,6 +716,13 @@ function sessionPreview(session) {
 
 function selectFile(file) {
   selectedFileId.value = file.id
+  if (window.innerWidth <= 768) {
+    detailActive.value = true
+  }
+}
+
+function closeDetail() {
+  detailActive.value = false
 }
 
 function resolveRouteFileId() {
@@ -1337,6 +1346,9 @@ function triggerDownload(url, name) {
   padding: 20px;
   background: linear-gradient(180deg, #fcfcfd 0%, #f8fbff 100%);
 }
+.detail-back-btn {
+  display: none;
+}
 .preview-head {
   display: flex;
   align-items: flex-start;
@@ -1670,11 +1682,37 @@ function triggerDownload(url, name) {
   .workspace-right {
     display: none;
   }
+  .workspace-panel.detail-active {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    overflow-y: auto;
+    background: #fff;
+  }
   .workspace-panel.detail-active .workspace-left {
     display: none;
   }
   .workspace-panel.detail-active .workspace-right {
     display: block;
+  }
+  .detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f2f5;
+    color: #1d2129;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .detail-back-btn:hover {
+    background: #e5e6eb;
+  }
+  .preview-head {
+    gap: 8px;
   }
 }
 @media (max-width: 960px) {
