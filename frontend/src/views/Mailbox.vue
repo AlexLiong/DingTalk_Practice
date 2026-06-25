@@ -55,7 +55,7 @@
         <span class="live-strip-meta">{{ mailboxSyncText }}</span>
       </button>
 
-      <div class="mailbox-layout">
+      <div class="mailbox-layout" :class="{ 'detail-active': detailActive }">
         <div class="mail-list-wrap">
           <div class="mail-toolbar">
             <el-tabs v-model="activeTab" class="mail-tabs">
@@ -112,6 +112,7 @@
         <div class="mail-detail-wrap">
           <template v-if="currentMail">
             <div class="detail-head">
+              <button type="button" class="detail-back-btn" @click="closeDetail"><el-icon><ArrowLeft /></el-icon> 返回</button>
               <div class="detail-header-main">
                 <div class="detail-pills">
                   <span v-if="currentMail.direction === 'sent'" class="state-pill sent">我发出的</span>
@@ -366,7 +367,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Back, Search } from '@element-plus/icons-vue'
+import { Back, Search, ArrowLeft } from '@element-plus/icons-vue'
 import AppSideNav from '../components/AppSideNav.vue'
 import { useCollabStore } from '../store/collab'
 import { useUserPreferenceStore } from '../store/userPreference'
@@ -391,6 +392,7 @@ const activeTab = ref('all')
 const keyword = ref('')
 const mails = ref([])
 const currentId = ref(null)
+const detailActive = ref(false)
 const mailboxStateReady = ref(false)
 const replyDraft = ref('')
 const draftDirty = ref(false)
@@ -485,6 +487,9 @@ async function loadContacts() {
 
 async function selectMail(mail) {
   currentId.value = mail.id
+  if (window.innerWidth <= 768) {
+    detailActive.value = true
+  }
   if (!mail.unread) return
   mail.unread = 0
   try {
@@ -492,6 +497,10 @@ async function selectMail(mail) {
   } catch (error) {
     mail.unread = 1
   }
+}
+
+function closeDetail() {
+  detailActive.value = false
 }
 
 async function focusLatestMail() {
@@ -1495,6 +1504,9 @@ function mailMetaText(mail) {
   align-items: center;
   justify-content: center;
 }
+.detail-back-btn {
+  display: none;
+}
 @media (max-width: 1100px) {
   .stat-row,
   .mailbox-layout,
@@ -1544,11 +1556,35 @@ function mailMetaText(mail) {
   .mail-detail-wrap {
     display: none;
   }
+  .mailbox-layout.detail-active {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    overflow-y: auto;
+    background: #fff;
+  }
   .mailbox-layout.detail-active .mail-list-wrap {
     display: none;
   }
   .mailbox-layout.detail-active .mail-detail-wrap {
     display: block;
+  }
+  .detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f2f5;
+    color: #1d2129;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+  }
+  .detail-back-btn:hover {
+    background: #e5e6eb;
   }
 }
 </style>

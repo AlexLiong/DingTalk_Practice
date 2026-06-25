@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <div class="ding-layout">
+      <div class="ding-layout" :class="{ 'detail-active': detailActive }">
         <div class="ding-list-wrap">
           <div class="ding-toolbar">
             <el-tabs v-model="activeTab" class="ding-tabs">
@@ -124,6 +124,7 @@
         <div class="ding-detail-wrap" :class="currentDing ? `status-${currentDing.status}` : ''">
           <template v-if="currentDing">
             <div class="detail-head">
+              <button type="button" class="detail-back-btn" @click="closeDetail"><el-icon><ArrowLeft /></el-icon> 返回</button>
               <div>
                 <div class="detail-title">{{ currentDing.title }}</div>
                 <div class="detail-meta">{{ currentDing.sentAt }} · {{ currentDing.direction === 'received' ? `${currentDing.owner} 发起` : `发给 ${currentDing.target}` }}</div>
@@ -319,7 +320,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Back, Search } from '@element-plus/icons-vue'
+import { Back, Search, ArrowLeft } from '@element-plus/icons-vue'
 import AppSideNav from '../components/AppSideNav.vue'
 import { useCollabStore } from '../store/collab'
 import { useUserPreferenceStore } from '../store/userPreference'
@@ -341,6 +342,7 @@ const activeTab = ref('todo')
 const keyword = ref('')
 const dingList = ref([])
 const currentId = ref(null)
+const detailActive = ref(false)
 const dingStateReady = ref(false)
 const detailNote = ref('')
 const contacts = ref([])
@@ -453,6 +455,13 @@ async function loadContacts() {
 
 function selectDing(item) {
   currentId.value = item.id
+  if (window.innerWidth <= 768) {
+    detailActive.value = true
+  }
+}
+
+function closeDetail() {
+  detailActive.value = false
 }
 
 async function focusLatestDing() {
@@ -1243,6 +1252,9 @@ function contactLabel(user) {
   align-items: center;
   justify-content: center;
 }
+.detail-back-btn {
+  display: none;
+}
 @media (max-width: 1100px) {
   .stat-row,
   .scenario-strip,
@@ -1292,11 +1304,35 @@ function contactLabel(user) {
   .ding-detail-wrap {
     display: none;
   }
+  .ding-layout.detail-active {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    overflow-y: auto;
+    background: #fff;
+  }
   .ding-layout.detail-active .ding-list-wrap {
     display: none;
   }
   .ding-layout.detail-active .ding-detail-wrap {
     display: block;
+  }
+  .detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f2f5;
+    color: #1d2129;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+  }
+  .detail-back-btn:hover {
+    background: #e5e6eb;
   }
   .scenario-strip {
     grid-template-columns: 1fr;
