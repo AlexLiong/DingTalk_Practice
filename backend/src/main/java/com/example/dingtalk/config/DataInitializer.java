@@ -99,6 +99,8 @@ public class DataInitializer implements CommandLineRunner {
         createMenu(mDept, "新增部门", 3, null, null, "system:dept:add", 1);
         createMenu(mDept, "编辑部门", 3, null, null, "system:dept:edit", 2);
         createMenu(mDept, "删除部门", 3, null, null, "system:dept:remove", 3);
+        createMenu(0L,"公告管理",2,"/admin/notice","InfoFilled","system:menu:notice",1);
+        createMenu(0L,"看板",2,"/admin/dashboard","DataBoard","system:user:dashboard",1);
 
         // 3. 角色
         Long roleAdmin = createRole("超级管理员", "admin", 1, "拥有所有权限");

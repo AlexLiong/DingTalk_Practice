@@ -47,7 +47,7 @@
       <div class="mobile-menu-item" @click="navigateTo('favorites'); mobileMenuOpen = false">
         <span class="mm-icon">⭐</span><span>收藏</span>
       </div>
-      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
+      <div v-if="permsList.includes(`system:user:dashboard`)" class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
         <span class="mm-icon">📊</span><span>数据</span>
       </div>
       <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin'); mobileMenuOpen = false">
@@ -173,7 +173,7 @@
           </div>
           <div
             class="nav-row"
-            v-if="isAdmin"
+            v-if="permsList.includes(`system:user:dashboard`)"
             @click="$router.push('/admin/dashboard')"
           >
             <span class="nav-icon">📊</span><span>数据</span>
@@ -973,7 +973,7 @@
             <span>收藏</span>
           </div>
           <div
-            v-if="isAdmin"
+            v-if="permsList.includes(`system:user:dashboard`)"
             class="app-card"
             @click="$router.push('/admin/dashboard')"
           >
@@ -981,7 +981,7 @@
             <span>数据看板</span>
           </div>
           <div
-            v-if="isAdmin"
+            v-if="permsList.includes(`system:menu:notice`)"
             class="app-card"
             @click="$router.push('/admin/notice')"
           >
@@ -1643,6 +1643,7 @@ const themeStore = useThemeStore();
 const collabStore = useCollabStore();
 const preferenceStore = useUserPreferenceStore();
 const user = computed(() => userStore.user);
+const permsList = computed(() => userStore.permissions);
 const isAdmin = computed(() => userStore.isAdmin);
 const isDark = computed(() => themeStore.dark);
 
@@ -2156,37 +2157,31 @@ const addAppItems = computed(() => {
       color: "#13c2c2",
     },
   ];
-  if (isAdmin.value) {
-    items.push(
-      {
-        key: "app:/admin/dashboard",
-        kind: "app",
-        title: "数据看板",
-        description: "查看平台运营数据",
-        path: "/admin/dashboard",
-        badge: "数",
-        color: "#531dab",
-      },
-      {
-        key: "app:/admin/notice",
-        kind: "app",
-        title: "公告管理",
-        description: "维护平台公告内容",
-        path: "/admin/notice",
-        badge: "告",
-        color: "#eb2f96",
-      },
-      {
-        key: "app:/admin",
-        kind: "app",
-        title: "系统管理",
-        description: "进入后台管理中心",
-        path: "/admin",
-        badge: "管",
-        color: "#08979c",
-      },
-    );
+  if(permsList.value.includes("system:user:dashboard")) {
+    items.push({
+      key: "app:/admin/dashboard",
+      kind: "app",
+      title: "数据看板",
+      description: "查看平台运营数据",
+    });
   }
+  if (permsList.value.includes("system:menu:notice")) {
+    items.push({
+      key: "app:/admin/notice",
+      kind: "app",
+      title: "公告管理",
+      description: "维护平台公告内容",
+    });
+  }
+  if (isAdmin.value) {
+    items.push({
+      key: "app:/admin/system",
+      kind: "app",
+      title: "系统管理",
+      description: "进入后台管理中心",
+    });
+  }
+  console.log(permsList.value);
   return items;
 });
 const fileAddItems = computed(() => recentFiles.value.map(fileToAddItem));

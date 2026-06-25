@@ -114,7 +114,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Setting, User, Avatar, Menu, OfficeBuilding, Document,
-  Location, ChatDotRound, ArrowDown, DataBoard, Expand
+  Location, ChatDotRound, ArrowDown, DataBoard, Expand,
+  InfoFilled
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../store/user'
 
@@ -125,7 +126,7 @@ const user = computed(() => userStore.user)
 const menus = computed(() => userStore.menus)
 const drawerOpen = ref(false)
 
-const iconMap = { Setting, User, Avatar, Menu, OfficeBuilding, Document, DataBoard }
+const iconMap = { Setting, User, Avatar, Menu, OfficeBuilding, Document, DataBoard,InfoFilled}
 
 const activeMenu = computed(() => route.path)
 const titleMap = {
