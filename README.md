@@ -63,7 +63,7 @@ mvn spring-boot:run
 启动成功后：
 - 后端地址：http://localhost:8080
 - H2 数据库控制台：http://localhost:8080/h2-console
-  （JDBC URL: `jdbc:h2:mem:dingtalk`，用户名 `sa`，密码空）
+  （JDBC URL: `jdbc:h2:file:./data/dingtalk`，用户名 `sa`，密码空）
 
 > 注意：H2 是内存库，**重启后数据重置**为种子数据。需要持久化请改 `application.yml` 换 MySQL。
 
@@ -84,11 +84,12 @@ npm run dev
 | 账号 | 密码 | 角色 |
 |------|------|------|
 | admin | Boz@2026 | 管理员/技术部 |
-| zhangsan | Boz@2026 | 产品经理/产品部 |
-| lisi | Boz@2026 | UI设计师/设计部 |
-| wangwu | Boz@2026 | 后端工程师/技术部 |
+| chenyuqi | Boz@2026 | 产品经理/产品部 |
+| zhouleheng | Boz@2026 | 前端工程师/前端组 |
+| liuyulin | Boz@2026 | 后端工程师/后端组 |
+| liangqinwei | Boz@2026 | UI设计师/设计创意部 |
+| jiangzezhi | Boz@2026 | HR/人力部 |
 
-初始数据：1 个群聊「产品研发群」(含全部成员) + admin 与 zhangsan 的单聊，均带历史消息。
 
 ### 体验实时聊天
 1. 浏览器 A 用 `admin` 登录
@@ -110,6 +111,7 @@ npm run dev
 - [x] 文件消息（上传、下载）
 - [x] 消息撤回（本人 / 群主可撤回）
 - [x] @提醒（群聊内 @ 成员，高亮显示）
+- [x] AI聊天（基于springai实现，支持对话/文件分析） 
 
 ### 群聊管理
 - [x] 建群（多选成员、自定义群名）
@@ -129,7 +131,7 @@ npm run dev
 
 ## 六、权限说明
 - `admin` 是「超级管理员」，可见「管理后台」入口，拥有全部 17 项权限
-- `zhangsan` / `lisi` / `wangwu` 是「普通员工」，只有协作功能，无后台入口
+- 其他人 是「普通员工」，只有协作功能，无后台入口
 - 普通员工即使直接调后台接口也会被 `@PreAuthorize` 拦截（返回「无操作权限」）
 
 ## 七、可扩展方向（继续加分）
@@ -165,4 +167,3 @@ npm run dev
 
 ---
 
-> 本脚手架已通过编译、接口冒烟测试和 WebSocket 端到端联调验证。
