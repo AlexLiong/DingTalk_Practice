@@ -6,7 +6,12 @@
       <div class="approval-top">
         <div class="approval-top-inner">
           <div class="page-title-cluster">
-            <el-button class="page-back-btn" :icon="Back" @click="router.push('/chat')">返回消息</el-button>
+            <el-button
+              class="page-back-btn"
+              :icon="Back"
+              @click="router.push('/chat')"
+              >返回消息</el-button
+            >
             <div class="page-title-block">
               <div class="page-section-label">协同应用</div>
               <div class="page-heading-row">
@@ -15,42 +20,84 @@
             </div>
           </div>
           <div class="page-top-actions">
-            <el-button type="primary" :icon="Plus" @click="openApply">发起审批</el-button>
+            <el-button type="primary" :icon="Plus" @click="openApply"
+              >发起审批</el-button
+            >
           </div>
         </div>
       </div>
 
       <div class="approval-body">
-      <el-tabs v-model="activeTab" @tab-change="onTabChange" class="approval-tabs">
-        <el-tab-pane label="我发起的" name="applied" />
-        <el-tab-pane label="待我审批" name="pending" />
-      </el-tabs>
+        <el-tabs
+          v-model="activeTab"
+          @tab-change="onTabChange"
+          class="approval-tabs"
+        >
+          <el-tab-pane label="我发起的" name="applied" />
+          <el-tab-pane label="待我审批" name="pending" />
+        </el-tabs>
 
-      <div v-loading="loading" class="card-list">
-        <el-empty v-if="!list.length && !loading" description="暂无记录" />
-        <div v-for="item in list" :key="item.id" class="approval-card">
-          <div class="card-header">
-            <span class="type-badge">{{ item.type === 'leave' ? '🏖 请假' : '💰 报销' }}</span>
-            <span class="card-title">{{ item.title }}</span>
-            <el-tag size="small" :type="statusType(item.status)" class="status-tag">
-              {{ statusLabel(item.status) }}
-            </el-tag>
-          </div>
-          <div class="card-meta">
-            <span>申请人: {{ item.applicantName || '-' }}</span>
-            <span>审批人: {{ item.approverName || '-' }}</span>
-            <span>{{ item.createTime }}</span>
-          </div>
-          <div v-if="item.content" class="card-content">{{ item.content }}</div>
-          <div v-if="item.remark" class="card-remark">审批备注: {{ item.remark }}</div>
+        <div v-loading="loading" class="card-list">
+          <el-empty v-if="!list.length && !loading" description="暂无记录" />
+          <div v-for="item in list" :key="item.id" class="approval-card">
+            <div class="card-header">
+              <span class="type-badge">{{
+                item.type === "leave" ? "🏖 请假" : "💰 报销"
+              }}</span>
+              <span class="card-title">{{ item.title }}</span>
+              <el-tag
+                size="small"
+                :type="statusType(item.status)"
+                class="status-tag"
+              >
+                {{ statusLabel(item.status) }}
+              </el-tag>
+            </div>
+            <div class="card-meta">
+              <span>申请人: {{ item.applicantName || "-" }}</span>
+              <span>审批人: {{ item.approverName || "-" }}</span>
+              <span>{{ item.createTime }}</span>
+            </div>
+            <div v-if="item.content" class="card-content">
+              <table
+                cellpadding="6"
+                cellspacing="0"
+                style="border-collapse: collapse"
+              >
+                <tr>
+                  <th width="120">说明</th>
+                  <th>内容</th>
+                </tr>
+                <tr v-for="(val, key) in parseJson(item.content)" :key="key">
+                  <td>{{ key }}</td>
+                  <td>{{ val }}</td>
+                </tr>
+              </table>
+            </div>
+            <div v-if="item.remark" class="card-remark">
+              审批备注: {{ item.remark }}
+            </div>
 
-          <!-- 待审批操作 -->
-          <div v-if="activeTab === 'pending' && item.status === 0" class="card-actions">
-            <el-button type="success" size="small" @click="handleApprove(item, 1)">通过</el-button>
-            <el-button type="danger" size="small" @click="handleApprove(item, 2)">驳回</el-button>
+            <!-- 待审批操作 -->
+            <div
+              v-if="activeTab === 'pending' && item.status === 0"
+              class="card-actions"
+            >
+              <el-button
+                type="success"
+                size="small"
+                @click="handleApprove(item, 1)"
+                >通过</el-button
+              >
+              <el-button
+                type="danger"
+                size="small"
+                @click="handleApprove(item, 2)"
+                >驳回</el-button
+              >
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
 
@@ -66,11 +113,26 @@
           <el-input v-model="form.title" placeholder="审批标题" />
         </el-form-item>
         <el-form-item label="内容">
-          <el-input v-model="form.content" type="textarea" :rows="3" placeholder="详细说明" />
+          <el-input
+            v-model="form.content"
+            type="textarea"
+            :rows="3"
+            placeholder="详细说明"
+          />
         </el-form-item>
         <el-form-item label="审批人">
-          <el-select v-model="form.approverId" filterable placeholder="选择审批人" style="width: 100%">
-            <el-option v-for="u in users" :key="u.id" :label="u.nickname || u.username" :value="u.id" />
+          <el-select
+            v-model="form.approverId"
+            filterable
+            placeholder="选择审批人"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="u in users"
+              :key="u.id"
+              :label="u.nickname || u.username"
+              :value="u.id"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -83,93 +145,149 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Back, Plus } from '@element-plus/icons-vue'
-import AppSideNav from '../components/AppSideNav.vue'
-import { apiApprovalList, apiApprovalPending, apiApprovalApplied, apiApprovalApply, apiApprovalApprove, apiUserList } from '../api'
-import { useUserPreferenceStore } from '../store/userPreference'
+import { reactive, ref, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Back, Plus } from "@element-plus/icons-vue";
+import AppSideNav from "../components/AppSideNav.vue";
+import {
+  apiApprovalPending,
+  apiApprovalApplied,
+  apiApprovalApply,
+  apiApprovalApprove,
+  apiUserList,
+} from "../api";
+import { useUserPreferenceStore } from "../store/userPreference";
 
-const router = useRouter()
-const preferenceStore = useUserPreferenceStore()
-const loading = ref(false)
-const list = ref([])
-const users = ref([])
-const activeTab = ref('applied')
-const approvalStateReady = ref(false)
-const applyDialog = ref(false)
-const form = reactive({ type: 'leave', title: '', content: '', approverId: null })
+const router = useRouter();
+const preferenceStore = useUserPreferenceStore();
+const loading = ref(false);
+const list = ref([]);
+const users = ref([]);
+const activeTab = ref("applied");
+const approvalStateReady = ref(false);
+const applyDialog = ref(false);
+const form = reactive({
+  type: "leave",
+  title: "",
+  content: "",
+  approverId: null,
+});
 
-watch(() => preferenceStore.loaded, (loaded) => {
-  if (!loaded || approvalStateReady.value) return
-  const state = preferenceStore.getPageState('approval')
-  if (typeof state.activeTab === 'string') activeTab.value = state.activeTab
-  approvalStateReady.value = true
-}, { immediate: true })
+watch(
+  () => preferenceStore.loaded,
+  (loaded) => {
+    if (!loaded || approvalStateReady.value) return;
+    const state = preferenceStore.getPageState("approval");
+    if (typeof state.activeTab === "string") activeTab.value = state.activeTab;
+    approvalStateReady.value = true;
+  },
+  { immediate: true },
+);
 
 watch(activeTab, () => {
-  if (!approvalStateReady.value || !preferenceStore.loaded) return
-  preferenceStore.setPageState('approval', { activeTab: activeTab.value })
-})
+  if (!approvalStateReady.value || !preferenceStore.loaded) return;
+  preferenceStore.setPageState("approval", { activeTab: activeTab.value });
+});
 
 onMounted(async () => {
-  users.value = await apiUserList()
-  await load()
-})
-
-async function load() {
-  loading.value = true
+  users.value = await apiUserList();
+  await load();
+});
+// 解析JSON，捕获报错防止页面崩溃
+const parseJson = (str) => {
   try {
-    let data
-    if (activeTab.value === 'pending') {
-      data = await apiApprovalPending()
+    return JSON.parse(str);
+  } catch (e) {
+    return {};
+  }
+};
+
+// 判断是否为合法JSON字符串
+const isJsonStr = (str) => {
+  if (typeof str !== "string") return false;
+  try {
+    JSON.parse(str);
+    return true;
+  } catch {
+    return false;
+  }
+};
+async function load() {
+  loading.value = true;
+  try {
+    let data;
+    if (activeTab.value === "pending") {
+      data = await apiApprovalPending();
     } else {
-      data = await apiApprovalApplied()
+      data = await apiApprovalApplied();
     }
-    list.value = Array.isArray(data) ? data : (data.records || data.list || [])
+    list.value = Array.isArray(data) ? data : data.records || data.list || [];
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-function onTabChange() { load() }
+function onTabChange() {
+  load();
+}
 
 function openApply() {
-  Object.assign(form, { type: 'leave', title: '', content: '', approverId: null })
-  applyDialog.value = true
+  Object.assign(form, {
+    type: "leave",
+    title: "",
+    content: "",
+    approverId: null,
+  });
+  applyDialog.value = true;
 }
 
 async function submitApply() {
-  if (!form.title) { ElMessage.warning('请输入标题'); return }
-  if (!form.approverId) { ElMessage.warning('请选择审批人'); return }
-  await apiApprovalApply({ ...form })
-  ElMessage.success('审批已提交')
-  applyDialog.value = false
-  await load()
+  if (!form.title) {
+    ElMessage.warning("请输入标题");
+    return;
+  }
+  if (!form.approverId) {
+    ElMessage.warning("请选择审批人");
+    return;
+  }
+  await apiApprovalApply({ ...form });
+  ElMessage.success("审批已提交");
+  applyDialog.value = false;
+  await load();
 }
 
 async function handleApprove(item, status) {
-  const action = status === 1 ? '通过' : '驳回'
-  const { value: remark } = await ElMessageBox.prompt(`请输入${action}备注（可选）`, `确认${action}`, {
-    inputPlaceholder: '备注',
-    inputValue: '',
-    confirmButtonText: action,
-    cancelButtonText: '取消',
-    type: status === 1 ? 'success' : 'warning',
-    inputRequired: false,
-    beforeClose: (act, instance, done) => { done() }
-  }).catch(() => ({ value: null }))
+  const action = status === 1 ? "通过" : "驳回";
+  const { value: remark } = await ElMessageBox.prompt(
+    `请输入${action}备注（可选）`,
+    `确认${action}`,
+    {
+      inputPlaceholder: "备注",
+      inputValue: "",
+      confirmButtonText: action,
+      cancelButtonText: "取消",
+      type: status === 1 ? "success" : "warning",
+      inputRequired: false,
+      beforeClose: (act, instance, done) => {
+        done();
+      },
+    },
+  ).catch(() => ({ value: null }));
 
-  if (remark === null) return
+  if (remark === null) return;
 
-  await apiApprovalApprove(item.id, { status, remark: remark || '' })
-  ElMessage.success(`已${action}`)
-  await load()
+  await apiApprovalApprove(item.id, { status, remark: remark || "" });
+  ElMessage.success(`已${action}`);
+  await load();
 }
 
-function statusLabel(s) { return { 0: '待审批', 1: '已通过', 2: '已驳回' }[s] ?? '待审批' }
-function statusType(s) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] ?? 'info' }
+function statusLabel(s) {
+  return { 0: "待审批", 1: "已通过", 2: "已驳回" }[s] ?? "待审批";
+}
+function statusType(s) {
+  return { 0: "warning", 1: "success", 2: "danger" }[s] ?? "info";
+}
 </script>
 
 <style scoped>
@@ -188,7 +306,11 @@ function statusType(s) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] ?
 }
 .approval-top {
   padding: 16px 24px 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 249, 252, 0.92) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(247, 249, 252, 0.92) 100%
+  );
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
   backdrop-filter: blur(18px);
   flex-shrink: 0;
@@ -208,7 +330,9 @@ function statusType(s) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] ?
   align-items: center;
   gap: 14px;
 }
-.page-title-block { min-width: 0; }
+.page-title-block {
+  min-width: 0;
+}
 .page-section-label {
   margin-bottom: 4px;
   color: #98a2b3;
@@ -242,12 +366,6 @@ function statusType(s) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] ?
   gap: 10px;
   flex-shrink: 0;
 }
-.page-top-actions :deep(.el-button) {
-  height: 36px;
-  padding: 0 16px;
-  border-radius: 10px;
-  font-weight: 600;
-}
 .ptitle {
   font-size: 20px;
   line-height: 1.15;
@@ -278,7 +396,7 @@ function statusType(s) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] ?
   background: #fff;
   border-radius: 10px;
   padding: 16px 20px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 .card-header {
   display: flex;
@@ -292,8 +410,14 @@ function statusType(s) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] ?
   background: #f5f5f5;
   border-radius: 4px;
 }
-.card-title { font-size: 15px; font-weight: 600; color: #1d2129; }
-.status-tag { margin-left: auto; }
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2129;
+}
+.status-tag {
+  margin-left: auto;
+}
 .card-meta {
   display: flex;
   gap: 20px;
