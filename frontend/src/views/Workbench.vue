@@ -2,64 +2,173 @@
   <div class="workbench-wrapper">
     <!-- 移动端：底部Tab栏 -->
     <div class="mobile-bottom-tab">
-      <div class="tab-item" :class="{ active: tab === 'chat' }" @click="tab = 'chat'; chatFilter = 'all'; isMobileChatActive = false">
+      <div
+        class="tab-item"
+        :class="{ active: tab === 'chat' }"
+        @click="
+          tab = 'chat';
+          chatFilter = 'all';
+          isMobileChatActive = false;
+        "
+      >
         <span class="tab-icon">💬</span>
         <span class="tab-label">消息</span>
-        <span v-if="unreadTotal > 0" class="tab-badge">{{ unreadTotal > 99 ? '99+' : unreadTotal }}</span>
+        <span v-if="unreadTotal > 0" class="tab-badge">{{
+          unreadTotal > 99 ? "99+" : unreadTotal
+        }}</span>
       </div>
-      <div class="tab-item" :class="{ active: false }" @click="$router.push('/documents')">
+      <div
+        class="tab-item"
+        :class="{ active: false }"
+        @click="$router.push('/documents')"
+      >
         <span class="tab-icon">📄</span>
         <span class="tab-label">文档</span>
       </div>
-      <div class="tab-item" :class="{ active: tab === 'work' }" @click="tab = 'work'">
+      <div
+        class="tab-item"
+        :class="{ active: tab === 'work' }"
+        @click="tab = 'work'"
+      >
         <span class="tab-icon">💼</span>
         <span class="tab-label">工作台</span>
       </div>
-      <div class="tab-item" :class="{ active: false }" @click="$router.push('/calendar')">
+      <div
+        class="tab-item"
+        :class="{ active: false }"
+        @click="$router.push('/calendar')"
+      >
         <span class="tab-icon">📅</span>
         <span class="tab-label">日历</span>
       </div>
-      <div class="tab-item" :class="{ active: ['notice','todo','mailbox','ding','favorites','contacts','atme','single','group','admin','admin-dashboard'].includes(activeKey) }" @click="mobileMenuOpen = true">
+      <div
+        class="tab-item"
+        :class="{
+          active: [
+            'notice',
+            'todo',
+            'mailbox',
+            'ding',
+            'favorites',
+            'contacts',
+            'atme',
+            'single',
+            'group',
+            'admin',
+            'admin-dashboard',
+          ].includes(activeKey),
+        }"
+        @click="mobileMenuOpen = true"
+      >
         <span class="tab-icon">☰</span>
         <span class="tab-label">更多</span>
       </div>
     </div>
     <!-- 移动端：更多菜单抽屉 -->
-  <el-drawer v-model="mobileMenuOpen" direction="btt" size="auto" :show-close="false" class="mobile-menu-drawer">
-    <div class="mobile-menu-grid">
-      <div class="mobile-menu-item" @click="navigateTo('contacts'); mobileMenuOpen = false">
-        <span class="mm-icon">📇</span><span>通讯录</span>
+    <el-drawer
+      v-model="mobileMenuOpen"
+      direction="btt"
+      size="auto"
+      :show-close="false"
+      class="mobile-menu-drawer"
+    >
+      <div class="mobile-menu-grid">
+        <div
+          class="mobile-menu-item"
+          @click="
+            navigateTo('contacts');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">📇</span><span>通讯录</span>
+        </div>
+        <div
+          class="mobile-menu-item"
+          @click="
+            navigateTo('notice');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">🔔</span><span>通知</span>
+          <span v-if="collabStore.mailboxUnread > 0" class="mm-badge">{{
+            formatCounter(collabStore.mailboxUnread)
+          }}</span>
+        </div>
+        <div
+          class="mobile-menu-item"
+          @click="
+            navigateTo('mailbox');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">📧</span><span>邮箱</span>
+        </div>
+        <div
+          class="mobile-menu-item"
+          @click="
+            navigateTo('todo');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">📝</span><span>待办</span>
+        </div>
+        <div
+          class="mobile-menu-item"
+          @click="
+            navigateTo('ding');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">🔔</span><span>DING</span>
+          <span v-if="collabStore.dingPending > 0" class="mm-badge">{{
+            formatCounter(collabStore.dingPending)
+          }}</span>
+        </div>
+        <div
+          class="mobile-menu-item"
+          @click="
+            navigateTo('favorites');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">⭐</span><span>收藏</span>
+        </div>
+        <div
+          v-if="permsList.includes(`system:user:dashboard`)"
+          class="mobile-menu-item"
+          @click="
+            navigateTo('admin-dashboard');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">📊</span><span>数据</span>
+        </div>
+        <div
+          v-if="isAdmin"
+          class="mobile-menu-item"
+          @click="
+            navigateTo('admin');
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">⚙️</span><span>管理</span>
+        </div>
+        <div
+          class="mobile-menu-item"
+          @click="
+            profilePanel = true;
+            mobileMenuOpen = false;
+          "
+        >
+          <span class="mm-icon">👤</span><span>我的</span>
+        </div>
       </div>
-      <div class="mobile-menu-item" @click="navigateTo('notice'); mobileMenuOpen = false">
-        <span class="mm-icon">🔔</span><span>通知</span>
-        <span v-if="collabStore.mailboxUnread > 0" class="mm-badge">{{ formatCounter(collabStore.mailboxUnread) }}</span>
-      </div>
-      <div class="mobile-menu-item" @click="navigateTo('mailbox'); mobileMenuOpen = false">
-        <span class="mm-icon">📧</span><span>邮箱</span>
-      </div>
-      <div class="mobile-menu-item" @click="navigateTo('todo'); mobileMenuOpen = false">
-        <span class="mm-icon">📝</span><span>待办</span>
-      </div>
-      <div class="mobile-menu-item" @click="navigateTo('ding'); mobileMenuOpen = false">
-        <span class="mm-icon">🔔</span><span>DING</span>
-        <span v-if="collabStore.dingPending > 0" class="mm-badge">{{ formatCounter(collabStore.dingPending) }}</span>
-      </div>
-      <div class="mobile-menu-item" @click="navigateTo('favorites'); mobileMenuOpen = false">
-        <span class="mm-icon">⭐</span><span>收藏</span>
-      </div>
-      <div v-if="permsList.includes(`system:user:dashboard`)" class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
-        <span class="mm-icon">📊</span><span>数据</span>
-      </div>
-      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin'); mobileMenuOpen = false">
-        <span class="mm-icon">⚙️</span><span>管理</span>
-      </div>
-      <div class="mobile-menu-item" @click="profilePanel = true; mobileMenuOpen = false">
-        <span class="mm-icon">👤</span><span>我的</span>
-      </div>
-    </div>
-  </el-drawer>
+    </el-drawer>
     <!-- 主内容区域 -->
-    <div class="workbench" :class="{ dark: isDark, 'chat-active': isMobileChatActive }">
+    <div
+      class="workbench"
+      :class="{ dark: isDark, 'chat-active': isMobileChatActive }"
+    >
       <!-- ========== 1. 左侧导航栏 (仿钉钉宽版文字导航 ~130px) ========== -->
       <div class="side-nav">
         <!-- 组织选择器 -->
@@ -173,6 +282,13 @@
           </div>
           <div
             class="nav-row"
+            :class="{ active: activeKey === 'approval' }"
+            @click="$router.push('/approval')"
+          >
+            <span class="nav-icon">✅</span><span>审批</span>
+          </div>
+          <div
+            class="nav-row"
             v-if="permsList.includes(`system:user:dashboard`)"
             @click="$router.push('/admin/dashboard')"
           >
@@ -191,1363 +307,1399 @@
         </div>
       </div>
 
-    <!-- 个人信息侧边面板 (仿钉钉) -->
-    <Transition name="panel-slide">
-      <div v-if="profilePanel" class="profile-panel" @click.self="closePanel">
-        <div class="pp-content">
-          <div class="pp-header">
-            <el-upload
-              :show-file-list="false"
-              :http-request="uploadAvatar"
-              accept="image/*"
-              class="pp-avatar-upload"
-            >
-              <el-avatar
-                :size="56"
-                shape="square"
-                :src="user?.avatar"
-                :style="avatarStyle(user?.nickname)"
-                class="pp-avatar-clickable"
-                >{{ firstChar(user?.nickname) }}
-              </el-avatar>
-              <div class="pp-avatar-overlay">换头像</div>
-            </el-upload>
-            <div class="pp-info">
-              <div
-                class="pp-name"
-                @click="
-                  $router.push('/profile');
-                  profilePanel = false;
-                "
+      <!-- 个人信息侧边面板 (仿钉钉) -->
+      <Transition name="panel-slide">
+        <div v-if="profilePanel" class="profile-panel" @click.self="closePanel">
+          <div class="pp-content">
+            <div class="pp-header">
+              <el-upload
+                :show-file-list="false"
+                :http-request="uploadAvatar"
+                accept="image/*"
+                class="pp-avatar-upload"
               >
-                {{ user?.nickname }}
-                <el-icon :size="14">
-                  <ArrowRight />
+                <el-avatar
+                  :size="56"
+                  shape="square"
+                  :src="user?.avatar"
+                  :style="avatarStyle(user?.nickname)"
+                  class="pp-avatar-clickable"
+                  >{{ firstChar(user?.nickname) }}
+                </el-avatar>
+                <div class="pp-avatar-overlay">换头像</div>
+              </el-upload>
+              <div class="pp-info">
+                <div
+                  class="pp-name"
+                  @click="
+                    $router.push('/profile');
+                    profilePanel = false;
+                  "
+                >
+                  {{ user?.nickname }}
+                  <el-icon :size="14">
+                    <ArrowRight />
+                  </el-icon>
+                </div>
+                <div class="pp-dept">
+                  {{ user?.deptName || "" }} · {{ user?.jobTitle || "" }}
+                </div>
+              </div>
+            </div>
+            <div class="pp-status-selector">
+              <div
+                class="pp-status"
+                @click.stop="statusDropdownOpen = !statusDropdownOpen"
+              >
+                <span class="status-dot" :class="myStatusClass"></span
+                >{{ statusText }}
+                <el-icon :size="12" :class="{ rotate: statusDropdownOpen }">
+                  <ArrowDown />
                 </el-icon>
               </div>
-              <div class="pp-dept">
-                {{ user?.deptName || "" }} · {{ user?.jobTitle || "" }}
-              </div>
-            </div>
-          </div>
-          <div class="pp-status-selector">
-            <div
-              class="pp-status"
-              @click.stop="statusDropdownOpen = !statusDropdownOpen"
-            >
-              <span class="status-dot" :class="myStatusClass"></span
-              >{{ statusText }}
-              <el-icon :size="12" :class="{ rotate: statusDropdownOpen }">
-                <ArrowDown />
-              </el-icon>
-            </div>
-            <div
-              v-if="statusDropdownOpen"
-              class="pp-status-dropdown"
-              @click.stop
-            >
               <div
-                v-for="item in statusOptions"
-                :key="item.value"
-                class="pp-status-option"
-                :class="{ active: myStatusClass === item.value }"
-                @click.stop="handleSelectStatus(item.value)"
+                v-if="statusDropdownOpen"
+                class="pp-status-dropdown"
+                @click.stop
               >
-                <span class="status-option-dot" :class="item.value"></span>
-                <span>{{ item.label }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="pp-divider"></div>
-          <div
-            class="pp-menu-item"
-            @click="
-              $router.push('/profile');
-              profilePanel = false;
-            "
-          >
-            <el-icon :size="18">
-              <UserFilled />
-            </el-icon>
-            个人中心
-          </div>
-          <div
-            class="pp-menu-item"
-            @click="
-              themeStore.toggle();
-              profilePanel = false;
-            "
-          >
-            <el-icon :size="18">
-              <Moon />
-            </el-icon>
-            个性主题
-            <span class="pp-tag">{{ isDark ? "深色" : "浅色" }}</span>
-          </div>
-          <div
-            class="pp-menu-item"
-            v-if="isAdmin"
-            @click="
-              $router.push('/admin');
-              profilePanel = false;
-            "
-          >
-            <el-icon :size="18">
-              <Setting />
-            </el-icon>
-            系统管理
-          </div>
-          <div class="pp-divider"></div>
-          <div class="pp-menu-item" @click="profilePanel = false">
-            <el-icon :size="18">
-              <QuestionFilled />
-            </el-icon>
-            客服与帮助
-          </div>
-          <div class="pp-menu-item" @click="profilePanel = false">
-            <el-icon :size="18">
-              <InfoFilled />
-            </el-icon>
-            关于
-          </div>
-          <div class="pp-divider"></div>
-          <div class="pp-menu-item pp-logout" @click="logout">
-            <el-icon :size="18">
-              <SwitchButton />
-            </el-icon>
-            退出登录
-          </div>
-        </div>
-      </div>
-    </Transition>
-
-    <!-- ========== 2. 分组筛选面板 (可折叠) ========== -->
-    <Transition name="gp-slide">
-      <div v-if="tab === 'chat' && groupPanelOpen" class="group-panel">
-        <div class="gp-header">
-          <el-icon :size="14">
-            <Operation />
-          </el-icon>
-          <span>分组</span>
-          <el-icon :size="14" class="gp-close" @click="groupPanelOpen = false">
-            <DArrowLeft />
-          </el-icon>
-        </div>
-        <div class="gp-title">消息</div>
-        <div class="gp-list">
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'all' }"
-            @click="chatFilter = 'all'"
-          >
-            消息
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'top' }"
-            @click="chatFilter = 'top'"
-          >
-            置顶
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'unread' }"
-            @click="chatFilter = 'unread'"
-          >
-            未读
-            <span v-if="unreadTotal > 0" class="gp-badge">{{
-              unreadTotal > 99 ? "99+" : unreadTotal
-            }}</span>
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'atme' }"
-            @click="chatFilter = 'atme'"
-          >
-            @我
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'single' }"
-            @click="chatFilter = 'single'"
-          >
-            单聊
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'group' }"
-            @click="chatFilter = 'group'"
-          >
-            群聊
-          </div>
-          <div class="gp-item" @click="$router.push('/notice')">通知</div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'ai' }"
-            @click="openAiAssistant"
-          >
-            AI 助手
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'mute' }"
-            @click="chatFilter = 'mute'"
-          >
-            免打扰
-          </div>
-          <div
-            class="gp-item"
-            :class="{ active: chatFilter === 'star' }"
-            @click="chatFilter = 'star'"
-          >
-            特别关注
-          </div>
-        </div>
-      </div>
-    </Transition>
-    <!-- 收起时的展开按钮 -->
-    <div
-      v-if="tab === 'chat' && !groupPanelOpen"
-      class="gp-toggle"
-      @click="groupPanelOpen = true"
-    >
-      <el-icon :size="14">
-        <DArrowRight />
-      </el-icon>
-    </div>
-
-    <!-- ========== 3. 中栏: 会话列表 / 通讯录 / 工作台 ========== -->
-    <div class="mid-panel">
-      <div class="mid-header">
-        <el-input
-          v-model="keyword"
-          placeholder="搜索"
-          :prefix-icon="Search"
-          size="default"
-          clearable
-          class="search-input"
-          @input="onSearchInput"
-        />
-        <div class="add-entry" ref="addWrapRef">
-          <el-button
-            class="add-btn"
-            :icon="Plus"
-            circle
-            @click.stop="toggleAddPanel"
-          />
-          <div v-if="addPanelOpen" class="add-panel" @click.stop>
-            <div class="add-panel-head">
-              <div>
-                <div class="add-panel-title">添加</div>
-                <div class="add-panel-subtitle">
-                  支持文件、工作台应用和网页链接
-                </div>
-              </div>
-              <div class="add-panel-toolbox">
-                <button
-                  type="button"
-                  class="add-panel-settings"
-                  :class="{ active: addSettingsOpen }"
-                  @click.stop="toggleAddSettings"
+                <div
+                  v-for="item in statusOptions"
+                  :key="item.value"
+                  class="pp-status-option"
+                  :class="{ active: myStatusClass === item.value }"
+                  @click.stop="handleSelectStatus(item.value)"
                 >
-                  <span>设置</span>
-                </button>
-                <div v-if="addSettingsOpen" class="add-settings-menu">
-                  <div class="add-settings-group">
-                    <div class="add-settings-label">链接</div>
-                    <div class="add-settings-card">
-                      <button
-                        type="button"
-                        class="add-settings-item"
-                        @click="toggleSavedLinkManage"
-                      >
-                        <span class="add-settings-item-icon theme-link">
-                          <el-icon :size="14"><Link /></el-icon>
-                        </span>
-                        <div class="add-settings-item-main">
-                          <div class="add-settings-item-title">
-                            {{
-                              manageSavedLinks
-                                ? "完成链接管理"
-                                : "管理已保存链接"
-                            }}
-                          </div>
-                          <div class="add-settings-item-desc">
-                            查看、删除已经保存的网页链接
-                          </div>
-                        </div>
-                        <span class="add-settings-item-meta">{{
-                          manageSavedLinks
-                            ? "编辑中"
-                            : `${savedLinkItems.length} 项`
-                        }}</span>
-                        <el-icon class="add-settings-item-arrow" :size="14">
-                          <ArrowRight />
-                        </el-icon>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="add-settings-group">
-                    <div class="add-settings-label">内容</div>
-                    <div class="add-settings-card">
-                      <button
-                        type="button"
-                        class="add-settings-item"
-                        @click="refreshAddFiles"
-                      >
-                        <span class="add-settings-item-icon theme-refresh">
-                          <el-icon :size="14"><Refresh /></el-icon>
-                        </span>
-                        <div class="add-settings-item-main">
-                          <div class="add-settings-item-title">
-                            刷新最近文件
-                          </div>
-                          <div class="add-settings-item-desc">
-                            重新拉取你最近上传过的文件
-                          </div>
-                        </div>
-                        <span class="add-settings-item-meta">同步</span>
-                        <el-icon class="add-settings-item-arrow" :size="14">
-                          <ArrowRight />
-                        </el-icon>
-                      </button>
-                      <button
-                        type="button"
-                        class="add-settings-item danger"
-                        :disabled="!recentUsageKeys.length"
-                        @click="clearRecentUsage"
-                      >
-                        <span class="add-settings-item-icon theme-danger">
-                          <el-icon :size="14"><Delete /></el-icon>
-                        </span>
-                        <div class="add-settings-item-main">
-                          <div class="add-settings-item-title">
-                            清空最近使用
-                          </div>
-                          <div class="add-settings-item-desc">
-                            只清理这个弹层里的最近使用记录
-                          </div>
-                        </div>
-                        <span class="add-settings-item-meta">{{
-                          recentUsageKeys.length
-                            ? `${recentUsageKeys.length} 条`
-                            : "空"
-                        }}</span>
-                      </button>
-                    </div>
-                  </div>
+                  <span class="status-option-dot" :class="item.value"></span>
+                  <span>{{ item.label }}</span>
                 </div>
               </div>
             </div>
-            <div class="add-link-box">
-              <button
-                v-if="!linkEditorOpen"
-                type="button"
-                class="add-link-trigger"
-                @click="openLinkEditor"
-              >
-                添加链接
-              </button>
-              <div v-else class="add-link-editor">
-                <el-input
-                  ref="addLinkInputRef"
-                  v-model="linkDraft"
-                  placeholder="输入网页链接，例如 https://example.com"
-                  class="add-link-input"
-                  @keyup.enter="saveLink"
-                />
-                <div class="add-link-actions">
+            <div class="pp-divider"></div>
+            <div
+              class="pp-menu-item"
+              @click="
+                $router.push('/profile');
+                profilePanel = false;
+              "
+            >
+              <el-icon :size="18">
+                <UserFilled />
+              </el-icon>
+              个人中心
+            </div>
+            <div
+              class="pp-menu-item"
+              @click="
+                themeStore.toggle();
+                profilePanel = false;
+              "
+            >
+              <el-icon :size="18">
+                <Moon />
+              </el-icon>
+              个性主题
+              <span class="pp-tag">{{ isDark ? "深色" : "浅色" }}</span>
+            </div>
+            <div
+              class="pp-menu-item"
+              v-if="isAdmin"
+              @click="
+                $router.push('/admin');
+                profilePanel = false;
+              "
+            >
+              <el-icon :size="18">
+                <Setting />
+              </el-icon>
+              系统管理
+            </div>
+            <div class="pp-divider"></div>
+            <div class="pp-menu-item" @click="profilePanel = false">
+              <el-icon :size="18">
+                <QuestionFilled />
+              </el-icon>
+              客服与帮助
+            </div>
+            <div class="pp-menu-item" @click="profilePanel = false">
+              <el-icon :size="18">
+                <InfoFilled />
+              </el-icon>
+              关于
+            </div>
+            <div class="pp-divider"></div>
+            <div class="pp-menu-item pp-logout" @click="logout">
+              <el-icon :size="18">
+                <SwitchButton />
+              </el-icon>
+              退出登录
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- ========== 2. 分组筛选面板 (可折叠) ========== -->
+      <Transition name="gp-slide">
+        <div v-if="tab === 'chat' && groupPanelOpen" class="group-panel">
+          <div class="gp-header">
+            <el-icon :size="14">
+              <Operation />
+            </el-icon>
+            <span>分组</span>
+            <el-icon
+              :size="14"
+              class="gp-close"
+              @click="groupPanelOpen = false"
+            >
+              <DArrowLeft />
+            </el-icon>
+          </div>
+          <div class="gp-title">消息</div>
+          <div class="gp-list">
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'all' }"
+              @click="chatFilter = 'all'"
+            >
+              消息
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'top' }"
+              @click="chatFilter = 'top'"
+            >
+              置顶
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'unread' }"
+              @click="chatFilter = 'unread'"
+            >
+              未读
+              <span v-if="unreadTotal > 0" class="gp-badge">{{
+                unreadTotal > 99 ? "99+" : unreadTotal
+              }}</span>
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'atme' }"
+              @click="chatFilter = 'atme'"
+            >
+              @我
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'single' }"
+              @click="chatFilter = 'single'"
+            >
+              单聊
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'group' }"
+              @click="chatFilter = 'group'"
+            >
+              群聊
+            </div>
+            <div class="gp-item" @click="$router.push('/notice')">通知</div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'ai' }"
+              @click="openAiAssistant"
+            >
+              AI 助手
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'mute' }"
+              @click="chatFilter = 'mute'"
+            >
+              免打扰
+            </div>
+            <div
+              class="gp-item"
+              :class="{ active: chatFilter === 'star' }"
+              @click="chatFilter = 'star'"
+            >
+              特别关注
+            </div>
+          </div>
+        </div>
+      </Transition>
+      <!-- 收起时的展开按钮 -->
+      <div
+        v-if="tab === 'chat' && !groupPanelOpen"
+        class="gp-toggle"
+        @click="groupPanelOpen = true"
+      >
+        <el-icon :size="14">
+          <DArrowRight />
+        </el-icon>
+      </div>
+
+      <!-- ========== 3. 中栏: 会话列表 / 通讯录 / 工作台 ========== -->
+      <div class="mid-panel">
+        <div class="mid-header">
+          <el-input
+            v-model="keyword"
+            placeholder="搜索"
+            :prefix-icon="Search"
+            size="default"
+            clearable
+            class="search-input"
+            @input="onSearchInput"
+          />
+          <div class="add-entry" ref="addWrapRef">
+            <el-button
+              class="add-btn"
+              :icon="Plus"
+              circle
+              @click.stop="toggleAddPanel"
+            />
+            <div v-if="addPanelOpen" class="add-panel" @click.stop>
+              <div class="add-panel-head">
+                <div>
+                  <div class="add-panel-title">添加</div>
+                  <div class="add-panel-subtitle">
+                    支持文件、工作台应用和网页链接
+                  </div>
+                </div>
+                <div class="add-panel-toolbox">
                   <button
                     type="button"
-                    class="add-link-cancel"
-                    @click="cancelLinkEdit"
+                    class="add-panel-settings"
+                    :class="{ active: addSettingsOpen }"
+                    @click.stop="toggleAddSettings"
                   >
-                    取消
+                    <span>设置</span>
                   </button>
-                  <button type="button" class="add-link-save" @click="saveLink">
-                    保存
-                  </button>
+                  <div v-if="addSettingsOpen" class="add-settings-menu">
+                    <div class="add-settings-group">
+                      <div class="add-settings-label">链接</div>
+                      <div class="add-settings-card">
+                        <button
+                          type="button"
+                          class="add-settings-item"
+                          @click="toggleSavedLinkManage"
+                        >
+                          <span class="add-settings-item-icon theme-link">
+                            <el-icon :size="14"><Link /></el-icon>
+                          </span>
+                          <div class="add-settings-item-main">
+                            <div class="add-settings-item-title">
+                              {{
+                                manageSavedLinks
+                                  ? "完成链接管理"
+                                  : "管理已保存链接"
+                              }}
+                            </div>
+                            <div class="add-settings-item-desc">
+                              查看、删除已经保存的网页链接
+                            </div>
+                          </div>
+                          <span class="add-settings-item-meta">{{
+                            manageSavedLinks
+                              ? "编辑中"
+                              : `${savedLinkItems.length} 项`
+                          }}</span>
+                          <el-icon class="add-settings-item-arrow" :size="14">
+                            <ArrowRight />
+                          </el-icon>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="add-settings-group">
+                      <div class="add-settings-label">内容</div>
+                      <div class="add-settings-card">
+                        <button
+                          type="button"
+                          class="add-settings-item"
+                          @click="refreshAddFiles"
+                        >
+                          <span class="add-settings-item-icon theme-refresh">
+                            <el-icon :size="14"><Refresh /></el-icon>
+                          </span>
+                          <div class="add-settings-item-main">
+                            <div class="add-settings-item-title">
+                              刷新最近文件
+                            </div>
+                            <div class="add-settings-item-desc">
+                              重新拉取你最近上传过的文件
+                            </div>
+                          </div>
+                          <span class="add-settings-item-meta">同步</span>
+                          <el-icon class="add-settings-item-arrow" :size="14">
+                            <ArrowRight />
+                          </el-icon>
+                        </button>
+                        <button
+                          type="button"
+                          class="add-settings-item danger"
+                          :disabled="!recentUsageKeys.length"
+                          @click="clearRecentUsage"
+                        >
+                          <span class="add-settings-item-icon theme-danger">
+                            <el-icon :size="14"><Delete /></el-icon>
+                          </span>
+                          <div class="add-settings-item-main">
+                            <div class="add-settings-item-title">
+                              清空最近使用
+                            </div>
+                            <div class="add-settings-item-desc">
+                              只清理这个弹层里的最近使用记录
+                            </div>
+                          </div>
+                          <span class="add-settings-item-meta">{{
+                            recentUsageKeys.length
+                              ? `${recentUsageKeys.length} 条`
+                              : "空"
+                          }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <template v-if="manageSavedLinks">
-              <div class="add-panel-section">
-                <span>已保存链接</span>
-                <span class="add-panel-count">{{ savedLinkItems.length }}</span>
-              </div>
-              <div class="add-panel-list">
-                <div
-                  v-for="item in savedLinkItems"
-                  :key="item.key"
-                  class="add-panel-item"
+              <div class="add-link-box">
+                <button
+                  v-if="!linkEditorOpen"
+                  type="button"
+                  class="add-link-trigger"
+                  @click="openLinkEditor"
                 >
-                  <div
-                    class="add-item-badge"
-                    :style="{ background: item.color }"
-                  >
-                    <template v-if="item.kind === 'file'">
-                      <div
-                        v-if="item.iconShape === 'tile'"
-                        class="add-tile-icon"
-                        :class="`theme-${item.iconTheme || 'stack'}`"
-                      >
-                        <span
-                          v-if="item.iconTheme === 'stack'"
-                          class="add-tile-stack"
-                        ></span>
-                        <span v-else class="add-tile-glyph">{{
-                          item.iconBadge || item.badge
-                        }}</span>
-                      </div>
-                      <div
-                        v-else
-                        class="add-file-icon"
-                        :class="`theme-${item.iconTheme || 'generic'}`"
-                      >
-                        <span class="add-file-fold"></span>
-                        <span class="add-file-lines"></span>
-                        <span class="add-file-type">{{
-                          item.iconBadge || item.badge
-                        }}</span>
-                      </div>
-                    </template>
-                    <template v-else>{{ item.badge }}</template>
-                  </div>
-                  <div class="add-item-main">
-                    <div class="add-item-title">{{ item.title }}</div>
-                    <div class="add-item-desc">{{ item.description }}</div>
-                  </div>
-                  <div class="add-item-actions">
+                  添加链接
+                </button>
+                <div v-else class="add-link-editor">
+                  <el-input
+                    ref="addLinkInputRef"
+                    v-model="linkDraft"
+                    placeholder="输入网页链接，例如 https://example.com"
+                    class="add-link-input"
+                    @keyup.enter="saveLink"
+                  />
+                  <div class="add-link-actions">
                     <button
                       type="button"
-                      class="add-item-action ghost"
+                      class="add-link-cancel"
+                      @click="cancelLinkEdit"
+                    >
+                      取消
+                    </button>
+                    <button
+                      type="button"
+                      class="add-link-save"
+                      @click="saveLink"
+                    >
+                      保存
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <template v-if="manageSavedLinks">
+                <div class="add-panel-section">
+                  <span>已保存链接</span>
+                  <span class="add-panel-count">{{
+                    savedLinkItems.length
+                  }}</span>
+                </div>
+                <div class="add-panel-list">
+                  <div
+                    v-for="item in savedLinkItems"
+                    :key="item.key"
+                    class="add-panel-item"
+                  >
+                    <div
+                      class="add-item-badge"
+                      :style="{ background: item.color }"
+                    >
+                      <template v-if="item.kind === 'file'">
+                        <div
+                          v-if="item.iconShape === 'tile'"
+                          class="add-tile-icon"
+                          :class="`theme-${item.iconTheme || 'stack'}`"
+                        >
+                          <span
+                            v-if="item.iconTheme === 'stack'"
+                            class="add-tile-stack"
+                          ></span>
+                          <span v-else class="add-tile-glyph">{{
+                            item.iconBadge || item.badge
+                          }}</span>
+                        </div>
+                        <div
+                          v-else
+                          class="add-file-icon"
+                          :class="`theme-${item.iconTheme || 'generic'}`"
+                        >
+                          <span class="add-file-fold"></span>
+                          <span class="add-file-lines"></span>
+                          <span class="add-file-type">{{
+                            item.iconBadge || item.badge
+                          }}</span>
+                        </div>
+                      </template>
+                      <template v-else>{{ item.badge }}</template>
+                    </div>
+                    <div class="add-item-main">
+                      <div class="add-item-title">{{ item.title }}</div>
+                      <div class="add-item-desc">{{ item.description }}</div>
+                    </div>
+                    <div class="add-item-actions">
+                      <button
+                        type="button"
+                        class="add-item-action ghost"
+                        @click.stop="sendAddItem(item)"
+                      >
+                        添加
+                      </button>
+                      <button
+                        type="button"
+                        class="add-item-action delete"
+                        @click.stop="removeSavedLink(item)"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                  <el-empty
+                    v-if="!savedLinkItems.length"
+                    description="暂无已保存链接"
+                    :image-size="56"
+                  />
+                </div>
+              </template>
+              <template v-else>
+                <div class="add-panel-footer">
+                  <button
+                    type="button"
+                    class="add-footer-btn"
+                    @click="openGroupCreate"
+                  >
+                    发起群聊
+                  </button>
+                  <span class="add-footer-sep"></span>
+                  <button
+                    type="button"
+                    class="add-footer-btn"
+                    @click="openContactFinder"
+                  >
+                    找人单聊
+                  </button>
+                </div>
+                <div class="add-panel-section">
+                  <span>最近使用</span>
+                </div>
+                <div class="add-panel-list">
+                  <div
+                    v-for="item in addPanelItems"
+                    :key="item.key"
+                    class="add-panel-item compact"
+                  >
+                    <div
+                      class="add-item-badge"
+                      :style="{ background: item.color }"
+                    >
+                      <template v-if="item.kind === 'file'">
+                        <div
+                          v-if="item.iconShape === 'tile'"
+                          class="add-tile-icon"
+                          :class="`theme-${item.iconTheme || 'stack'}`"
+                        >
+                          <span
+                            v-if="item.iconTheme === 'stack'"
+                            class="add-tile-stack"
+                          ></span>
+                          <span v-else class="add-tile-glyph">{{
+                            item.iconBadge || item.badge
+                          }}</span>
+                        </div>
+                        <div
+                          v-else
+                          class="add-file-icon"
+                          :class="`theme-${item.iconTheme || 'generic'}`"
+                        >
+                          <span class="add-file-fold"></span>
+                          <span class="add-file-lines"></span>
+                          <span class="add-file-type">{{
+                            item.iconBadge || item.badge
+                          }}</span>
+                        </div>
+                      </template>
+                      <template v-else>{{ item.badge }}</template>
+                    </div>
+                    <div class="add-item-main">
+                      <div class="add-item-title">{{ item.title }}</div>
+                      <div v-if="item.kind === 'link'" class="add-item-desc">
+                        {{ item.description }}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="add-item-action"
                       @click.stop="sendAddItem(item)"
                     >
                       添加
                     </button>
-                    <button
-                      type="button"
-                      class="add-item-action delete"
-                      @click.stop="removeSavedLink(item)"
-                    >
-                      删除
-                    </button>
                   </div>
+                  <el-empty
+                    v-if="!addPanelItems.length"
+                    description="暂无可添加内容"
+                    :image-size="56"
+                  />
                 </div>
-                <el-empty
-                  v-if="!savedLinkItems.length"
-                  description="暂无已保存链接"
-                  :image-size="56"
-                />
-              </div>
-            </template>
-            <template v-else>
-              <div class="add-panel-footer">
-                <button
-                  type="button"
-                  class="add-footer-btn"
-                  @click="openGroupCreate"
-                >
-                  发起群聊
-                </button>
-                <span class="add-footer-sep"></span>
-                <button
-                  type="button"
-                  class="add-footer-btn"
-                  @click="openContactFinder"
-                >
-                  找人单聊
-                </button>
-              </div>
-              <div class="add-panel-section">
-                <span>最近使用</span>
-              </div>
-              <div class="add-panel-list">
-                <div
-                  v-for="item in addPanelItems"
-                  :key="item.key"
-                  class="add-panel-item compact"
-                >
-                  <div
-                    class="add-item-badge"
-                    :style="{ background: item.color }"
-                  >
-                    <template v-if="item.kind === 'file'">
-                      <div
-                        v-if="item.iconShape === 'tile'"
-                        class="add-tile-icon"
-                        :class="`theme-${item.iconTheme || 'stack'}`"
-                      >
-                        <span
-                          v-if="item.iconTheme === 'stack'"
-                          class="add-tile-stack"
-                        ></span>
-                        <span v-else class="add-tile-glyph">{{
-                          item.iconBadge || item.badge
-                        }}</span>
-                      </div>
-                      <div
-                        v-else
-                        class="add-file-icon"
-                        :class="`theme-${item.iconTheme || 'generic'}`"
-                      >
-                        <span class="add-file-fold"></span>
-                        <span class="add-file-lines"></span>
-                        <span class="add-file-type">{{
-                          item.iconBadge || item.badge
-                        }}</span>
-                      </div>
-                    </template>
-                    <template v-else>{{ item.badge }}</template>
-                  </div>
-                  <div class="add-item-main">
-                    <div class="add-item-title">{{ item.title }}</div>
-                    <div v-if="item.kind === 'link'" class="add-item-desc">
-                      {{ item.description }}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    class="add-item-action"
-                    @click.stop="sendAddItem(item)"
-                  >
-                    添加
-                  </button>
-                </div>
-                <el-empty
-                  v-if="!addPanelItems.length"
-                  description="暂无可添加内容"
-                  :image-size="56"
-                />
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- 搜索结果 -->
-      <div v-if="searchMode" class="list">
-        <div class="contact-section">搜索结果 — 联系人</div>
-        <div
-          v-for="u in searchContacts"
-          :key="'c' + u.id"
-          class="session-item"
-          @click="startChat(u)"
-        >
-          <el-avatar :size="36" shape="square" :style="avatarStyle(u.nickname)"
-            >{{ firstChar(u.nickname) }}
-          </el-avatar>
-          <div class="session-info">
-            <div class="line1">
-              <span class="name">{{ u.nickname }}</span>
+              </template>
             </div>
-            <div class="line2">{{ u.deptName }}</div>
           </div>
         </div>
-        <div
-          v-if="searchMsgs.length"
-          class="contact-section"
-          style="margin-top: 12px"
-        >
-          搜索结果 — 消息
-        </div>
-        <div
-          v-for="m in searchMsgs"
-          :key="'m' + m.id"
-          class="session-item"
-          @click="jumpToMessage(m)"
-        >
-          <el-avatar
-            :size="36"
-            shape="square"
-            :style="avatarStyle(m.senderName)"
-            >{{ firstChar(m.senderName) }}
-          </el-avatar>
-          <div class="session-info">
-            <div class="line1">
-              <span class="name">{{ m.senderName }}</span
-              ><span class="time">{{ fmtTime(m.createTime) }}</span>
-            </div>
-            <div class="line2">{{ displayMessageContent(m) }}</div>
-          </div>
-        </div>
-        <el-empty
-          v-if="!searchContacts.length && !searchMsgs.length"
-          description="无结果"
-          :image-size="60"
-        />
-      </div>
 
-      <!-- 会话列表 -->
-      <div v-else-if="tab === 'chat'" class="list">
-        <div
-          v-for="s in displaySessions"
-          :key="s.id"
-          class="session-item"
-          :class="{ active: current?.id === s.id, topped: s.isTop === 1 }"
-          @click="openSession(s)"
-          @contextmenu.prevent="onSessionMenu($event, s)"
-        >
-          <el-badge
-            :value="s.unread"
-            :hidden="!s.unread"
-            :max="99"
-            class="sess-badge"
+        <!-- 搜索结果 -->
+        <div v-if="searchMode" class="list">
+          <div class="contact-section">搜索结果 — 联系人</div>
+          <div
+            v-for="u in searchContacts"
+            :key="'c' + u.id"
+            class="session-item"
+            @click="startChat(u)"
+          >
+            <el-avatar
+              :size="36"
+              shape="square"
+              :style="avatarStyle(u.nickname)"
+              >{{ firstChar(u.nickname) }}
+            </el-avatar>
+            <div class="session-info">
+              <div class="line1">
+                <span class="name">{{ u.nickname }}</span>
+              </div>
+              <div class="line2">{{ u.deptName }}</div>
+            </div>
+          </div>
+          <div
+            v-if="searchMsgs.length"
+            class="contact-section"
+            style="margin-top: 12px"
+          >
+            搜索结果 — 消息
+          </div>
+          <div
+            v-for="m in searchMsgs"
+            :key="'m' + m.id"
+            class="session-item"
+            @click="jumpToMessage(m)"
+          >
+            <el-avatar
+              :size="36"
+              shape="square"
+              :style="avatarStyle(m.senderName)"
+              >{{ firstChar(m.senderName) }}
+            </el-avatar>
+            <div class="session-info">
+              <div class="line1">
+                <span class="name">{{ m.senderName }}</span
+                ><span class="time">{{ fmtTime(m.createTime) }}</span>
+              </div>
+              <div class="line2">{{ displayMessageContent(m) }}</div>
+            </div>
+          </div>
+          <el-empty
+            v-if="!searchContacts.length && !searchMsgs.length"
+            description="无结果"
+            :image-size="60"
+          />
+        </div>
+
+        <!-- 会话列表 -->
+        <div v-else-if="tab === 'chat'" class="list">
+          <div
+            v-for="s in displaySessions"
+            :key="s.id"
+            class="session-item"
+            :class="{ active: current?.id === s.id, topped: s.isTop === 1 }"
+            @click="openSession(s)"
+            @contextmenu.prevent="onSessionMenu($event, s)"
+          >
+            <el-badge
+              :value="s.unread"
+              :hidden="!s.unread"
+              :max="99"
+              class="sess-badge"
+            >
+              <div class="avatar-wrap">
+                <el-avatar
+                  :size="42"
+                  shape="square"
+                  :src="s.avatar"
+                  :style="avatarStyle(s.name)"
+                  >{{ firstChar(s.name) }}
+                </el-avatar>
+                <span
+                  v-if="s.type === 1 && s.targetUserId"
+                  class="user-online"
+                  :class="presenceClass(s.targetUserId)"
+                ></span>
+              </div>
+            </el-badge>
+            <div class="session-info">
+              <div class="line1">
+                <span class="name">{{ s.name }}</span>
+                <span class="time">{{ fmtTime(s.lastTime) }}</span>
+              </div>
+              <div class="line2">
+                <el-tag
+                  v-if="s.type === 2"
+                  size="small"
+                  type="info"
+                  effect="plain"
+                  class="group-label"
+                  >内部群
+                </el-tag>
+                {{ s.lastMsg || "暂无消息" }}
+              </div>
+            </div>
+            <el-icon v-if="s.isTop === 1" class="pin-icon" :size="12">
+              <Top />
+            </el-icon>
+            <span v-if="s.isMute === 1" class="mute-icon">🔕</span>
+            <span v-if="s.isStar === 1" class="star-icon">⭐</span>
+          </div>
+          <el-empty
+            v-if="!displaySessions.length"
+            :description="
+              chatFilter === 'all' ? '暂无会话' : '没有符合条件的会话'
+            "
+            :image-size="80"
+          />
+        </div>
+
+        <!-- 通讯录 -->
+        <div v-else-if="tab === 'contacts'" class="list">
+          <div class="contact-section">企业通讯录 ({{ contacts.length }})</div>
+          <div
+            v-for="u in filteredContacts"
+            :key="u.id"
+            class="session-item"
+            @click="startChat(u)"
           >
             <div class="avatar-wrap">
               <el-avatar
                 :size="42"
                 shape="square"
-                :src="s.avatar"
-                :style="avatarStyle(s.name)"
-                >{{ firstChar(s.name) }}
+                :src="u.avatar"
+                :style="avatarStyle(u.nickname)"
+                >{{ firstChar(u.nickname) }}
               </el-avatar>
               <span
-                v-if="s.type === 1 && s.targetUserId"
+                v-if="u.id"
                 class="user-online"
-                :class="presenceClass(s.targetUserId)"
+                :class="presenceClass(u.id)"
               ></span>
             </div>
-          </el-badge>
-          <div class="session-info">
-            <div class="line1">
-              <span class="name">{{ s.name }}</span>
-              <span class="time">{{ fmtTime(s.lastTime) }}</span>
-            </div>
-            <div class="line2">
-              <el-tag
-                v-if="s.type === 2"
-                size="small"
-                type="info"
-                effect="plain"
-                class="group-label"
-                >内部群
-              </el-tag>
-              {{ s.lastMsg || "暂无消息" }}
-            </div>
-          </div>
-          <el-icon v-if="s.isTop === 1" class="pin-icon" :size="12">
-            <Top />
-          </el-icon>
-          <span v-if="s.isMute === 1" class="mute-icon">🔕</span>
-          <span v-if="s.isStar === 1" class="star-icon">⭐</span>
-        </div>
-        <el-empty
-          v-if="!displaySessions.length"
-          :description="
-            chatFilter === 'all' ? '暂无会话' : '没有符合条件的会话'
-          "
-          :image-size="80"
-        />
-      </div>
-
-      <!-- 通讯录 -->
-      <div v-else-if="tab === 'contacts'" class="list">
-        <div class="contact-section">企业通讯录 ({{ contacts.length }})</div>
-        <div
-          v-for="u in filteredContacts"
-          :key="u.id"
-          class="session-item"
-          @click="startChat(u)"
-        >
-          <div class="avatar-wrap">
-            <el-avatar
-              :size="42"
-              shape="square"
-              :src="u.avatar"
-              :style="avatarStyle(u.nickname)"
-              >{{ firstChar(u.nickname) }}
-            </el-avatar>
-            <span
-              v-if="u.id"
-              class="user-online"
-              :class="presenceClass(u.id)"
-            ></span>
-          </div>
-          <div class="session-info">
-            <div class="line1">
-              <span class="name">{{ u.nickname }}</span>
-              <el-tag size="small" :type="presenceTagType(u.id)" effect="plain"
-                >{{ presenceTextById(u.id) }}
-              </el-tag>
-            </div>
-            <div class="line2">{{ u.deptName }} · {{ u.jobTitle }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 工作台 -->
-      <div v-else class="list work-grid">
-        <div class="grid-title">工作台</div>
-        <div class="work-summary-row">
-          <button
-            type="button"
-            class="work-summary-card mailbox"
-            @click="$router.push('/mailbox')"
-          >
-            <div class="work-summary-label">未读邮件</div>
-            <div class="work-summary-value">
-              {{ collabCounts.mailboxUnread }}
-            </div>
-            <div class="work-summary-desc">
-              {{
-                collabCounts.mailboxUnread
-                  ? "有新邮件待处理"
-                  : "当前没有未读邮件"
-              }}
-            </div>
-          </button>
-          <button
-            type="button"
-            class="work-summary-card ding"
-            @click="$router.push('/ding')"
-          >
-            <div class="work-summary-label">待处理 DING</div>
-            <div class="work-summary-value">{{ collabCounts.dingPending }}</div>
-            <div class="work-summary-desc">
-              {{
-                collabCounts.dingUrgent
-                  ? `${collabCounts.dingUrgent} 条紧急`
-                  : "处理状态已同步"
-              }}
-            </div>
-          </button>
-          <button
-            type="button"
-            class="work-summary-card feed"
-            @click="openWorkNotice(latestWorkNotice)"
-          >
-            <div class="work-summary-label">最新动态</div>
-            <div class="work-summary-title">
-              {{ latestWorkNotice?.title || "等待新的协同提醒" }}
-            </div>
-            <div class="work-summary-desc">
-              {{
-                latestWorkNotice?.summary ||
-                "邮箱和 DING 的最新变化会实时出现在这里"
-              }}
-            </div>
-          </button>
-        </div>
-        <div class="app-grid">
-          <div class="app-card" @click="$router.push('/documents')">
-            <div class="app-icon" style="background: #4c8bf5">📄</div>
-            <span>文档中心</span>
-          </div>
-          <div class="app-card" @click="$router.push('/notice')">
-            <div class="app-icon" style="background: #1677ff">📢</div>
-            <span>通知公告</span>
-          </div>
-          <div class="app-card" @click="$router.push('/mailbox')">
-            <div class="app-icon-wrap">
-              <div class="app-icon" style="background: #5f6cf8">📧</div>
-              <span v-if="collabCounts.mailboxUnread > 0" class="app-badge">{{
-                formatCounter(collabCounts.mailboxUnread)
-              }}</span>
-            </div>
-            <span>企业邮箱</span>
-          </div>
-          <div class="app-card" @click="$router.push('/todo')">
-            <div class="app-icon" style="background: #52c41a">✅</div>
-            <span>待办任务</span>
-          </div>
-          <div class="app-card" @click="$router.push('/ding')">
-            <div class="app-icon-wrap">
-              <div class="app-icon" style="background: #ff9f1a">🔔</div>
-              <span v-if="collabCounts.dingPending > 0" class="app-badge">{{
-                formatCounter(collabCounts.dingPending)
-              }}</span>
-            </div>
-            <span>DING 提醒</span>
-          </div>
-          <div class="app-card" @click="$router.push('/approval')">
-            <div class="app-icon" style="background: #fa8c16">📝</div>
-            <span>审批中心</span>
-          </div>
-          <div class="app-card" @click="$router.push('/calendar')">
-            <div class="app-icon" style="background: #722ed1">📅</div>
-            <span>日历</span>
-          </div>
-          <div class="app-card" @click="$router.push('/favorites')">
-            <div class="app-icon" style="background: #13c2c2">⭐</div>
-            <span>收藏</span>
-          </div>
-          <div
-            v-if="permsList.includes(`system:user:dashboard`)"
-            class="app-card"
-            @click="$router.push('/admin/dashboard')"
-          >
-            <div class="app-icon" style="background: #722ed1">📊</div>
-            <span>数据看板</span>
-          </div>
-          <div
-            v-if="permsList.includes(`system:menu:notice`)"
-            class="app-card"
-            @click="$router.push('/admin/notice')"
-          >
-            <div class="app-icon" style="background: #eb2f96">📋</div>
-            <span>公告管理</span>
-          </div>
-          <div v-if="isAdmin" class="app-card" @click="$router.push('/admin')">
-            <div class="app-icon" style="background: #13c2c2">⚙️</div>
-            <span>系统管理</span>
-          </div>
-        </div>
-        <div class="work-feed-card">
-          <div class="work-feed-head">
-            <span>协同提醒</span>
-            <span class="work-feed-meta">{{
-              workNotices.length ? `${workNotices.length} 条动态` : "实时刷新"
-            }}</span>
-          </div>
-          <div v-if="workNotices.length" class="work-feed-list">
-            <button
-              v-for="notice in workNotices"
-              :key="notice.id"
-              type="button"
-              class="work-feed-item"
-              @click="openWorkNotice(notice)"
-            >
-              <span class="work-feed-badge" :class="notice.category">{{
-                workNoticeCategoryText(notice)
-              }}</span>
-              <div class="work-feed-main">
-                <div class="work-feed-title">{{ notice.title }}</div>
-                <div class="work-feed-desc">{{ notice.summary }}</div>
+            <div class="session-info">
+              <div class="line1">
+                <span class="name">{{ u.nickname }}</span>
+                <el-tag
+                  size="small"
+                  :type="presenceTagType(u.id)"
+                  effect="plain"
+                  >{{ presenceTextById(u.id) }}
+                </el-tag>
               </div>
-              <span class="work-feed-time">{{
-                formatWorkNoticeTime(notice.createTime)
-              }}</span>
+              <div class="line2">{{ u.deptName }} · {{ u.jobTitle }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 工作台 -->
+        <div v-else class="list work-grid">
+          <div class="grid-title">工作台</div>
+          <div class="work-summary-row">
+            <button
+              type="button"
+              class="work-summary-card mailbox"
+              @click="$router.push('/mailbox')"
+            >
+              <div class="work-summary-label">未读邮件</div>
+              <div class="work-summary-value">
+                {{ collabCounts.mailboxUnread }}
+              </div>
+              <div class="work-summary-desc">
+                {{
+                  collabCounts.mailboxUnread
+                    ? "有新邮件待处理"
+                    : "当前没有未读邮件"
+                }}
+              </div>
+            </button>
+            <button
+              type="button"
+              class="work-summary-card ding"
+              @click="$router.push('/ding')"
+            >
+              <div class="work-summary-label">待处理 DING</div>
+              <div class="work-summary-value">
+                {{ collabCounts.dingPending }}
+              </div>
+              <div class="work-summary-desc">
+                {{
+                  collabCounts.dingUrgent
+                    ? `${collabCounts.dingUrgent} 条紧急`
+                    : "处理状态已同步"
+                }}
+              </div>
+            </button>
+            <button
+              type="button"
+              class="work-summary-card feed"
+              @click="openWorkNotice(latestWorkNotice)"
+            >
+              <div class="work-summary-label">最新动态</div>
+              <div class="work-summary-title">
+                {{ latestWorkNotice?.title || "等待新的协同提醒" }}
+              </div>
+              <div class="work-summary-desc">
+                {{
+                  latestWorkNotice?.summary ||
+                  "邮箱和 DING 的最新变化会实时出现在这里"
+                }}
+              </div>
             </button>
           </div>
-          <div v-else class="work-feed-empty">
-            发送邮箱或 DING 后，最新联动会实时显示在这里。
+          <div class="app-grid">
+            <div class="app-card" @click="$router.push('/documents')">
+              <div class="app-icon" style="background: #4c8bf5">📄</div>
+              <span>文档中心</span>
+            </div>
+            <div class="app-card" @click="$router.push('/notice')">
+              <div class="app-icon" style="background: #1677ff">📢</div>
+              <span>通知公告</span>
+            </div>
+            <div class="app-card" @click="$router.push('/mailbox')">
+              <div class="app-icon-wrap">
+                <div class="app-icon" style="background: #5f6cf8">📧</div>
+                <span v-if="collabCounts.mailboxUnread > 0" class="app-badge">{{
+                  formatCounter(collabCounts.mailboxUnread)
+                }}</span>
+              </div>
+              <span>企业邮箱</span>
+            </div>
+            <div class="app-card" @click="$router.push('/todo')">
+              <div class="app-icon" style="background: #52c41a">✅</div>
+              <span>待办任务</span>
+            </div>
+            <div class="app-card" @click="$router.push('/ding')">
+              <div class="app-icon-wrap">
+                <div class="app-icon" style="background: #ff9f1a">🔔</div>
+                <span v-if="collabCounts.dingPending > 0" class="app-badge">{{
+                  formatCounter(collabCounts.dingPending)
+                }}</span>
+              </div>
+              <span>DING 提醒</span>
+            </div>
+            <div class="app-card" @click="$router.push('/approval')">
+              <div class="app-icon" style="background: #fa8c16">📝</div>
+              <span>审批中心</span>
+            </div>
+            <div class="app-card" @click="$router.push('/calendar')">
+              <div class="app-icon" style="background: #722ed1">📅</div>
+              <span>日历</span>
+            </div>
+            <div class="app-card" @click="$router.push('/favorites')">
+              <div class="app-icon" style="background: #13c2c2">⭐</div>
+              <span>收藏</span>
+            </div>
+            <div
+              v-if="permsList.includes(`system:user:dashboard`)"
+              class="app-card"
+              @click="$router.push('/admin/dashboard')"
+            >
+              <div class="app-icon" style="background: #722ed1">📊</div>
+              <span>数据看板</span>
+            </div>
+            <div
+              v-if="permsList.includes(`system:menu:notice`)"
+              class="app-card"
+              @click="$router.push('/admin/notice')"
+            >
+              <div class="app-icon" style="background: #eb2f96">📋</div>
+              <span>公告管理</span>
+            </div>
+            <div
+              v-if="isAdmin"
+              class="app-card"
+              @click="$router.push('/admin')"
+            >
+              <div class="app-icon" style="background: #13c2c2">⚙️</div>
+              <span>系统管理</span>
+            </div>
+          </div>
+          <div class="work-feed-card">
+            <div class="work-feed-head">
+              <span>协同提醒</span>
+              <span class="work-feed-meta">{{
+                workNotices.length ? `${workNotices.length} 条动态` : "实时刷新"
+              }}</span>
+            </div>
+            <div v-if="workNotices.length" class="work-feed-list">
+              <button
+                v-for="notice in workNotices"
+                :key="notice.id"
+                type="button"
+                class="work-feed-item"
+                @click="openWorkNotice(notice)"
+              >
+                <span class="work-feed-badge" :class="notice.category">{{
+                  workNoticeCategoryText(notice)
+                }}</span>
+                <div class="work-feed-main">
+                  <div class="work-feed-title">{{ notice.title }}</div>
+                  <div class="work-feed-desc">{{ notice.summary }}</div>
+                </div>
+                <span class="work-feed-time">{{
+                  formatWorkNoticeTime(notice.createTime)
+                }}</span>
+              </button>
+            </div>
+            <div v-else class="work-feed-empty">
+              发送邮箱或 DING 后，最新联动会实时显示在这里。
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ========== 4. 右栏: 聊天窗口 ========== -->
-    <div class="chat-panel">
-      <template v-if="current">
-        <div class="chat-header">
-          <el-button class="mobile-back-btn" text :icon="Back" @click="goBackToSessions" />
-          <div class="ch-title">
-            {{ current.name
-            }}<span v-if="current.type === 2" class="ch-count">(群聊)</span>
-            <span
-              v-if="current.type === 1"
-              class="status-tag"
-              :class="presenceClass(current.targetUserId)"
-              >{{ presenceTextById(current.targetUserId) }}</span
-            >
+      <!-- ========== 4. 右栏: 聊天窗口 ========== -->
+      <div class="chat-panel">
+        <template v-if="current">
+          <div class="chat-header">
+            <el-button
+              class="mobile-back-btn"
+              text
+              :icon="Back"
+              @click="goBackToSessions"
+            />
+            <div class="ch-title">
+              {{ current.name
+              }}<span v-if="current.type === 2" class="ch-count">(群聊)</span>
+              <span
+                v-if="current.type === 1"
+                class="status-tag"
+                :class="presenceClass(current.targetUserId)"
+                >{{ presenceTextById(current.targetUserId) }}</span
+              >
+            </div>
+            <div class="ch-actions">
+              <el-icon
+                v-if="current.type === 2"
+                :size="20"
+                @click="openGroupSetting"
+              >
+                <Setting />
+              </el-icon>
+            </div>
           </div>
-          <div class="ch-actions">
-            <el-icon
-              v-if="current.type === 2"
-              :size="20"
-              @click="openGroupSetting"
+
+          <div class="chat-body" ref="bodyRef">
+            <template v-for="(m, i) in messages" :key="m.id">
+              <div v-if="showTime(i)" class="time-divider">
+                <span>{{ fmtFullTime(m.createTime) }}</span>
+              </div>
+              <div v-if="m.contentType === 4 || m.status === 0" class="sys-msg">
+                {{ m.status === 0 ? recallText(m) : m.content }}
+              </div>
+              <div
+                v-else
+                class="msg-row"
+                :class="{ mine: m.senderId === user?.id }"
+                @mouseenter="hoverId = m.id"
+                @mouseleave="hoverId = null"
+              >
+                <el-avatar
+                  :size="40"
+                  shape="square"
+                  :src="m.senderAvatar"
+                  :style="avatarStyle(m.senderName)"
+                  >{{ firstChar(m.senderName) }}
+                </el-avatar>
+                <div class="msg-content">
+                  <div
+                    v-if="current.type === 2 && m.senderId !== user?.id"
+                    class="msg-sender"
+                  >
+                    {{ m.senderName }}
+                  </div>
+                  <div v-if="m._quote" class="quote-block">
+                    <span class="q-name">{{ m._quote.senderName }}:</span>
+                    {{ m._quote.content?.substring(0, 60) }}
+                  </div>
+                  <div class="bubble-wrap">
+                    <div
+                      v-if="m.contentType === 1"
+                      class="bubble"
+                      v-html="renderText(m.content)"
+                    ></div>
+                    <div
+                      v-else-if="m.contentType === 2"
+                      class="bubble img-bubble"
+                    >
+                      <img :src="m.content" @click="previewImg(m.content)" />
+                    </div>
+                    <div
+                      v-else-if="
+                        m.contentType === 3 && isDocumentShareMessage(m)
+                      "
+                      class="bubble doc-card-bubble"
+                      @click="openDocumentMessage(m)"
+                    >
+                      <div class="doc-card-head">
+                        <div
+                          class="doc-card-icon"
+                          :class="`theme-${documentBadgeMeta(m).theme}`"
+                        >
+                          <span class="doc-card-icon-label">{{
+                            documentBadgeMeta(m).badge
+                          }}</span>
+                        </div>
+                        <div class="doc-card-title-wrap">
+                          <div class="doc-card-type">协作文档</div>
+                          <div class="doc-card-title">
+                            {{ documentTitle(m) }}
+                          </div>
+                        </div>
+                        <div class="doc-card-status">
+                          {{ documentStatus(m) }}
+                        </div>
+                      </div>
+                      <div class="doc-card-desc">{{ documentDesc(m) }}</div>
+                      <div class="doc-card-foot">
+                        <div class="doc-card-meta">
+                          <span>{{ documentScene(m) }}</span>
+                          <span>{{ fmtSize(documentMeta(m).size) }}</span>
+                          <span v-if="documentMeta(m).shareCount">{{
+                            `已分享${documentMeta(m).shareCount}次`
+                          }}</span>
+                        </div>
+                        <button
+                          type="button"
+                          class="doc-card-action"
+                          @click.stop="downloadDocumentFile(m)"
+                        >
+                          下载
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      v-else-if="m.contentType === 3"
+                      class="bubble file-bubble"
+                      @click="downloadFile(m)"
+                    >
+                      <el-icon :size="32" color="#1677ff">
+                        <Document />
+                      </el-icon>
+                      <div class="file-info">
+                        <div class="file-name">{{ m.content }}</div>
+                        <div class="file-size">
+                          {{ fmtSize(parseExtra(m.extra).size) }}
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      v-else-if="m.contentType === 6"
+                      class="bubble link-card-bubble"
+                      @click="openCardMessage(m)"
+                    >
+                      <div class="card-badge" :style="cardBadgeStyle(m)">
+                        {{ cardBadgeText(m) }}
+                      </div>
+                      <div class="card-main">
+                        <div class="card-type">{{ cardTypeText(m) }}</div>
+                        <div class="card-title">{{ cardTitle(m) }}</div>
+                        <div class="card-desc">{{ cardDesc(m) }}</div>
+                      </div>
+                      <el-icon :size="16" class="card-arrow">
+                        <ArrowRight />
+                      </el-icon>
+                    </div>
+                    <!-- 视频消息 contentType=5 -->
+                    <div
+                      v-else-if="m.contentType === 5"
+                      class="bubble video-bubble"
+                    >
+                      <video
+                        :src="m.content"
+                        controls
+                        preload="metadata"
+                        class="chat-video"
+                      ></video>
+                      <div class="video-name">
+                        {{ parseExtra(m.extra).name || "视频" }}
+                      </div>
+                    </div>
+                    <div v-if="hoverId === m.id" class="msg-actions">
+                      <span @click="quoteMsg(m)">引用</span>
+                      <span @click="favoriteMsg(m)">收藏</span>
+                      <span v-if="m.senderId === user?.id" @click="recall(m)"
+                        >撤回</span
+                      >
+                    </div>
+                  </div>
+                  <!-- 消息反应展示 -->
+                  <div
+                    v-if="m.reactions && m.reactions.length"
+                    class="reaction-bar"
+                  >
+                    <span
+                      v-for="r in m.reactions"
+                      :key="r.emoji"
+                      class="reaction-tag"
+                      :class="{ mine: r.userIds?.includes(user?.id) }"
+                      @click="toggleReaction(m.id, r.emoji)"
+                    >
+                      {{ r.emoji }} {{ r.count }}
+                    </span>
+                  </div>
+                  <div
+                    v-if="m.senderId === user?.id && current.type === 1"
+                    class="read-status"
+                  >
+                    {{
+                      m.readCount > 0 || readReceipts[m.id] ? "已读" : "未读"
+                    }}
+                  </div>
+                  <div
+                    v-if="m.senderId === user?.id && current.type === 2"
+                    class="read-status"
+                    @click="showReaders(m.id)"
+                  >
+                    {{ (m.readCount || 0) + (readCounts[m.id] || 0) }}人已读
+                  </div>
+                </div>
+              </div>
+            </template>
+            <el-empty
+              v-if="!messages.length"
+              description="发送第一条消息"
+              :image-size="90"
+            />
+          </div>
+
+          <div v-if="quoteRef" class="quote-bar">
+            <span
+              >回复 {{ quoteRef.senderName }}:
+              {{ quoteRef.content?.substring(0, 40) }}</span
             >
-              <Setting />
+            <el-icon @click="quoteRef = null">
+              <Close />
             </el-icon>
           </div>
-        </div>
 
-        <div class="chat-body" ref="bodyRef">
-          <template v-for="(m, i) in messages" :key="m.id">
-            <div v-if="showTime(i)" class="time-divider">
-              <span>{{ fmtFullTime(m.createTime) }}</span>
-            </div>
-            <div v-if="m.contentType === 4 || m.status === 0" class="sys-msg">
-              {{ m.status === 0 ? recallText(m) : m.content }}
-            </div>
-            <div
-              v-else
-              class="msg-row"
-              :class="{ mine: m.senderId === user?.id }"
-              @mouseenter="hoverId = m.id"
-              @mouseleave="hoverId = null"
-            >
-              <el-avatar
-                :size="40"
-                shape="square"
-                :src="m.senderAvatar"
-                :style="avatarStyle(m.senderName)"
-                >{{ firstChar(m.senderName) }}
-              </el-avatar>
-              <div class="msg-content">
-                <div
-                  v-if="current.type === 2 && m.senderId !== user?.id"
-                  class="msg-sender"
-                >
-                  {{ m.senderName }}
-                </div>
-                <div v-if="m._quote" class="quote-block">
-                  <span class="q-name">{{ m._quote.senderName }}:</span>
-                  {{ m._quote.content?.substring(0, 60) }}
-                </div>
-                <div class="bubble-wrap">
-                  <div
-                    v-if="m.contentType === 1"
-                    class="bubble"
-                    v-html="renderText(m.content)"
-                  ></div>
-                  <div
-                    v-else-if="m.contentType === 2"
-                    class="bubble img-bubble"
-                  >
-                    <img :src="m.content" @click="previewImg(m.content)" />
-                  </div>
-                  <div
-                    v-else-if="m.contentType === 3 && isDocumentShareMessage(m)"
-                    class="bubble doc-card-bubble"
-                    @click="openDocumentMessage(m)"
-                  >
-                    <div class="doc-card-head">
-                      <div
-                        class="doc-card-icon"
-                        :class="`theme-${documentBadgeMeta(m).theme}`"
-                      >
-                        <span class="doc-card-icon-label">{{
-                          documentBadgeMeta(m).badge
-                        }}</span>
-                      </div>
-                      <div class="doc-card-title-wrap">
-                        <div class="doc-card-type">协作文档</div>
-                        <div class="doc-card-title">{{ documentTitle(m) }}</div>
-                      </div>
-                      <div class="doc-card-status">{{ documentStatus(m) }}</div>
-                    </div>
-                    <div class="doc-card-desc">{{ documentDesc(m) }}</div>
-                    <div class="doc-card-foot">
-                      <div class="doc-card-meta">
-                        <span>{{ documentScene(m) }}</span>
-                        <span>{{ fmtSize(documentMeta(m).size) }}</span>
-                        <span v-if="documentMeta(m).shareCount">{{
-                          `已分享${documentMeta(m).shareCount}次`
-                        }}</span>
-                      </div>
-                      <button
-                        type="button"
-                        class="doc-card-action"
-                        @click.stop="downloadDocumentFile(m)"
-                      >
-                        下载
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    v-else-if="m.contentType === 3"
-                    class="bubble file-bubble"
-                    @click="downloadFile(m)"
-                  >
-                    <el-icon :size="32" color="#1677ff">
-                      <Document />
-                    </el-icon>
-                    <div class="file-info">
-                      <div class="file-name">{{ m.content }}</div>
-                      <div class="file-size">
-                        {{ fmtSize(parseExtra(m.extra).size) }}
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    v-else-if="m.contentType === 6"
-                    class="bubble link-card-bubble"
-                    @click="openCardMessage(m)"
-                  >
-                    <div class="card-badge" :style="cardBadgeStyle(m)">
-                      {{ cardBadgeText(m) }}
-                    </div>
-                    <div class="card-main">
-                      <div class="card-type">{{ cardTypeText(m) }}</div>
-                      <div class="card-title">{{ cardTitle(m) }}</div>
-                      <div class="card-desc">{{ cardDesc(m) }}</div>
-                    </div>
-                    <el-icon :size="16" class="card-arrow">
-                      <ArrowRight />
-                    </el-icon>
-                  </div>
-                  <!-- 视频消息 contentType=5 -->
-                  <div
-                    v-else-if="m.contentType === 5"
-                    class="bubble video-bubble"
-                  >
-                    <video
-                      :src="m.content"
-                      controls
-                      preload="metadata"
-                      class="chat-video"
-                    ></video>
-                    <div class="video-name">
-                      {{ parseExtra(m.extra).name || "视频" }}
-                    </div>
-                  </div>
-                  <div v-if="hoverId === m.id" class="msg-actions">
-                    <span @click="quoteMsg(m)">引用</span>
-                    <span @click="favoriteMsg(m)">收藏</span>
-                    <span v-if="m.senderId === user?.id" @click="recall(m)"
-                      >撤回</span
-                    >
-                  </div>
-                </div>
-                <!-- 消息反应展示 -->
-                <div
-                  v-if="m.reactions && m.reactions.length"
-                  class="reaction-bar"
-                >
-                  <span
-                    v-for="r in m.reactions"
-                    :key="r.emoji"
-                    class="reaction-tag"
-                    :class="{ mine: r.userIds?.includes(user?.id) }"
-                    @click="toggleReaction(m.id, r.emoji)"
-                  >
-                    {{ r.emoji }} {{ r.count }}
-                  </span>
-                </div>
-                <div
-                  v-if="m.senderId === user?.id && current.type === 1"
-                  class="read-status"
-                >
-                  {{ m.readCount > 0 || readReceipts[m.id] ? "已读" : "未读" }}
-                </div>
-                <div
-                  v-if="m.senderId === user?.id && current.type === 2"
-                  class="read-status"
-                  @click="showReaders(m.id)"
-                >
-                  {{ (m.readCount || 0) + (readCounts[m.id] || 0) }}人已读
-                </div>
-              </div>
-            </div>
-          </template>
-          <el-empty
-            v-if="!messages.length"
-            description="发送第一条消息"
-            :image-size="90"
-          />
-        </div>
-
-        <div v-if="quoteRef" class="quote-bar">
-          <span
-            >回复 {{ quoteRef.senderName }}:
-            {{ quoteRef.content?.substring(0, 40) }}</span
-          >
-          <el-icon @click="quoteRef = null">
-            <Close />
-          </el-icon>
-        </div>
-
-        <div class="chat-input">
-          <div class="input-toolbar">
-            <div class="toolbar-emoji" ref="emojiWrapRef">
-              <el-tooltip content="表情包" placement="top">
-                <button
-                  type="button"
-                  class="toolbar-btn"
-                  :class="{ active: emojiPanelOpen }"
-                  @click.stop="toggleEmojiPanel"
-                >
-                  <el-icon :size="20">
-                    <ChatDotRound />
-                  </el-icon>
-                </button>
-              </el-tooltip>
-              <div v-if="emojiPanelOpen" class="emoji-pop" @click.stop>
-                <div class="emoji-panel-header">
-                  <span class="emoji-panel-title">表情包</span>
+          <div class="chat-input">
+            <div class="input-toolbar">
+              <div class="toolbar-emoji" ref="emojiWrapRef">
+                <el-tooltip content="表情包" placement="top">
                   <button
                     type="button"
-                    class="emoji-close"
-                    @click="emojiPanelOpen = false"
+                    class="toolbar-btn"
+                    :class="{ active: emojiPanelOpen }"
+                    @click.stop="toggleEmojiPanel"
                   >
-                    <el-icon :size="14">
-                      <Close />
+                    <el-icon :size="20">
+                      <ChatDotRound />
                     </el-icon>
                   </button>
-                </div>
-                <div class="emoji-panel">
-                  <div class="emoji-tabs">
-                    <span
-                      v-for="(cat, i) in emojiCategories"
-                      :key="i"
-                      class="emoji-tab"
-                      :class="{ active: emojiTab === i }"
-                      @click="emojiTab = i"
-                      >{{ cat.icon }}</span
+                </el-tooltip>
+                <div v-if="emojiPanelOpen" class="emoji-pop" @click.stop>
+                  <div class="emoji-panel-header">
+                    <span class="emoji-panel-title">表情包</span>
+                    <button
+                      type="button"
+                      class="emoji-close"
+                      @click="emojiPanelOpen = false"
                     >
+                      <el-icon :size="14">
+                        <Close />
+                      </el-icon>
+                    </button>
                   </div>
-                  <div class="emoji-tab-title">
-                    {{ activeEmojiCategory.name }}
-                  </div>
-                  <div
-                    class="emoji-grid"
-                    :class="{
-                      'sticker-grid': activeEmojiCategory.type === 'sticker',
-                    }"
-                  >
-                    <span
-                      v-for="e in activeEmojiCategory.list"
-                      :key="e"
-                      class="emoji-item"
+                  <div class="emoji-panel">
+                    <div class="emoji-tabs">
+                      <span
+                        v-for="(cat, i) in emojiCategories"
+                        :key="i"
+                        class="emoji-tab"
+                        :class="{ active: emojiTab === i }"
+                        @click="emojiTab = i"
+                        >{{ cat.icon }}</span
+                      >
+                    </div>
+                    <div class="emoji-tab-title">
+                      {{ activeEmojiCategory.name }}
+                    </div>
+                    <div
+                      class="emoji-grid"
                       :class="{
-                        'sticker-item': activeEmojiCategory.type === 'sticker',
+                        'sticker-grid': activeEmojiCategory.type === 'sticker',
                       }"
-                      @click="insertEmoji(e)"
-                      >{{ e }}</span
                     >
+                      <span
+                        v-for="e in activeEmojiCategory.list"
+                        :key="e"
+                        class="emoji-item"
+                        :class="{
+                          'sticker-item':
+                            activeEmojiCategory.type === 'sticker',
+                        }"
+                        @click="insertEmoji(e)"
+                        >{{ e }}</span
+                      >
+                    </div>
                   </div>
                 </div>
               </div>
+              <el-upload
+                :show-file-list="false"
+                :http-request="sendImage"
+                accept="image/*"
+              >
+                <el-tooltip content="图片" placement="top">
+                  <el-icon :size="20">
+                    <Picture />
+                  </el-icon>
+                </el-tooltip>
+              </el-upload>
+              <el-upload
+                :show-file-list="false"
+                :http-request="sendVideo"
+                accept="video/*"
+              >
+                <el-tooltip content="视频" placement="top">
+                  <el-icon :size="20">
+                    <VideoCamera />
+                  </el-icon>
+                </el-tooltip>
+              </el-upload>
+              <el-upload :show-file-list="false" :http-request="sendFile">
+                <el-tooltip content="文件" placement="top">
+                  <el-icon :size="20">
+                    <Folder />
+                  </el-icon>
+                </el-tooltip>
+              </el-upload>
+              <el-tooltip
+                v-if="current.type === 2"
+                content="@提醒"
+                placement="top"
+              >
+                <el-icon :size="20" @click="openAt">
+                  <Bell />
+                </el-icon>
+              </el-tooltip>
             </div>
-            <el-upload
-              :show-file-list="false"
-              :http-request="sendImage"
-              accept="image/*"
-            >
-              <el-tooltip content="图片" placement="top">
-                <el-icon :size="20">
-                  <Picture />
-                </el-icon>
-              </el-tooltip>
-            </el-upload>
-            <el-upload
-              :show-file-list="false"
-              :http-request="sendVideo"
-              accept="video/*"
-            >
-              <el-tooltip content="视频" placement="top">
-                <el-icon :size="20">
-                  <VideoCamera />
-                </el-icon>
-              </el-tooltip>
-            </el-upload>
-            <el-upload :show-file-list="false" :http-request="sendFile">
-              <el-tooltip content="文件" placement="top">
-                <el-icon :size="20">
-                  <Folder />
-                </el-icon>
-              </el-tooltip>
-            </el-upload>
-            <el-tooltip
-              v-if="current.type === 2"
-              content="@提醒"
-              placement="top"
-            >
-              <el-icon :size="20" @click="openAt">
-                <Bell />
-              </el-icon>
-            </el-tooltip>
+            <el-input
+              v-model="draft"
+              type="textarea"
+              :rows="4"
+              resize="none"
+              class="msg-textarea"
+              placeholder="输入消息, 回车发送"
+              ref="inputRef"
+              @keydown.enter.exact.prevent="aiLoading || sendMessage()"
+            />
+            <div class="input-foot">
+              <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
+              <el-button
+                type="primary"
+                :disabled="!draft.trim() || aiLoading"
+                @click="sendMessage"
+                >{{ aiLoading ? "AI思考中..." : "发送" }}
+              </el-button>
+            </div>
           </div>
+        </template>
+        <div v-else class="chat-empty">
+          <div class="empty-illustration">
+            <el-icon :size="56">
+              <ChatLineRound />
+            </el-icon>
+          </div>
+          <p>选择一个会话开始聊天</p>
+        </div>
+      </div>
+
+      <!-- 弹窗区 -->
+      <el-dialog v-model="groupDialog" title="发起群聊" width="460px">
+        <el-input
+          v-model="groupForm.name"
+          placeholder="群名称(可选)"
+          style="margin-bottom: 12px"
+        />
+        <div class="member-pick">
+          <el-checkbox-group v-model="groupForm.memberIds">
+            <div v-for="u in contacts" :key="u.id" class="pick-item">
+              <el-checkbox :value="u.id">
+                <el-avatar
+                  :size="28"
+                  shape="square"
+                  :style="avatarStyle(u.nickname)"
+                  >{{ firstChar(u.nickname) }}
+                </el-avatar>
+                <span class="pick-name">{{ u.nickname }}</span></el-checkbox
+              >
+            </div>
+          </el-checkbox-group>
+        </div>
+        <template #footer>
+          <el-button @click="groupDialog = false">取消 </el-button>
+          <el-button
+            type="primary"
+            :disabled="!groupForm.memberIds.length"
+            @click="createGroup"
+            >创建
+          </el-button>
+        </template>
+      </el-dialog>
+
+      <el-drawer v-model="settingDrawer" title="群设置" size="340px">
+        <div class="setting-block">
+          <div class="block-title">群公告</div>
           <el-input
-            v-model="draft"
+            v-model="groupNotice"
             type="textarea"
-            :rows="4"
-            resize="none"
-            class="msg-textarea"
-            placeholder="输入消息, 回车发送"
-            ref="inputRef"
-            @keydown.enter.exact.prevent="aiLoading || sendMessage()"
+            :rows="3"
+            :readonly="!isGroupOwner"
+            placeholder="暂无群公告"
           />
-          <div class="input-foot">
-            <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
+          <el-button
+            v-if="isGroupOwner"
+            size="small"
+            type="primary"
+            style="margin-top: 8px"
+            @click="saveNotice"
+            >保存
+          </el-button>
+        </div>
+        <div class="setting-block">
+          <div class="block-title">
+            群成员 ({{ groupMembers.length }})
             <el-button
+              v-if="isGroupOwner"
+              link
               type="primary"
-              :disabled="!draft.trim() || aiLoading"
-              @click="sendMessage"
-              >{{ aiLoading ? "AI思考中..." : "发送" }}
+              @click="openAddMember"
+              >+ 添加
+            </el-button>
+          </div>
+          <div v-for="m in groupMembers" :key="m.userId" class="member-row">
+            <div class="avatar-wrap-sm">
+              <el-avatar
+                :size="32"
+                shape="square"
+                :src="m.avatar"
+                :style="avatarStyle(m.nickname)"
+                >{{ firstChar(m.nickname) }}
+              </el-avatar>
+              <span
+                v-if="m.userId"
+                class="user-online-sm"
+                :class="presenceClass(m.userId)"
+              ></span>
+            </div>
+            <span class="m-name">{{ m.nickname }}</span>
+            <el-tag v-if="m.memberRole === 1" size="small" type="warning"
+              >群主
+            </el-tag>
+            <span class="spacer"></span>
+            <el-button
+              v-if="isGroupOwner && m.memberRole !== 1"
+              link
+              type="danger"
+              size="small"
+              @click="kick(m)"
+              >移除
             </el-button>
           </div>
         </div>
-      </template>
-      <div v-else class="chat-empty">
-        <div class="empty-illustration">
-          <el-icon :size="56">
-            <ChatLineRound />
-          </el-icon>
-        </div>
-        <p>选择一个会话开始聊天</p>
-      </div>
-    </div>
-
-    <!-- 弹窗区 -->
-    <el-dialog v-model="groupDialog" title="发起群聊" width="460px">
-      <el-input
-        v-model="groupForm.name"
-        placeholder="群名称(可选)"
-        style="margin-bottom: 12px"
-      />
-      <div class="member-pick">
-        <el-checkbox-group v-model="groupForm.memberIds">
-          <div v-for="u in contacts" :key="u.id" class="pick-item">
-            <el-checkbox :value="u.id">
-              <el-avatar
-                :size="28"
-                shape="square"
-                :style="avatarStyle(u.nickname)"
-                >{{ firstChar(u.nickname) }}
-              </el-avatar>
-              <span class="pick-name">{{ u.nickname }}</span></el-checkbox
-            >
-          </div>
-        </el-checkbox-group>
-      </div>
-      <template #footer>
-        <el-button @click="groupDialog = false">取消 </el-button>
-        <el-button
-          type="primary"
-          :disabled="!groupForm.memberIds.length"
-          @click="createGroup"
-          >创建
-        </el-button>
-      </template>
-    </el-dialog>
-
-    <el-drawer v-model="settingDrawer" title="群设置" size="340px">
-      <div class="setting-block">
-        <div class="block-title">群公告</div>
-        <el-input
-          v-model="groupNotice"
-          type="textarea"
-          :rows="3"
-          :readonly="!isGroupOwner"
-          placeholder="暂无群公告"
-        />
-        <el-button
-          v-if="isGroupOwner"
-          size="small"
-          type="primary"
-          style="margin-top: 8px"
-          @click="saveNotice"
-          >保存
-        </el-button>
-      </div>
-      <div class="setting-block">
-        <div class="block-title">
-          群成员 ({{ groupMembers.length }})
+        <div class="setting-block">
           <el-button
-            v-if="isGroupOwner"
-            link
-            type="primary"
-            @click="openAddMember"
-            >+ 添加
-          </el-button>
-        </div>
-        <div v-for="m in groupMembers" :key="m.userId" class="member-row">
-          <div class="avatar-wrap-sm">
-            <el-avatar
-              :size="32"
-              shape="square"
-              :src="m.avatar"
-              :style="avatarStyle(m.nickname)"
-              >{{ firstChar(m.nickname) }}
-            </el-avatar>
-            <span
-              v-if="m.userId"
-              class="user-online-sm"
-              :class="presenceClass(m.userId)"
-            ></span>
-          </div>
-          <span class="m-name">{{ m.nickname }}</span>
-          <el-tag v-if="m.memberRole === 1" size="small" type="warning"
-            >群主
-          </el-tag>
-          <span class="spacer"></span>
-          <el-button
-            v-if="isGroupOwner && m.memberRole !== 1"
-            link
+            v-if="!isGroupOwner"
             type="danger"
-            size="small"
-            @click="kick(m)"
-            >移除
+            plain
+            style="width: 100%"
+            @click="quit"
+            >退出群聊
           </el-button>
         </div>
-      </div>
-      <div class="setting-block">
-        <el-button
-          v-if="!isGroupOwner"
-          type="danger"
-          plain
-          style="width: 100%"
-          @click="quit"
-          >退出群聊
-        </el-button>
-      </div>
-    </el-drawer>
-    <el-dialog v-model="addMemberDialog" title="添加成员" width="420px">
-      <div class="member-pick">
-        <el-checkbox-group v-model="addMemberIds">
-          <div v-for="u in nonMembers" :key="u.id" class="pick-item">
-            <el-checkbox :value="u.id">
-              <el-avatar
-                :size="28"
-                shape="square"
-                :style="avatarStyle(u.nickname)"
-                >{{ firstChar(u.nickname) }}
-              </el-avatar>
-              <span class="pick-name">{{ u.nickname }}</span></el-checkbox
-            >
-          </div>
-        </el-checkbox-group>
-      </div>
-      <template #footer>
-        <el-button @click="addMemberDialog = false">取消 </el-button>
-        <el-button
-          type="primary"
-          :disabled="!addMemberIds.length"
-          @click="confirmAddMember"
-          >添加
-        </el-button>
-      </template>
-    </el-dialog>
-    <el-dialog v-model="atDialog" title="选择要@的成员" width="380px">
+      </el-drawer>
+      <el-dialog v-model="addMemberDialog" title="添加成员" width="420px">
+        <div class="member-pick">
+          <el-checkbox-group v-model="addMemberIds">
+            <div v-for="u in nonMembers" :key="u.id" class="pick-item">
+              <el-checkbox :value="u.id">
+                <el-avatar
+                  :size="28"
+                  shape="square"
+                  :style="avatarStyle(u.nickname)"
+                  >{{ firstChar(u.nickname) }}
+                </el-avatar>
+                <span class="pick-name">{{ u.nickname }}</span></el-checkbox
+              >
+            </div>
+          </el-checkbox-group>
+        </div>
+        <template #footer>
+          <el-button @click="addMemberDialog = false">取消 </el-button>
+          <el-button
+            type="primary"
+            :disabled="!addMemberIds.length"
+            @click="confirmAddMember"
+            >添加
+          </el-button>
+        </template>
+      </el-dialog>
+      <el-dialog v-model="atDialog" title="选择要@的成员" width="380px">
+        <div
+          v-for="m in groupMembers.filter((x) => x.userId !== user?.id)"
+          :key="m.userId"
+          class="pick-item"
+          @click="pickAt(m)"
+        >
+          <el-avatar :size="28" shape="square" :style="avatarStyle(m.nickname)"
+            >{{ firstChar(m.nickname) }}
+          </el-avatar>
+          <span class="pick-name">{{ m.nickname }}</span>
+        </div>
+      </el-dialog>
+      <el-dialog v-model="readersDialog" title="已读成员" width="360px">
+        <div v-for="r in readersList" :key="r.userId" class="pick-item">
+          <el-avatar :size="28" shape="square" :style="avatarStyle(r.nickname)"
+            >{{ firstChar(r.nickname) }}
+          </el-avatar>
+          <span class="pick-name">{{ r.nickname }}</span>
+          <span style="color: #999; margin-left: auto; font-size: 12px">{{
+            fmtFullTime(r.readTime)
+          }}</span>
+        </div>
+      </el-dialog>
       <div
-        v-for="m in groupMembers.filter((x) => x.userId !== user?.id)"
-        :key="m.userId"
-        class="pick-item"
-        @click="pickAt(m)"
+        v-if="ctxMenu.visible"
+        class="ctx-menu"
+        :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
+        @mouseleave="ctxMenu.visible = false"
       >
-        <el-avatar :size="28" shape="square" :style="avatarStyle(m.nickname)"
-          >{{ firstChar(m.nickname) }}
-        </el-avatar>
-        <span class="pick-name">{{ m.nickname }}</span>
+        <div class="ctx-item" @click="toggleTop(ctxMenu.session)">
+          {{ ctxMenu.session?.isTop === 1 ? "取消置顶" : "📌 置顶" }}
+        </div>
+        <div class="ctx-item" @click="toggleMute(ctxMenu.session)">
+          {{ ctxMenu.session?.isMute === 1 ? "取消免打扰" : "🔕 免打扰" }}
+        </div>
+        <div class="ctx-item" @click="toggleStar(ctxMenu.session)">
+          {{ ctxMenu.session?.isStar === 1 ? "取消关注" : "⭐ 特别关注" }}
+        </div>
       </div>
-    </el-dialog>
-    <el-dialog v-model="readersDialog" title="已读成员" width="360px">
-      <div v-for="r in readersList" :key="r.userId" class="pick-item">
-        <el-avatar :size="28" shape="square" :style="avatarStyle(r.nickname)"
-          >{{ firstChar(r.nickname) }}
-        </el-avatar>
-        <span class="pick-name">{{ r.nickname }}</span>
-        <span style="color: #999; margin-left: auto; font-size: 12px">{{
-          fmtFullTime(r.readTime)
-        }}</span>
-      </div>
-    </el-dialog>
-    <div
-      v-if="ctxMenu.visible"
-      class="ctx-menu"
-      :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
-      @mouseleave="ctxMenu.visible = false"
-    >
-      <div class="ctx-item" @click="toggleTop(ctxMenu.session)">
-        {{ ctxMenu.session?.isTop === 1 ? "取消置顶" : "📌 置顶" }}
-      </div>
-      <div class="ctx-item" @click="toggleMute(ctxMenu.session)">
-        {{ ctxMenu.session?.isMute === 1 ? "取消免打扰" : "🔕 免打扰" }}
-      </div>
-      <div class="ctx-item" @click="toggleStar(ctxMenu.session)">
-        {{ ctxMenu.session?.isStar === 1 ? "取消关注" : "⭐ 特别关注" }}
-      </div>
+      <el-image-viewer
+        v-if="previewUrl"
+        :url-list="[previewUrl]"
+        @close="previewUrl = ''"
+      />
     </div>
-    <el-image-viewer
-      v-if="previewUrl"
-      :url-list="[previewUrl]"
-      @close="previewUrl = ''"
-    />
   </div>
-</div>
 </template>
 
 <script setup>
@@ -1648,42 +1800,44 @@ const isAdmin = computed(() => userStore.isAdmin);
 const isDark = computed(() => themeStore.dark);
 
 // 移动端聊天导航
-const isMobileChatActive = ref(false)
-function goBackToSessions() { isMobileChatActive.value = false }
+const isMobileChatActive = ref(false);
+function goBackToSessions() {
+  isMobileChatActive.value = false;
+}
 
 // 移动端更多菜单抽屉
-const mobileMenuOpen = ref(false)
+const mobileMenuOpen = ref(false);
 
 // 当前激活的导航键
 const activeKey = computed(() => {
-  const tabVal = tab.value
-  if (tabVal === 'chat') return 'chat'
-  if (tabVal === 'work') return 'work'
-  if (tabVal === 'contacts') return 'contacts'
-  return route.query.tab || route.query.filter || 'chat'
-})
+  const tabVal = tab.value;
+  if (tabVal === "chat") return "chat";
+  if (tabVal === "work") return "work";
+  if (tabVal === "contacts") return "contacts";
+  return route.query.tab || route.query.filter || "chat";
+});
 
 // 导航函数
 function navigateTo(key) {
-  mobileMenuOpen.value = false
-  profilePanel.value = false
-  if (key === 'chat') {
-    tab.value = 'chat'
-    isMobileChatActive.value = false
-  } else if (key === 'documents') router.push('/documents')
-  else if (key === 'work') tab.value = 'work'
-  else if (key === 'contacts') tab.value = 'contacts'
-  else if (key === 'atme') chatFilter.value = 'atme'
-  else if (key === 'calendar') router.push('/calendar')
-  else if (key === 'single') chatFilter.value = 'single'
-  else if (key === 'group') chatFilter.value = 'group'
-  else if (key === 'notice') router.push('/notice')
-  else if (key === 'mailbox') router.push('/mailbox')
-  else if (key === 'todo') router.push('/todo')
-  else if (key === 'ding') router.push('/ding')
-  else if (key === 'favorites') router.push('/favorites')
-  else if (key === 'admin-dashboard') router.push('/admin/dashboard')
-  else if (key === 'admin') router.push('/admin')
+  mobileMenuOpen.value = false;
+  profilePanel.value = false;
+  if (key === "chat") {
+    tab.value = "chat";
+    isMobileChatActive.value = false;
+  } else if (key === "documents") router.push("/documents");
+  else if (key === "work") tab.value = "work";
+  else if (key === "contacts") tab.value = "contacts";
+  else if (key === "atme") chatFilter.value = "atme";
+  else if (key === "calendar") router.push("/calendar");
+  else if (key === "single") chatFilter.value = "single";
+  else if (key === "group") chatFilter.value = "group";
+  else if (key === "notice") router.push("/notice");
+  else if (key === "mailbox") router.push("/mailbox");
+  else if (key === "todo") router.push("/todo");
+  else if (key === "ding") router.push("/ding");
+  else if (key === "favorites") router.push("/favorites");
+  else if (key === "admin-dashboard") router.push("/admin/dashboard");
+  else if (key === "admin") router.push("/admin");
 }
 
 const tab = ref("chat");
@@ -2157,7 +2311,7 @@ const addAppItems = computed(() => {
       color: "#13c2c2",
     },
   ];
-  if(permsList.value.includes("system:user:dashboard")) {
+  if (permsList.value.includes("system:user:dashboard")) {
     items.push({
       key: "app:/admin/dashboard",
       kind: "app",
@@ -2379,7 +2533,7 @@ async function loadSessions() {
   await hydrateAtMeSessions();
   await openSessionFromRoute();
   // 移动端不自动打开会话，保持在消息列表页面
-  if (typeof window !== 'undefined' && window.innerWidth > 768) {
+  if (typeof window !== "undefined" && window.innerWidth > 768) {
     await openStoredSessionIfNeeded();
   }
 }
@@ -6058,7 +6212,7 @@ function scrollBottom() {
     overflow: hidden;
     padding-bottom: var(--dt-bottom-tab-height);
   }
-  
+
   .workbench {
     flex-direction: column;
     flex: 1;
@@ -6066,7 +6220,7 @@ function scrollBottom() {
     position: relative;
     overflow: auto;
   }
-  
+
   /* 隐藏桌面端元素 */
   .workbench > .side-nav {
     display: none;
@@ -6075,7 +6229,7 @@ function scrollBottom() {
   .workbench .gp-toggle {
     display: none;
   }
-  
+
   /* 移动端底部Tab栏样式 */
   .mobile-bottom-tab {
     display: flex;
@@ -6103,9 +6257,16 @@ function scrollBottom() {
     position: relative;
     -webkit-tap-highlight-color: transparent;
   }
-  .tab-item.active { color: var(--dt-primary); }
-  .tab-icon { font-size: 20px; line-height: 1; }
-  .tab-label { font-size: 10px; }
+  .tab-item.active {
+    color: var(--dt-primary);
+  }
+  .tab-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+  .tab-label {
+    font-size: 10px;
+  }
   .tab-badge {
     position: absolute;
     top: 2px;
@@ -6121,7 +6282,7 @@ function scrollBottom() {
     font-size: 9px;
     padding: 0 4px;
   }
-  
+
   /* 消息列表面板 - 默认显示 */
   .workbench .mid-panel {
     width: 100%;
@@ -6132,7 +6293,7 @@ function scrollBottom() {
     position: relative;
     background: var(--dt-bg);
   }
-  
+
   /* 消息列表头部 */
   .workbench .mid-header {
     padding: 10px 12px;
@@ -6142,20 +6303,20 @@ function scrollBottom() {
     top: 0;
     z-index: 10;
   }
-  
+
   /* 搜索框 */
   .workbench .search-input {
     height: 36px;
     font-size: 13px;
   }
-  
+
   /* 消息列表区域 - 留出底部空间 */
   .workbench .chat-list {
     flex: 1;
     overflow-y: auto;
     padding-bottom: calc(16px + var(--dt-bottom-tab-height));
   }
-  
+
   /* 聊天面板 - 默认隐藏，选中会话时显示 */
   .workbench .chat-panel {
     display: none;
@@ -6168,7 +6329,7 @@ function scrollBottom() {
     z-index: 100;
     flex-direction: column;
   }
-  
+
   /* 选中会话时切换显示 */
   .workbench.chat-active .mid-panel {
     display: none;
@@ -6176,7 +6337,7 @@ function scrollBottom() {
   .workbench.chat-active .chat-panel {
     display: flex;
   }
-  
+
   /* 聊天头部 */
   .chat-header {
     height: 48px;
@@ -6189,7 +6350,7 @@ function scrollBottom() {
     position: relative;
     z-index: 10;
   }
-  
+
   /* 返回按钮 - 移动端始终显示 */
   .mobile-back-btn {
     display: inline-flex !important;
@@ -6201,13 +6362,13 @@ function scrollBottom() {
     align-items: center;
     justify-content: center;
   }
-  
-  .ch-title { 
-    font-size: 14px; 
+
+  .ch-title {
+    font-size: 14px;
     flex: 1;
     text-align: center;
   }
-  
+
   /* 聊天内容区域 */
   .chat-body {
     flex: 1;
@@ -6215,26 +6376,26 @@ function scrollBottom() {
     padding: 8px 12px;
     padding-bottom: calc(8px + var(--dt-bottom-tab-height));
   }
-  
+
   .chat-input-bar {
     padding: 8px 10px;
     padding-bottom: calc(8px + var(--dt-bottom-tab-height));
   }
-  
+
   .msg-list {
     padding: 8px 10px;
   }
-  
+
   /* 工作台列表 */
   .work-list {
     padding-bottom: calc(16px + var(--dt-bottom-tab-height));
   }
-  
+
   /* 通讯录列表 */
   .contacts-panel {
     padding-bottom: calc(16px + var(--dt-bottom-tab-height));
   }
-  
+
   /* 个人信息面板 */
   .workbench .profile-panel .pp-content {
     width: 100%;
@@ -6274,10 +6435,14 @@ function scrollBottom() {
   border-radius: 10px;
   cursor: pointer;
   position: relative;
-  transition: background .15s;
+  transition: background 0.15s;
 }
-.mobile-menu-item:active { background: var(--dt-hover); }
-.mm-icon { font-size: 24px; }
+.mobile-menu-item:active {
+  background: var(--dt-hover);
+}
+.mm-icon {
+  font-size: 24px;
+}
 .mm-badge {
   position: absolute;
   top: 6px;
