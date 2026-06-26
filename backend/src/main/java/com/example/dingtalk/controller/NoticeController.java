@@ -5,6 +5,7 @@ import com.example.dingtalk.common.Result;
 import com.example.dingtalk.common.SecurityUtils;
 import com.example.dingtalk.entity.SysNotice;
 import com.example.dingtalk.service.NoticeService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,12 +33,14 @@ public class NoticeController {
 
     /** 管理: 全部公告 */
     @GetMapping("/admin/list")
+    @PreAuthorize("hasAuthority('notice:list')")
     public Result<IPage<SysNotice>> adminList(@RequestParam(defaultValue = "1") int pageNum,
                                               @RequestParam(defaultValue = "10") int pageSize) {
         return Result.ok(noticeService.adminPage(pageNum, pageSize));
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('notice:add')")
     public Result<?> add(@RequestBody SysNotice notice) {
         notice.setPublisherId(SecurityUtils.getUserId());
         noticeService.save(notice);
@@ -45,12 +48,14 @@ public class NoticeController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('notice:edit')")
     public Result<?> update(@RequestBody SysNotice notice) {
         noticeService.update(notice);
         return Result.ok();
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('notice:remove')")
     public Result<?> delete(@PathVariable Long id) {
         noticeService.delete(id);
         return Result.ok();
