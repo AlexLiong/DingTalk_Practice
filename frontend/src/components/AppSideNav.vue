@@ -59,7 +59,10 @@
       <div class="nav-row" :class="{ active: activeKey === 'favorites' }" @click="navigateTo('favorites')">
         <span class="nav-icon">⭐</span><span>收藏</span>
       </div>
-      <div v-if="isAdmin" class="nav-row" :class="{ active: activeKey === 'admin-dashboard' }" @click="navigateTo('admin-dashboard')">
+      <div class="nav-row" :class="{ active: activeKey === 'approval' }" @click="navigateTo('approval')">
+        <span class="nav-icon">✅</span><span>审批</span>
+      </div>
+      <div class="nav-row" :class="{ active: activeKey === 'admin-dashboard' }" @click="navigateTo('admin-dashboard')">
         <span class="nav-icon">📊</span><span>数据</span>
       </div>
       <div v-if="isAdmin" class="nav-row" :class="{ active: activeKey === 'admin' }" @click="navigateTo('admin')">
@@ -93,7 +96,7 @@
       <span class="tab-icon">📅</span>
       <span class="tab-label">日历</span>
     </div>
-    <div class="tab-item" :class="{ active: ['notice','todo','mailbox','ding','favorites','contacts','atme','single','group','admin','admin-dashboard'].includes(activeKey) }" @click="mobileMenuOpen = true">
+    <div class="tab-item" :class="{ active: ['notice','todo','mailbox','ding','favorites','contacts','atme','single','group','admin','admin-dashboard','approval'].includes(activeKey) }" @click="mobileMenuOpen = true">
       <span class="tab-icon">☰</span>
       <span class="tab-label">更多</span>
     </div>
@@ -122,7 +125,10 @@
       <div class="mobile-menu-item" @click="navigateTo('favorites'); mobileMenuOpen = false">
         <span class="mm-icon">⭐</span><span>收藏</span>
       </div>
-      <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
+      <div class="mobile-menu-item" @click="navigateTo('approval'); mobileMenuOpen = false">
+        <span class="mm-icon">✅</span><span>审批</span>
+      </div>
+      <div class="mobile-menu-item" @click="navigateTo('admin-dashboard'); mobileMenuOpen = false">
         <span class="mm-icon">📊</span><span>数据</span>
       </div>
       <div v-if="isAdmin" class="mobile-menu-item" @click="navigateTo('admin'); mobileMenuOpen = false">
@@ -254,6 +260,7 @@ function navigateTo(key) {
   else if (key === 'todo') router.push('/todo')
   else if (key === 'ding') router.push('/ding')
   else if (key === 'favorites') router.push('/favorites')
+  else if (key === 'approval') router.push('/approval')
   else if (key === 'admin-dashboard') router.push('/admin/dashboard')
   else if (key === 'admin') router.push('/admin')
 }
