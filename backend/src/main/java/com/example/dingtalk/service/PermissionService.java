@@ -40,10 +40,11 @@ public class PermissionService {
         Set<Long> menuIds = getMenuIds(userId);
         if (menuIds.isEmpty()) return Collections.emptySet();
         List<SysMenu> menus = menuMapper.selectBatchIds(menuIds);
-        return menus.stream()
+        Set<String> premSet = menus.stream()
                 .map(SysMenu::getPerms)
                 .filter(p -> p != null && !p.isBlank())
                 .collect(Collectors.toSet());
+        return premSet;
     }
 
     /** 用户的角色key集合 */
