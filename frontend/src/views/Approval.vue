@@ -101,26 +101,105 @@
       </div>
     </div>
 
-    <el-dialog v-model="applyDialog" title="发起审批" width="520px">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="类型">
-          <el-select v-model="form.type" style="width: 100%">
-            <el-option label="请假" value="leave" />
-            <el-option label="报销" value="expense" />
-          </el-select>
+    <el-dialog v-model="applyDialog" title="发起审批" width="560px" :close-on-click-modal="false">
+      <el-form :model="form" label-width="80px" class="apply-form">
+        <el-form-item label="类型" required>
+          <el-radio-group v-model="form.type" @change="onTypeChange">
+            <el-radio-button value="leave">🏖 请假</el-radio-button>
+            <el-radio-button value="expense">💰 报销</el-radio-button>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="标题">
-          <el-input v-model="form.title" placeholder="审批标题" />
+
+        <el-form-item label="标题" required>
+          <el-input v-model="form.title" :placeholder="titlePlaceholder" clearable />
         </el-form-item>
-        <el-form-item label="内容">
+
+        <!-- 请假表单 -->
+        <template v-if="form.type === 'leave'">
+          <el-form-item label="事由" required>
+            <el-input
+              v-model="leaveForm.reason"
+              type="textarea"
+              :rows="2"
+              placeholder="例如：家中有事需要处理"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item label="开始时间" required>
+            <el-date-picker
+              v-model="leaveForm.startDate"
+              type="date"
+              placeholder="选择开始日期"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
+          <el-form-item label="结束时间" required>
+            <el-date-picker
+              v-model="leaveForm.endDate"
+              type="date"
+              placeholder="选择结束日期"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
+          <el-form-item label="天数" required>
+            <el-input-number
+              v-model="leaveForm.days"
+              :min="0.5"
+              :step="0.5"
+              :precision="1"
+              controls-position="right"
+              style="width: 100%"
+            />
+          </el-form-item>
+        </template>
+
+        <!-- 报销表单 -->
+        <template v-else-if="form.type === 'expense'">
+          <el-form-item label="事由" required>
+            <el-input
+              v-model="expenseForm.reason"
+              type="textarea"
+              :rows="2"
+              placeholder="例如：客户招待费"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item label="金额" required>
+            <el-input-number
+              v-model="expenseForm.amount"
+              :min="0.01"
+              :step="10"
+              :precision="2"
+              controls-position="right"
+              style="width: 100%"
+            >
+              <template #prefix>¥</template>
+            </el-input-number>
+          </el-form-item>
+          <el-form-item label="类别" required>
+            <el-select v-model="expenseForm.category" placeholder="选择报销类别" style="width: 100%">
+              <el-option label="交通费" value="交通费" />
+              <el-option label="餐饮费" value="餐饮费" />
+              <el-option label="住宿费等" value="住宿费" />
+              <el-option label="办公用品" value="办公用品" />
+              <el-option label="其他" value="其他" />
+            </el-select>
+          </el-form-item>
+        </template>
+
+        <el-form-item label="补充说明">
           <el-input
             v-model="form.content"
             type="textarea"
-            :rows="3"
-            placeholder="详细说明"
+            :rows="2"
+            placeholder="其他需要补充的信息（选填）"
+            clearable
           />
         </el-form-item>
-        <el-form-item label="审批人">
+
+        <el-form-item label="审批人" required>
           <el-select
             v-model="form.approverId"
             filterable
@@ -138,7 +217,7 @@
       </el-form>
       <template #footer>
         <el-button @click="applyDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitApply">提交</el-button>
+        <el-button type="primary" @click="submitApply" :loading="submitting">提交</el-button>
       </template>
     </el-dialog>
   </div>
@@ -166,8 +245,10 @@ const list = ref([]);
 const users = ref([]);
 const activeTab = ref("applied");
 const approvalStateReady = ref(false);
-const applyDialog = ref(false)
-const leaveForm = reactive({ reason: '', startDate: '', endDate: '', days: 0.5 })
+const applyDialog = ref(false);
+const submitting = ref(false);
+const titlePlaceholder = ref("请假标题");
+const leaveForm = reactive({ reason: '', startDate: '', endDate: '', days: 0.5 });
 const expenseForm = reactive({ reason: '', amount: 0, category: '' });
 const form = reactive({
   type: "leave",
@@ -175,6 +256,15 @@ const form = reactive({
   content: "",
   approverId: null,
 });
+
+// 切换类型时更新默认标题提示并清空对应表单
+function onTypeChange() {
+  if (form.type === 'leave') {
+    titlePlaceholder.value = '请假标题';
+  } else {
+    titlePlaceholder.value = '报销标题';
+  }
+}
 
 watch(
   () => preferenceStore.loaded,
@@ -234,13 +324,16 @@ function onTabChange() {
   load();
 }
 
-function openApply() {
+async function openApply() {
   Object.assign(form, {
     type: "leave",
     title: "",
     content: "",
     approverId: null,
   });
+  Object.assign(leaveForm, { reason: '', startDate: '', endDate: '', days: 0.5 });
+  Object.assign(expenseForm, { reason: '', amount: 0, category: '' });
+  titlePlaceholder.value = '请假标题';
   applyDialog.value = true;
 }
 
@@ -253,46 +346,55 @@ async function submitApply() {
     ElMessage.warning("请选择审批人");
     return;
   }
-  // 根据审批类型构建结构化内容
-  let contentJson = {};
-  if (form.type === 'leave') {
-    if (!leaveForm.reason) { ElMessage.warning("请输入请假事由"); return; }
-    contentJson = {
-      类型: '请假',
-      事由: leaveForm.reason,
-      开始时间: leaveForm.startDate,
-      结束时间: leaveForm.endDate,
-      天数: leaveForm.days
+
+  submitting.value = true;
+  try {
+    // 根据审批类型构建结构化内容
+    let contentJson = {};
+    if (form.type === 'leave') {
+      if (!leaveForm.reason) { ElMessage.warning("请输入请假事由"); return; }
+      if (!leaveForm.startDate) { ElMessage.warning("请选择开始时间"); return; }
+      if (!leaveForm.endDate) { ElMessage.warning("请选择结束时间"); return; }
+      contentJson = {
+        类型: '请假',
+        事由: leaveForm.reason,
+        开始时间: leaveForm.startDate,
+        结束时间: leaveForm.endDate,
+        天数: leaveForm.days
+      };
+    } else if (form.type === 'expense') {
+      if (!expenseForm.reason) { ElMessage.warning("请输入报销事由"); return; }
+      if (!expenseForm.amount || expenseForm.amount <= 0) { ElMessage.warning("请输入有效的报销金额"); return; }
+      if (!expenseForm.category) { ElMessage.warning("请选择报销类别"); return; }
+      contentJson = {
+        类型: '报销',
+        事由: expenseForm.reason,
+        金额: expenseForm.amount + '元',
+        类别: expenseForm.category
+      };
+    }
+    // 如果有补充说明，加入JSON
+    if (form.content && form.content.trim()) {
+      contentJson['补充说明'] = form.content.trim();
+    }
+    const submitData = {
+      type: form.type,
+      title: form.title,
+      content: JSON.stringify(contentJson),
+      approverId: form.approverId
     };
-  } else if (form.type === 'expense') {
-    if (!expenseForm.reason) { ElMessage.warning("请输入报销事由"); return; }
-    if (!expenseForm.amount || expenseForm.amount <= 0) { ElMessage.warning("请输入有效的报销金额"); return; }
-    contentJson = {
-      类型: '报销',
-      事由: expenseForm.reason,
-      金额: expenseForm.amount + '元',
-      类别: expenseForm.category || '其他'
-    };
+    await apiApprovalApply(submitData);
+    ElMessage.success("审批已提交");
+    applyDialog.value = false;
+    // 重置表单
+    Object.assign(leaveForm, { reason: '', startDate: '', endDate: '', days: 0.5 });
+    Object.assign(expenseForm, { reason: '', amount: 0, category: '' });
+    form.title = '';
+    form.content = '';
+    await load();
+  } finally {
+    submitting.value = false;
   }
-  // 如果有补充说明，加入JSON
-  if (form.content && form.content.trim()) {
-    contentJson['补充说明'] = form.content.trim();
-  }
-  const submitData = {
-    type: form.type,
-    title: form.title,
-    content: JSON.stringify(contentJson),
-    approverId: form.approverId
-  };
-  await apiApprovalApply(submitData);
-  ElMessage.success("审批已提交");
-  applyDialog.value = false;
-  // 重置表单
-  Object.assign(leaveForm, { reason: '', startDate: '', endDate: '', days: 0.5 });
-  Object.assign(expenseForm, { reason: '', amount: 0, category: '' });
-  form.title = '';
-  form.content = '';
-  await load();
 }
 
 async function handleApprove(item, status) {
@@ -484,6 +586,14 @@ function statusType(s) {
   gap: 8px;
   margin-top: 12px;
   justify-content: flex-end;
+}
+
+/* 审批弹窗表单 */
+.apply-form {
+  padding: 8px 12px 0;
+}
+.apply-form .el-form-item {
+  margin-bottom: 18px;
 }
 @media (max-width: 960px) {
   .approval-top {
