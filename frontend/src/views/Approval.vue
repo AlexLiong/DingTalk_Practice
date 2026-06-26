@@ -1,6 +1,6 @@
 <template>
   <div class="approval-shell">
-    <AppSideNav active-key="work" />
+    <AppSideNav active-key="approval" />
 
     <div class="approval-page">
       <div class="approval-top">
@@ -166,7 +166,9 @@ const list = ref([]);
 const users = ref([]);
 const activeTab = ref("applied");
 const approvalStateReady = ref(false);
-const applyDialog = ref(false);
+const applyDialog = ref(false)
+const leaveForm = reactive({ reason: '', startDate: '', endDate: '', days: 0.5 })
+const expenseForm = reactive({ reason: '', amount: 0, category: '' });
 const form = reactive({
   type: "leave",
   title: "",
@@ -251,9 +253,45 @@ async function submitApply() {
     ElMessage.warning("请选择审批人");
     return;
   }
-  await apiApprovalApply({ ...form });
+  // 根据审批类型构建结构化内容
+  let contentJson = {};
+  if (form.type === 'leave') {
+    if (!leaveForm.reason) { ElMessage.warning("请输入请假事由"); return; }
+    contentJson = {
+      类型: '请假',
+      事由: leaveForm.reason,
+      开始时间: leaveForm.startDate,
+      结束时间: leaveForm.endDate,
+      天数: leaveForm.days
+    };
+  } else if (form.type === 'expense') {
+    if (!expenseForm.reason) { ElMessage.warning("请输入报销事由"); return; }
+    if (!expenseForm.amount || expenseForm.amount <= 0) { ElMessage.warning("请输入有效的报销金额"); return; }
+    contentJson = {
+      类型: '报销',
+      事由: expenseForm.reason,
+      金额: expenseForm.amount + '元',
+      类别: expenseForm.category || '其他'
+    };
+  }
+  // 如果有补充说明，加入JSON
+  if (form.content && form.content.trim()) {
+    contentJson['补充说明'] = form.content.trim();
+  }
+  const submitData = {
+    type: form.type,
+    title: form.title,
+    content: JSON.stringify(contentJson),
+    approverId: form.approverId
+  };
+  await apiApprovalApply(submitData);
   ElMessage.success("审批已提交");
   applyDialog.value = false;
+  // 重置表单
+  Object.assign(leaveForm, { reason: '', startDate: '', endDate: '', days: 0.5 });
+  Object.assign(expenseForm, { reason: '', amount: 0, category: '' });
+  form.title = '';
+  form.content = '';
   await load();
 }
 
