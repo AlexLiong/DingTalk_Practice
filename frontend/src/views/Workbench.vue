@@ -1,442 +1,11 @@
 <template>
   <div class="workbench-wrapper">
-    <!-- 移动端：底部Tab栏 -->
-    <div class="mobile-bottom-tab">
-      <div
-        class="tab-item"
-        :class="{ active: tab === 'chat' }"
-        @click="
-          tab = 'chat';
-          chatFilter = 'all';
-          isMobileChatActive = false;
-        "
-      >
-        <span class="tab-icon">💬</span>
-        <span class="tab-label">消息</span>
-        <span v-if="unreadTotal > 0" class="tab-badge">{{
-          unreadTotal > 99 ? "99+" : unreadTotal
-        }}</span>
-      </div>
-      <div
-        class="tab-item"
-        :class="{ active: false }"
-        @click="$router.push('/documents')"
-      >
-        <span class="tab-icon">📄</span>
-        <span class="tab-label">文档</span>
-      </div>
-      <div
-        class="tab-item"
-        :class="{ active: tab === 'work' }"
-        @click="tab = 'work'"
-      >
-        <span class="tab-icon">💼</span>
-        <span class="tab-label">工作台</span>
-      </div>
-      <div
-        class="tab-item"
-        :class="{ active: false }"
-        @click="$router.push('/calendar')"
-      >
-        <span class="tab-icon">📅</span>
-        <span class="tab-label">日历</span>
-      </div>
-      <div
-        class="tab-item"
-        :class="{
-          active: [
-            'notice',
-            'todo',
-            'mailbox',
-            'ding',
-            'favorites',
-            'contacts',
-            'atme',
-            'single',
-            'group',
-            'admin',
-            'admin-dashboard',
-          ].includes(activeKey),
-        }"
-        @click="mobileMenuOpen = true"
-      >
-        <span class="tab-icon">☰</span>
-        <span class="tab-label">更多</span>
-      </div>
-    </div>
-    <!-- 移动端：更多菜单抽屉 -->
-    <el-drawer
-      v-model="mobileMenuOpen"
-      direction="btt"
-      size="auto"
-      :show-close="false"
-      class="mobile-menu-drawer"
-    >
-      <div class="mobile-menu-grid">
-        <div
-          class="mobile-menu-item"
-          @click="
-            navigateTo('contacts');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">📇</span><span>通讯录</span>
-        </div>
-        <div
-          class="mobile-menu-item"
-          @click="
-            navigateTo('notice');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">🔔</span><span>通知</span>
-          <span v-if="collabStore.mailboxUnread > 0" class="mm-badge">{{
-            formatCounter(collabStore.mailboxUnread)
-          }}</span>
-        </div>
-        <div
-          class="mobile-menu-item"
-          @click="
-            navigateTo('mailbox');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">📧</span><span>邮箱</span>
-        </div>
-        <div
-          class="mobile-menu-item"
-          @click="
-            navigateTo('todo');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">📝</span><span>待办</span>
-        </div>
-        <div
-          class="mobile-menu-item"
-          @click="
-            navigateTo('ding');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">🔔</span><span>DING</span>
-          <span v-if="collabStore.dingPending > 0" class="mm-badge">{{
-            formatCounter(collabStore.dingPending)
-          }}</span>
-        </div>
-        <div
-          class="mobile-menu-item"
-          @click="
-            navigateTo('favorites');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">⭐</span><span>收藏</span>
-        </div>
-        <div
-          v-if="permsList.includes(`system:user:dashboard`)"
-          class="mobile-menu-item"
-          @click="
-            navigateTo('admin-dashboard');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">📊</span><span>数据</span>
-        </div>
-        <div
-          v-if="isAdmin"
-          class="mobile-menu-item"
-          @click="
-            navigateTo('admin');
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">⚙️</span><span>管理</span>
-        </div>
-        <div
-          class="mobile-menu-item"
-          @click="
-            profilePanel = true;
-            mobileMenuOpen = false;
-          "
-        >
-          <span class="mm-icon">👤</span><span>我的</span>
-        </div>
-      </div>
-    </el-drawer>
+    <AppSideNav :active-key="sidebarActiveKey" :chat-unread="unreadTotal" />
     <!-- 主内容区域 -->
     <div
       class="workbench"
       :class="{ dark: isDark, 'chat-active': isMobileChatActive }"
     >
-      <!-- ========== 1. 左侧导航栏 (仿钉钉宽版文字导航 ~130px) ========== -->
-      <div class="side-nav">
-        <!-- 组织选择器 -->
-        <div class="org-header" @click.stop="togglePanel">
-          <div class="nav-avatar-wrap">
-            <el-avatar
-              :size="28"
-              shape="square"
-              :src="user?.avatar"
-              :style="avatarStyle(user?.nickname)"
-              >{{ firstChar(user?.nickname) }}
-            </el-avatar>
-            <span class="nav-status-dot" :class="myStatusClass"></span>
-          </div>
-          <span class="org-name">{{ user?.deptName || "企业协作" }}</span>
-          <el-icon :size="12">
-            <ArrowDown />
-          </el-icon>
-        </div>
-
-        <!-- 导航菜单 (可滚动) -->
-        <div class="nav-list">
-          <div
-            class="nav-row"
-            :class="{ active: tab === 'chat' && chatFilter === 'all' }"
-            @click="
-              tab = 'chat';
-              chatFilter = 'all';
-            "
-          >
-            <span class="nav-icon">💬</span><span>消息</span>
-            <span v-if="unreadTotal > 0" class="nav-badge">{{
-              unreadTotal > 99 ? "99+" : unreadTotal
-            }}</span>
-          </div>
-          <div class="nav-row" @click="$router.push('/documents')">
-            <span class="nav-icon">📄</span><span>文档</span>
-          </div>
-          <div
-            class="nav-row"
-            :class="{ active: tab === 'work' }"
-            @click="tab = 'work'"
-          >
-            <span class="nav-icon">💼</span><span>工作台</span>
-          </div>
-          <div
-            class="nav-row"
-            :class="{ active: tab === 'contacts' }"
-            @click="switchContacts"
-          >
-            <span class="nav-icon">📇</span><span>通讯录</span>
-          </div>
-          <div
-            class="nav-row"
-            @click="
-              tab = 'chat';
-              chatFilter = 'atme';
-            "
-          >
-            <span class="nav-icon">@</span><span>@我</span>
-          </div>
-          <div class="nav-row" @click="$router.push('/calendar')">
-            <span class="nav-icon">📅</span><span>日历</span>
-          </div>
-
-          <div class="nav-sep"></div>
-
-          <div
-            class="nav-row"
-            :class="{ active: tab === 'chat' && chatFilter === 'single' }"
-            @click="
-              tab = 'chat';
-              chatFilter = 'single';
-            "
-          >
-            <span class="nav-icon">👤</span><span>单聊</span>
-          </div>
-          <div
-            class="nav-row"
-            :class="{ active: tab === 'chat' && chatFilter === 'group' }"
-            @click="
-              tab = 'chat';
-              chatFilter = 'group';
-            "
-          >
-            <span class="nav-icon">👥</span><span>群聊</span>
-          </div>
-          <div class="nav-row" @click="$router.push('/notice')">
-            <span class="nav-icon">🔔</span><span>通知</span>
-          </div>
-
-          <div class="nav-sep"></div>
-
-          <div class="nav-row" @click="$router.push('/mailbox')">
-            <span class="nav-icon">📧</span><span>邮箱</span>
-            <span v-if="collabCounts.mailboxUnread > 0" class="nav-badge">{{
-              formatCounter(collabCounts.mailboxUnread)
-            }}</span>
-          </div>
-          <div class="nav-row" @click="$router.push('/todo')">
-            <span class="nav-icon">📝</span><span>待办</span>
-          </div>
-          <div class="nav-row" @click="$router.push('/ding')">
-            <span class="nav-icon">🔔</span><span>DING</span>
-            <span v-if="collabCounts.dingPending > 0" class="nav-badge">{{
-              formatCounter(collabCounts.dingPending)
-            }}</span>
-          </div>
-          <div class="nav-row" @click="$router.push('/favorites')">
-            <span class="nav-icon">⭐</span><span>收藏</span>
-          </div>
-          <div
-            class="nav-row"
-            :class="{ active: activeKey === 'approval' }"
-            @click="$router.push('/approval')"
-          >
-            <span class="nav-icon">✅</span><span>审批</span>
-          </div>
-          <div
-            class="nav-row"
-            v-if="permsList.includes(`system:user:dashboard`)"
-            @click="$router.push('/admin/dashboard')"
-          >
-            <span class="nav-icon">📊</span><span>数据</span>
-          </div>
-          <div class="nav-row" v-if="isAdmin" @click="$router.push('/admin')">
-            <span class="nav-icon">⚙️</span><span>管理</span>
-          </div>
-        </div>
-
-        <!-- 底部按钮 -->
-        <div class="nav-footer">
-          <div class="nav-row nav-logout" @click="logout">
-            <span class="nav-icon">🚪</span><span>退出</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 个人信息侧边面板 (仿钉钉) -->
-      <Transition name="panel-slide">
-        <div v-if="profilePanel" class="profile-panel" @click.self="closePanel">
-          <div class="pp-content">
-            <div class="pp-header">
-              <el-upload
-                :show-file-list="false"
-                :http-request="uploadAvatar"
-                accept="image/*"
-                class="pp-avatar-upload"
-              >
-                <el-avatar
-                  :size="56"
-                  shape="square"
-                  :src="user?.avatar"
-                  :style="avatarStyle(user?.nickname)"
-                  class="pp-avatar-clickable"
-                  >{{ firstChar(user?.nickname) }}
-                </el-avatar>
-                <div class="pp-avatar-overlay">换头像</div>
-              </el-upload>
-              <div class="pp-info">
-                <div
-                  class="pp-name"
-                  @click="
-                    $router.push('/profile');
-                    profilePanel = false;
-                  "
-                >
-                  {{ user?.nickname }}
-                  <el-icon :size="14">
-                    <ArrowRight />
-                  </el-icon>
-                </div>
-                <div class="pp-dept">
-                  {{ user?.deptName || "" }} · {{ user?.jobTitle || "" }}
-                </div>
-              </div>
-            </div>
-            <div class="pp-status-selector">
-              <div
-                class="pp-status"
-                @click.stop="statusDropdownOpen = !statusDropdownOpen"
-              >
-                <span class="status-dot" :class="myStatusClass"></span
-                >{{ statusText }}
-                <el-icon :size="12" :class="{ rotate: statusDropdownOpen }">
-                  <ArrowDown />
-                </el-icon>
-              </div>
-              <div
-                v-if="statusDropdownOpen"
-                class="pp-status-dropdown"
-                @click.stop
-              >
-                <div
-                  v-for="item in statusOptions"
-                  :key="item.value"
-                  class="pp-status-option"
-                  :class="{ active: myStatusClass === item.value }"
-                  @click.stop="handleSelectStatus(item.value)"
-                >
-                  <span class="status-option-dot" :class="item.value"></span>
-                  <span>{{ item.label }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="pp-divider"></div>
-            <div
-              class="pp-menu-item"
-              @click="
-                $router.push('/profile');
-                profilePanel = false;
-              "
-            >
-              <el-icon :size="18">
-                <UserFilled />
-              </el-icon>
-              个人中心
-            </div>
-            <div
-              class="pp-menu-item"
-              @click="
-                themeStore.toggle();
-                profilePanel = false;
-              "
-            >
-              <el-icon :size="18">
-                <Moon />
-              </el-icon>
-              个性主题
-              <span class="pp-tag">{{ isDark ? "深色" : "浅色" }}</span>
-            </div>
-            <div
-              class="pp-menu-item"
-              v-if="isAdmin"
-              @click="
-                $router.push('/admin');
-                profilePanel = false;
-              "
-            >
-              <el-icon :size="18">
-                <Setting />
-              </el-icon>
-              系统管理
-            </div>
-            <div class="pp-divider"></div>
-            <div class="pp-menu-item" @click="profilePanel = false">
-              <el-icon :size="18">
-                <QuestionFilled />
-              </el-icon>
-              客服与帮助
-            </div>
-            <div class="pp-menu-item" @click="profilePanel = false">
-              <el-icon :size="18">
-                <InfoFilled />
-              </el-icon>
-              关于
-            </div>
-            <div class="pp-divider"></div>
-            <div class="pp-menu-item pp-logout" @click="logout">
-              <el-icon :size="18">
-                <SwitchButton />
-              </el-icon>
-              退出登录
-            </div>
-          </div>
-        </div>
-      </Transition>
-
       <!-- ========== 2. 分组筛选面板 (可折叠) ========== -->
       <Transition name="gp-slide">
         <div v-if="tab === 'chat' && groupPanelOpen" class="group-panel">
@@ -1717,13 +1286,9 @@ import { ElMessage, ElMessageBox, ElImageViewer } from "element-plus";
 import {
   ChatDotRound,
   ChatLineRound,
-  User,
-  Grid,
   Setting,
-  SwitchButton,
   Search,
   Plus,
-  MoreFilled,
   Picture,
   Folder,
   Bell,
@@ -1731,20 +1296,14 @@ import {
   Close,
   Top,
   ArrowRight,
-  ArrowDown,
-  UserFilled,
-  Moon,
-  DataLine,
-  QuestionFilled,
-  InfoFilled,
+  VideoCamera,
+  Back,
   Link,
   Refresh,
   Delete,
   Operation,
   DArrowLeft,
   DArrowRight,
-  VideoCamera,
-  Back,
 } from "@element-plus/icons-vue";
 import { useUserStore } from "../store/user";
 import { useThemeStore } from "../store/theme";
@@ -1784,8 +1343,8 @@ import {
   apiAddPanelRememberUsage,
   apiAddPanelClearUsage,
   apiToggleReaction,
-  apiUpdateProfile,
 } from "../api";
+import AppSideNav from "../components/AppSideNav.vue";
 import { connectWs, disconnectWs, removeWsListeners } from "../utils/ws";
 
 const router = useRouter();
@@ -1805,40 +1364,14 @@ function goBackToSessions() {
   isMobileChatActive.value = false;
 }
 
-// 移动端更多菜单抽屉
-const mobileMenuOpen = ref(false);
-
-// 当前激活的导航键
-const activeKey = computed(() => {
+// 侧边栏激活键（同步给 AppSideNav 高亮）
+const sidebarActiveKey = computed(() => {
   const tabVal = tab.value;
   if (tabVal === "chat") return "chat";
   if (tabVal === "work") return "work";
   if (tabVal === "contacts") return "contacts";
   return route.query.tab || route.query.filter || "chat";
 });
-
-// 导航函数
-function navigateTo(key) {
-  mobileMenuOpen.value = false;
-  profilePanel.value = false;
-  if (key === "chat") {
-    tab.value = "chat";
-    isMobileChatActive.value = false;
-  } else if (key === "documents") router.push("/documents");
-  else if (key === "work") tab.value = "work";
-  else if (key === "contacts") tab.value = "contacts";
-  else if (key === "atme") chatFilter.value = "atme";
-  else if (key === "calendar") router.push("/calendar");
-  else if (key === "single") chatFilter.value = "single";
-  else if (key === "group") chatFilter.value = "group";
-  else if (key === "notice") router.push("/notice");
-  else if (key === "mailbox") router.push("/mailbox");
-  else if (key === "todo") router.push("/todo");
-  else if (key === "ding") router.push("/ding");
-  else if (key === "favorites") router.push("/favorites");
-  else if (key === "admin-dashboard") router.push("/admin/dashboard");
-  else if (key === "admin") router.push("/admin");
-}
 
 const tab = ref("chat");
 const keyword = ref("");
@@ -1856,16 +1389,8 @@ const hoverId = ref(null);
 const atUserSet = ref(new Set());
 const previewUrl = ref("");
 const quoteRef = ref(null);
-const profilePanel = ref(false);
-const statusDropdownOpen = ref(false);
 const groupPanelOpen = ref(true);
 const chatFilter = ref("all");
-const statusOptions = [
-  { value: "online", label: "在线" },
-  { value: "busy", label: "忙碌" },
-  { value: "away", label: "离开" },
-  { value: "offline", label: "离线" },
-];
 
 const onlineSet = ref(new Set());
 // 用户状态缓存：key=userId, value={chatStatus, online, lastActiveAt}
@@ -2152,7 +1677,6 @@ const emojiCategories = [
   },
 ];
 const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🎉", "🔥", "👏"];
-const presenceValueMap = { online: 1, busy: 2, away: 3, offline: 4 };
 const presenceLabelMap = {
   online: "在线",
   busy: "忙碌",
@@ -2205,23 +1729,6 @@ const unreadTotal = computed(() =>
 const atMeSessions = ref(new Set());
 const activeEmojiCategory = computed(
   () => emojiCategories[emojiTab.value] || emojiCategories[0],
-);
-// 当前用户自己的状态显示：
-// 1. 优先从 user.value.chatStatus 读取（来自 /auth/info，数据库值，刷新后也正确）
-// 2. 同时检查 userStatusMap 的 chatStatus（用户刚修改了状态但还没刷新时使用）
-// chatStatus 优先级：userStatusMap(刚修改) > user.value.chatStatus(数据库值)
-// online 始终视为 true（自己已登录）
-const myStatusClass = computed(() => {
-  if (!user.value) return "offline";
-  let chatStatus = user.value.chatStatus ?? 1;
-  const cached = userStatusMap.value.get(user.value.id);
-  if (cached && cached.chatStatus != null) {
-    chatStatus = cached.chatStatus;
-  }
-  return normalizePresence(chatStatus, true);
-});
-const statusText = computed(
-  () => presenceLabelMap[myStatusClass.value] || "在线",
 );
 const filteredContacts = computed(() =>
   contacts.value.filter(
@@ -2398,19 +1905,6 @@ watch([tab, chatFilter, keyword, () => current.value?.id ?? null], () => {
     currentSessionId: current.value?.id ?? null,
   });
 });
-
-watch(profilePanel, (val) => {
-  if (!val) statusDropdownOpen.value = false;
-});
-
-function closePanel() {
-  profilePanel.value = false;
-}
-
-function togglePanel() {
-  profilePanel.value = !profilePanel.value;
-  if (!profilePanel.value) statusDropdownOpen.value = false;
-}
 
 onMounted(async () => {
   document.addEventListener("click", handleGlobalClick);
@@ -2993,16 +2487,6 @@ async function toggleReaction(messageId, emoji) {
     messages.value = (await apiMessages(current.value.id)).map(hydrateMessage);
 }
 
-// 头像上传
-async function uploadAvatar(opt) {
-  const fd = new FormData();
-  fd.append("file", opt.file);
-  const f = await apiUpload(fd);
-  const u = await apiUpdateProfile({ avatar: f.url });
-  userStore.setUser(u);
-  ElMessage.success("头像已更新");
-}
-
 function normalizePresence(chatStatus, online) {
   // online=false/null/undefined -> 一律离线
   if (online === false || online == null) return "offline";
@@ -3049,35 +2533,6 @@ function presenceTagType(userId) {
       presenceClass(userId)
     ] || "info"
   );
-}
-
-function handleSelectStatus(status) {
-  statusDropdownOpen.value = false;
-  changeMyStatus(status);
-}
-
-async function changeMyStatus(status) {
-  const nextValue = presenceValueMap[status];
-  if (!user.value || !nextValue) return;
-  // 当前 chatStatus 与新值相同则无操作（兼容数字/字符串比较）
-  if (Number(user.value.chatStatus) === Number(nextValue)) {
-    ElMessage.info("当前已是该状态");
-    return;
-  }
-  try {
-    const updated = await apiUpdateProfile({ chatStatus: nextValue });
-    userStore.setUser(updated);
-    // 同步更新 userStatusMap，UI 立即响应
-    userStatusMap.value.set(user.value.id, {
-      chatStatus: Number(nextValue),
-      online: true,
-    });
-    userStatusMap.value = new Map(userStatusMap.value);
-    ElMessage.success("状态已更新");
-  } catch (err) {
-    console.error("更新状态失败", err);
-    ElMessage.error("状态更新失败，请重试");
-  }
 }
 
 function quoteMsg(m) {
@@ -3538,13 +2993,6 @@ function pickAt(m) {
   atDialog.value = false;
 }
 
-function logout() {
-  profilePanel.value = false;
-  disconnectWs();
-  userStore.logout();
-  router.push("/login");
-}
-
 function previewImg(url) {
   previewUrl.value = url;
 }
@@ -3785,7 +3233,7 @@ function scrollBottom() {
 .workbench-wrapper {
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .workbench {
@@ -3793,128 +3241,6 @@ function scrollBottom() {
   display: flex;
   background: var(--dt-bg);
   overflow: hidden;
-}
-
-/* ========== 左侧导航栏 (仿钉钉宽版 ~130px) ========== */
-.side-nav {
-  width: 130px;
-  background: var(--dt-list-bg);
-  border-right: 1px solid var(--dt-border);
-  display: flex;
-  flex-direction: column;
-  user-select: none;
-}
-
-.org-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 12px 10px;
-  cursor: pointer;
-  border-bottom: 1px solid var(--dt-border);
-}
-
-.org-header :deep(.el-avatar) {
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-.org-name {
-  flex: 1;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--dt-text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.org-header .el-icon {
-  color: var(--dt-text-secondary);
-}
-
-.nav-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 6px 0;
-}
-
-.nav-list::-webkit-scrollbar {
-  width: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-}
-
-.nav-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  font-size: 13px;
-  color: var(--dt-text);
-  cursor: pointer;
-  transition: all 0.15s;
-  position: relative;
-}
-
-.nav-row:hover {
-  background: var(--dt-hover);
-}
-
-.nav-row.active {
-  color: var(--dt-primary);
-  font-weight: 600;
-  background: var(--dt-active);
-}
-
-.nav-row.active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 20px;
-  background: var(--dt-primary);
-  border-radius: 0 3px 3px 0;
-}
-
-.nav-icon {
-  width: 20px;
-  text-align: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.nav-badge {
-  margin-left: auto;
-  min-width: 18px;
-  height: 18px;
-  line-height: 18px;
-  text-align: center;
-  border-radius: 9px;
-  background: #f56c6c;
-  color: #fff;
-  font-size: 10px;
-  padding: 0 5px;
-}
-
-.nav-sep {
-  height: 1px;
-  background: var(--dt-border);
-  margin: 6px 14px;
-}
-
-.nav-footer {
-  border-top: 1px solid var(--dt-border);
-  padding: 4px 0;
-}
-
-.nav-logout {
-  color: #f56c6c !important;
 }
 
 /* ========== 分组筛选面板 (仿钉钉竖向 ~96px) ========== */
@@ -5803,67 +5129,6 @@ function scrollBottom() {
   color: var(--dt-primary);
 }
 
-/* 头像上传覆盖层 */
-.pp-avatar-upload {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.pp-avatar-clickable {
-  cursor: pointer;
-}
-
-.pp-avatar-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.pp-avatar-upload:hover .pp-avatar-overlay {
-  opacity: 1;
-}
-
-/* 导航头像状态点 */
-.nav-avatar-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.nav-status-dot {
-  position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1.5px solid var(--dt-list-bg);
-}
-
-.nav-status-dot.online {
-  background: #52c41a;
-}
-
-.nav-status-dot.busy {
-  background: #fa541c;
-}
-
-.nav-status-dot.away {
-  background: #faad14;
-}
-
-.nav-status-dot.offline {
-  background: #bfbfbf;
-}
-
 .chat-empty {
   flex: 1;
   display: flex;
@@ -5962,247 +5227,6 @@ function scrollBottom() {
   background: var(--dt-hover);
 }
 
-/* ========== 个人信息侧边面板 ========== */
-.profile-panel {
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.pp-content {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 280px;
-  background: var(--dt-bg);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
-  padding: 24px 20px;
-  overflow-y: auto;
-}
-
-.pp-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.pp-header :deep(.el-avatar) {
-  border-radius: 12px;
-  flex-shrink: 0;
-}
-
-.pp-info {
-  flex: 1;
-}
-
-.pp-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--dt-text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.pp-name:hover {
-  color: var(--dt-primary);
-}
-
-.pp-dept {
-  font-size: 12px;
-  color: var(--dt-text-secondary);
-  margin-top: 4px;
-}
-
-.pp-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 16px;
-  background: var(--dt-hover);
-  font-size: 13px;
-  color: var(--dt-text);
-  cursor: pointer;
-  margin-bottom: 12px;
-}
-
-.pp-status:hover {
-  background: var(--dt-active);
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.status-dot.online {
-  background: #52c41a;
-}
-
-.status-dot.busy {
-  background: #fa541c;
-}
-
-.status-dot.away {
-  background: #faad14;
-}
-
-.status-dot.offline {
-  background: #bfbfbf;
-}
-
-.status-option-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-.status-option-dot.online {
-  background: #52c41a;
-}
-
-.status-option-dot.busy {
-  background: #fa541c;
-}
-
-.status-option-dot.away {
-  background: #faad14;
-}
-
-.status-option-dot.offline {
-  background: #bfbfbf;
-}
-
-.pp-status-selector {
-  position: relative;
-  margin-bottom: 12px;
-}
-
-.pp-status-selector .pp-status {
-  margin-bottom: 0;
-  position: relative;
-  z-index: 2;
-}
-
-.pp-status-selector .pp-status .el-icon {
-  transition: transform 0.2s;
-}
-
-.pp-status-selector .pp-status .el-icon.rotate {
-  transform: rotate(180deg);
-}
-
-.pp-status-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 6px;
-  background: var(--dt-bg-elevated, #fff);
-  border: 1px solid var(--dt-border);
-  border-radius: 10px;
-  padding: 6px;
-  min-width: 120px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  z-index: 10000;
-}
-
-.pp-status-option {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--dt-text);
-}
-
-.pp-status-option:hover {
-  background: var(--dt-hover);
-}
-
-.pp-status-option.active {
-  background: var(--dt-primary-light, #ecf5ff);
-  color: var(--dt-primary, #409eff);
-}
-
-.pp-divider {
-  height: 1px;
-  background: var(--dt-border);
-  margin: 12px 0;
-}
-
-.pp-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--dt-text);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.pp-menu-item:hover {
-  background: var(--dt-hover);
-}
-
-.pp-menu-item .el-icon {
-  color: var(--dt-text-secondary);
-}
-
-.pp-tag {
-  margin-left: auto;
-  font-size: 11px;
-  padding: 1px 8px;
-  border-radius: 10px;
-  background: var(--dt-hover);
-  color: var(--dt-text-secondary);
-}
-
-.pp-logout {
-  color: #f56c6c;
-}
-
-.pp-logout .el-icon {
-  color: #f56c6c;
-}
-
-.panel-slide-enter-active,
-.panel-slide-leave-active {
-  transition: all 0.25s ease;
-}
-
-.panel-slide-enter-active .pp-content,
-.panel-slide-leave-active .pp-content {
-  transition: transform 0.25s ease;
-}
-
-.panel-slide-enter-from {
-  opacity: 0;
-}
-
-.panel-slide-enter-from .pp-content {
-  transform: translateX(-100%);
-}
-
-.panel-slide-leave-to {
-  opacity: 0;
-}
-
-.panel-slide-leave-to .pp-content {
-  transform: translateX(-100%);
-}
-
 /* ========== 移动端适配 ========== */
 @media (max-width: 768px) {
   /* 整体布局容器 */
@@ -6211,17 +5235,18 @@ function scrollBottom() {
     position: relative;
     overflow: hidden;
     padding-bottom: var(--dt-bottom-tab-height);
+    flex-direction: column;
   }
 
   .workbench {
-    flex-direction: column;
     flex: 1;
+    flex-direction: column;
     padding-bottom: 0;
     position: relative;
     overflow: auto;
   }
 
-  /* 隐藏桌面端元素 */
+  /* 隐藏桌面端侧边栏（由 AppSideNav 提供） */
   .workbench > .side-nav {
     display: none;
   }
@@ -6230,7 +5255,7 @@ function scrollBottom() {
     display: none;
   }
 
-  /* 移动端底部Tab栏样式 */
+  /* 移动端底部Tab栏样式（由 AppSideNav 提供） */
   .mobile-bottom-tab {
     display: flex;
     position: fixed;
@@ -6280,6 +5305,54 @@ function scrollBottom() {
     background: #f56c6c;
     color: #fff;
     font-size: 9px;
+    padding: 0 4px;
+  }
+
+  /* 移动端更多菜单抽屉样式（由 AppSideNav 提供） */
+  .mobile-menu-drawer :deep(.el-drawer__wrapper) {
+    z-index: 1000;
+  }
+  .mobile-menu-drawer :deep(.el-drawer) {
+    border-radius: 16px 16px 0 0;
+    padding: 0;
+  }
+  .mobile-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px 8px 24px;
+  }
+  .mobile-menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 4px;
+    font-size: 12px;
+    color: var(--dt-text);
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+  .mobile-menu-item:active {
+    background: var(--dt-hover);
+  }
+  .mm-icon {
+    font-size: 24px;
+  }
+  .mm-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 8px;
+    background: #f56c6c;
+    color: #fff;
+    font-size: 10px;
     padding: 0 4px;
   }
 
@@ -6395,12 +5468,6 @@ function scrollBottom() {
   .contacts-panel {
     padding-bottom: calc(16px + var(--dt-bottom-tab-height));
   }
-
-  /* 个人信息面板 */
-  .workbench .profile-panel .pp-content {
-    width: 100%;
-    max-width: 320px;
-  }
 }
 
 /* 桌面端隐藏返回按钮 */
@@ -6408,53 +5475,5 @@ function scrollBottom() {
   .mobile-back-btn {
     display: none !important;
   }
-}
-
-/* 移动端更多菜单抽屉样式 */
-.mobile-menu-drawer :deep(.el-drawer__wrapper) {
-  z-index: 1000;
-}
-.mobile-menu-drawer :deep(.el-drawer) {
-  border-radius: 16px 16px 0 0;
-  padding: 0;
-}
-.mobile-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 12px 8px 24px;
-}
-.mobile-menu-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 4px;
-  font-size: 12px;
-  color: var(--dt-text);
-  border-radius: 10px;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.15s;
-}
-.mobile-menu-item:active {
-  background: var(--dt-hover);
-}
-.mm-icon {
-  font-size: 24px;
-}
-.mm-badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  min-width: 16px;
-  height: 16px;
-  line-height: 16px;
-  text-align: center;
-  border-radius: 8px;
-  background: #f56c6c;
-  color: #fff;
-  font-size: 10px;
-  padding: 0 4px;
 }
 </style>
