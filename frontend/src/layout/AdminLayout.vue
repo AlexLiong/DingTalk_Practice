@@ -131,7 +131,8 @@ const iconMap = { Setting, User, Avatar, Menu, OfficeBuilding, Document, DataBoa
 const activeMenu = computed(() => route.path)
 const titleMap = {
   '/admin/user': '用户管理', '/admin/role': '角色管理',
-  '/admin/menu': '菜单管理', '/admin/dept': '部门管理'
+  '/admin/menu': '菜单管理', '/admin/dept': '部门管理',
+  '/admin/dashboard': '数据看板', '/admin/notice': '公告管理'
 }
 const currentTitle = computed(() => titleMap[route.path] || '管理后台')
 
