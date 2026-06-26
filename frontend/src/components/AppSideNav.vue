@@ -329,22 +329,24 @@
     >
       <div class="pp-content">
         <div class="pp-header">
-          <el-upload
-            :show-file-list="false"
-            :http-request="uploadAvatar"
-            accept="image/*"
-            class="pp-avatar-upload"
-          >
-            <el-avatar
-              :size="56"
-              shape="square"
-              :src="user?.avatar"
-              :style="avatarStyle(user?.nickname)"
-              class="pp-avatar-clickable"
-              >{{ firstChar(user?.nickname) }}</el-avatar
+          <div class="pp-avatar-area">
+            <el-upload
+              :show-file-list="false"
+              :http-request="uploadAvatar"
+              accept="image/*"
+              class="pp-avatar-upload"
             >
+              <el-avatar
+                :size="56"
+                shape="square"
+                :src="user?.avatar"
+                :style="avatarStyle(user?.nickname)"
+                class="pp-avatar-clickable"
+                >{{ firstChar(user?.nickname) }}</el-avatar
+              >
+            </el-upload>
             <div class="pp-avatar-overlay">换头像</div>
-          </el-upload>
+          </div>
           <div class="pp-info">
             <div class="pp-name" @click="openProfile">
               {{ user?.nickname }} <el-icon :size="14"><ArrowRight /></el-icon>
@@ -355,24 +357,35 @@
           </div>
         </div>
 
-        <el-dropdown trigger="click" @command="changeMyStatus">
-          <div class="pp-status">
+        <div class="pp-status-selector">
+          <div
+            class="pp-status"
+            @click.stop="statusDropdownOpen = !statusDropdownOpen"
+          >
             <span class="status-dot" :class="myStatusClass"></span
-            >{{ statusText }}<el-icon :size="12"><ArrowDown /></el-icon>
+            >{{ statusText }}<el-icon :size="12" :class="{ rotate: statusDropdownOpen }">
+              <ArrowDown />
+            </el-icon>
           </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item
+          <Transition name="dropdown-fade">
+            <div
+              v-if="statusDropdownOpen"
+              class="pp-status-dropdown"
+              @click.stop
+            >
+              <div
                 v-for="item in statusOptions"
                 :key="item.value"
-                :command="item.value"
+                class="pp-status-option"
+                :class="{ active: myStatusClass === item.value }"
+                @click="handleSelectStatus(item.value)"
               >
-                <span class="status-option-dot" :class="item.value"></span
-                >{{ item.label }}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+                <span class="status-option-dot" :class="item.value"></span>
+                <span>{{ item.label }}</span>
+              </div>
+            </div>
+          </Transition>
+        </div>
 
         <div class="pp-divider"></div>
         <div class="pp-menu-item" @click="openProfile">
@@ -438,6 +451,7 @@ const collabStore = useCollabStore();
 
 const profilePanel = ref(false);
 const mobileMenuOpen = ref(false);
+const statusDropdownOpen = ref(false);
 
 const user = computed(() => userStore.user);
 const isAdmin = computed(() => userStore.isAdmin);
@@ -519,12 +533,13 @@ function normalizePresence(value) {
   return "online";
 }
 
-async function changeMyStatus(status) {
+async function handleSelectStatus(status) {
   const nextValue = presenceValueMap[status];
   if (!user.value || !nextValue || user.value.chatStatus === nextValue) return;
   const updated = await apiUpdateProfile({ chatStatus: nextValue });
   userStore.setUser(updated);
   ElMessage.success("状态已保存");
+  statusDropdownOpen.value = false;
 }
 
 function openProfile() {
@@ -838,7 +853,6 @@ function avatarStyle(name) {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 18px;
 }
 .pp-header :deep(.el-avatar) {
   border-radius: 12px;
@@ -846,6 +860,7 @@ function avatarStyle(name) {
 }
 .pp-info {
   flex: 1;
+  padding-bottom:30px;
 }
 .pp-name {
   font-size: 18px;
@@ -972,5 +987,87 @@ function avatarStyle(name) {
 }
 .panel-slide-leave-to .pp-content {
   transform: translateX(-100%);
+}
+
+.dropdown-fade-enter-active,
+.dropdown-fade-leave-active {
+  transition: all 0.15s ease;
+}
+.dropdown-fade-enter-from,
+.dropdown-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* 状态下拉菜单 */
+.pp-status-selector {
+  position: relative;
+  margin-bottom: 12px;
+}
+.rotate {
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+.pp-status-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: var(--dt-bg);
+  border: 1px solid var(--dt-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px;
+  z-index: 99999;
+  min-width: 140px;
+}
+.pp-status-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--dt-text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.pp-status-option:hover {
+  background: var(--dt-hover);
+}
+.pp-status-option.active {
+  color: var(--dt-primary);
+  font-weight: 600;
+}
+.pp-status-option.active .status-option-dot {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dt-primary) 25%, transparent);
+}
+
+/* 头像区域 */
+.pp-avatar-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.pp-avatar-upload {
+  cursor: pointer;
+}
+.pp-avatar-clickable {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.pp-avatar-clickable:hover {
+  opacity: 0.85;
+}
+.pp-avatar-overlay {
+  font-size: 12px;
+  color: var(--dt-text-secondary);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.pp-avatar-overlay:hover {
+  color: var(--dt-primary);
 }
 </style>
