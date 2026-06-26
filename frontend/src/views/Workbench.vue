@@ -1,6 +1,6 @@
 <template>
   <div class="workbench-wrapper">
-    <AppSideNav :active-key="sidebarActiveKey" :chat-unread="unreadTotal" />
+    <AppSideNav :active-key="sidebarActiveKey" :chat-unread="unreadTotal" @message="chatFilter = 'all'"/>
     <!-- 主内容区域 -->
     <div
       class="workbench"

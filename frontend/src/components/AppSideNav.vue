@@ -474,10 +474,13 @@ onMounted(async () => {
     } catch {}
   }
 });
-
+const emit = defineEmits(['message'])
 function navigateTo(key) {
   profilePanel.value = false;
-  if (key === "chat") router.push("/chat");
+  if (key === "chat") {
+    router.push("/chat");
+    emit("message");
+}
   else if (key === "documents") router.push("/documents");
   else if (key === "work")
     router.push({ path: "/chat", query: { tab: "work" } });
