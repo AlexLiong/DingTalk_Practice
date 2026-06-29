@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="workbench-wrapper">
     <AppSideNav :active-key="sidebarActiveKey" :chat-unread="unreadTotal" @message="chatFilter = 'all'"/>
     <!-- 主内容区域 -->
@@ -117,6 +117,15 @@
             class="search-input"
             @input="onSearchInput"
           />
+          <el-button
+            v-if="tab === 'chat'"
+            class="ai-quick-btn"
+            :class="{ active: current?.name === 'AI 助手' }"
+            @click="openAiAssistant"
+            title="AI 助手"
+          >
+            <span class="ai-quick-icon">AI</span>
+          </el-button>
           <div class="add-entry" ref="addWrapRef">
             <el-button
               class="add-btn"
@@ -514,7 +523,7 @@
               </div>
               <div class="line2">
                 <el-tag
-                  v-if="s.type === 2"
+                  v-if="s.type === 2 && s.name !== 'AI 助手'"
                   size="small"
                   type="info"
                   effect="plain"
@@ -746,7 +755,8 @@
             />
             <div class="ch-title">
               {{ current.name
-              }}<span v-if="current.type === 2" class="ch-count">(群聊)</span>
+              }}<span v-if="current.type === 2 && current.name !== 'AI 助手'" class="ch-count">群聊</span>
+              <span v-if="current.name === 'AI 助手'" class="ai-tag">AI</span>
               <span
                 v-if="current.type === 1"
                 class="status-tag"
@@ -756,7 +766,7 @@
             </div>
             <div class="ch-actions">
               <el-icon
-                v-if="current.type === 2"
+                v-if="current.type === 2 && current.name !== 'AI 助手'"
                 :size="20"
                 @click="openGroupSetting"
               >
@@ -1362,6 +1372,7 @@ const isDark = computed(() => themeStore.dark);
 const isMobileChatActive = ref(false);
 function goBackToSessions() {
   isMobileChatActive.value = false;
+  if (chatFilter.value === "ai") chatFilter.value = "all";
 }
 
 // 侧边栏激活键（同步给 AppSideNav 高亮）
@@ -1720,6 +1731,14 @@ const displaySessions = computed(() => {
     list = list.filter((s) => atMeSessions.value.has(s.id));
   else if (chatFilter.value === "ai")
     list = list.filter((s) => s.name === "AI 助手");
+  // AI assistant only visible in "all" and "ai" filters
+  if (chatFilter.value === "all" && !keyword.value) {
+    const aiSession = filteredSessions.value.find((s) => s.name === "AI 助手");
+    if (aiSession) {
+      list = list.filter((s) => s.name !== "AI 助手");
+      list.unshift(aiSession);
+    }
+  }
   return list;
 });
 const unreadTotal = computed(() =>
@@ -1971,6 +1990,7 @@ function syncWorkbenchViewFromRoute() {
     Boolean(queryTab) || Boolean(queryFilter) || Boolean(route.query.session);
 
   if (!hasExplicitRouteView && workbenchStateReady.value) {
+    if (tab.value !== "chat") tab.value = "chat";
     if (keyword.value.trim()) onSearchInput();
     return;
   }
@@ -3400,6 +3420,44 @@ function scrollBottom() {
 
 .add-entry {
   position: relative;
+}
+
+.ai-quick-btn {
+  background: var(--dt-hover);
+  border: none;
+  color: var(--dt-text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.ai-quick-btn:hover {
+  background: var(--dt-active);
+  color: var(--dt-primary);
+}
+.ai-quick-btn.active {
+  background: var(--dt-primary);
+  color: #fff;
+}
+.ai-quick-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ai-tag {
+  font-size: 11px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
 }
 
 .add-panel {
