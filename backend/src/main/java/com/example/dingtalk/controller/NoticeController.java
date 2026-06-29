@@ -33,14 +33,14 @@ public class NoticeController {
 
     /** 管理: 全部公告 */
     @GetMapping("/admin/list")
-    @PreAuthorize("hasAuthority('notice')")
+    @PreAuthorize("hasAuthority('notice:list')")
     public Result<IPage<SysNotice>> adminList(@RequestParam(defaultValue = "1") int pageNum,
                                               @RequestParam(defaultValue = "10") int pageSize) {
         return Result.ok(noticeService.adminPage(pageNum, pageSize));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('notice')")
+    @PreAuthorize("hasAuthority('notice:add')")
     public Result<?> add(@RequestBody SysNotice notice) {
         notice.setPublisherId(SecurityUtils.getUserId());
         noticeService.save(notice);
@@ -48,14 +48,14 @@ public class NoticeController {
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('notice')")
+    @PreAuthorize("hasAuthority('notice:edit')")
     public Result<?> update(@RequestBody SysNotice notice) {
         noticeService.update(notice);
         return Result.ok();
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('notice')")
+    @PreAuthorize("hasAuthority('notice:remove')")
     public Result<?> delete(@PathVariable Long id) {
         noticeService.delete(id);
         return Result.ok();

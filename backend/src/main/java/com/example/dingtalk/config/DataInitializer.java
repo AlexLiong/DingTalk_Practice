@@ -98,14 +98,11 @@ public class DataInitializer implements CommandLineRunner {
         Long mDept = createMenu(mSystem, "部门管理", 2, "/admin/dept", "OfficeBuilding", "system:dept:list", 4);
         createMenu(mDept, "新增部门", 3, null, null, "system:dept:add", 1);
         createMenu(mDept, "编辑部门", 3, null, null, "system:dept:edit", 2);
-        createMenu(mDept, "删除部门", 3, null, null, "system:dept:remove", 3);
-                Long mNotice = createMenu(0L,"公告管理",1,"/admin/notice","InfoFilled","notice:list",1);
-        createMenu(mNotice,"发布公告",3,null,null,"notice:add",1);
-        createMenu(mNotice,"编辑公告",3,null,null,"notice:edit",2);
-        createMenu(mNotice,"删除公告",3,null,null,"notice:remove",3);
-        Long mDashboard = createMenu(0L,"数据看板",1,"/admin/dashboard","DataBoard","dashboard:view",1);
-
-        // 3. 角色
+        Long mNotice = createMenu(0L, "公告管理", 1, "/admin/notice", "InfoFilled", "notice:list", 1);
+        createMenu(mNotice, "发布公告", 3, null, null, "notice:add", 1);
+        createMenu(mNotice, "编辑公告", 3, null, null, "notice:edit", 2);
+        createMenu(mNotice, "删除公告", 3, null, null, "notice:remove", 3);
+        Long mDashboard = createMenu(0L, "数据看板", 1, "/admin/dashboard", "DataBoard", "dashboard:view", 1);
         Long roleAdmin = createRole("超级管理员", "admin", 1, "拥有所有权限");
         Long roleStaff = createRole("普通员工", "staff", 2, "仅协作功能, 无后台管理");
         for (Long mid : allMenuIds) roleMenuMapper.insert(roleAdmin, mid);
