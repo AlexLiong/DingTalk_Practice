@@ -631,9 +631,7 @@ public class ChatService {
         if (session == null) {
             throw new BizException("会话不存在");
         }
-        boolean isAiSession = session.getType() != null
-                && session.getType() == 2
-                && "AI 助手".equals(session.getName());
+        boolean isAiSession = "AI 助手".equals(session.getName());
         if (!isAiSession) {
             throw new BizException("该会话不支持 AI 助手");
         }

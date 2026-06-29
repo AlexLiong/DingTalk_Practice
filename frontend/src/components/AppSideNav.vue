@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- 桌面端：左侧导航栏 -->
   <div class="side-nav desktop-nav">
     <div class="org-header" @click="profilePanel = !profilePanel">
@@ -281,6 +281,15 @@
       <div
         class="mobile-menu-item"
         @click="
+          navigateTo('ai');
+          mobileMenuOpen = false;
+        "
+      >
+        <span class="mm-icon">🤖</span><span>AI 助手</span>
+      </div>
+      <div
+        class="mobile-menu-item"
+        @click="
           navigateTo('approval');
           mobileMenuOpen = false;
         "
@@ -513,6 +522,8 @@ function navigateTo(key) {
   else if (key === "ding") router.push("/ding");
   else if (key === "favorites") router.push("/favorites");
   else if (key === "approval") router.push("/approval");
+  else if (key === "ai")
+    router.push({ path: "/chat", query: { filter: "ai" } });
   else if (key === "admin-dashboard") router.push("/admin/dashboard");
   else if (key === "admin") router.push("/admin");
 }
