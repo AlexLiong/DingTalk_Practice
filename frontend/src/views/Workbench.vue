@@ -2823,7 +2823,6 @@ async function sendMessage() {
         atUserIds: atIds,
         extra,
       });
-      console.log("[chat] apiSendMessage returned", savedMsg);
       if (savedMsg && current.value) {
         const hydrated = hydrateMessage(savedMsg);
         const existingIdx = messages.value.findIndex(
@@ -2851,10 +2850,18 @@ async function sendWithAi(content) {
     ElMessage.warning("AI正在回复中，请稍等");
     return;
   }
-
+  const extra = quoteRef.value
+      ? JSON.stringify({
+        quoteId: quoteRef.value.id,
+        quoteSender: quoteRef.value.senderName,
+        quoteContent: quoteRef.value.content?.substring(0, 100),
+      })
+      : undefined;
   // 清空输入框
   draft.value = "";
   aiLoading.value = true;
+  atUserSet.value = new Set();
+  quoteRef.value = null;
 
   // 1. 先把用户消息立刻渲染到聊天列表
   const userMsg = hydrateMessage({
@@ -2864,6 +2871,7 @@ async function sendWithAi(content) {
     senderName: user.value.nickname,
     contentType: 1,
     content,
+    extra:extra,
     status: 1,
     createTime: new Date().toISOString(),
   });
@@ -2871,10 +2879,13 @@ async function sendWithAi(content) {
   scrollBottom();
 
   // 2. 建立SSE长连接接收AI分片
+  const atIds = [...atUserSet.value].join(",");
   try {
     aiEventSource = await apiCreateAiSse({
       sessionId: current.value.id,
       content: content,
+      atUserIds: atIds,
+      extra,
     });
 
     // 接收每一段流式返回的 MessageVO

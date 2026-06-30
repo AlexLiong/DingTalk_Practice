@@ -608,11 +608,16 @@ public class ChatService {
         vo.setAtUserIds(msg.getAtUserIds());
         vo.setStatus(msg.getStatus());
         vo.setCreateTime(msg.getCreateTime());
-        if (msg.getSenderId() != null && msg.getSenderId() != 0L) {
-            SysUser sender = userMapper.selectById(msg.getSenderId());
-            if (sender != null) {
-                vo.setSenderName(sender.getNickname());
-                vo.setSenderAvatar(sender.getAvatar());
+        if (msg.getSenderId() != null) {
+            Long senderId = msg.getSenderId();
+            if(senderId == 0L){
+                vo.setSenderName("AI 助手");
+            }else{
+                SysUser sender = userMapper.selectById(msg.getSenderId());
+                if (sender != null) {
+                    vo.setSenderName(sender.getNickname());
+                    vo.setSenderAvatar(sender.getAvatar());
+                }
             }
         }
         // 已读人数 (从 chat_message_read 查)
