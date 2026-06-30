@@ -3,14 +3,21 @@ package com.example.dingtalk.controller;
 import com.example.dingtalk.common.Result;
 import com.example.dingtalk.common.SecurityUtils;
 import com.example.dingtalk.dto.CreateGroupDTO;
+import com.example.dingtalk.dto.ExtraDTO;
 import com.example.dingtalk.dto.SendMessageDTO;
 import com.example.dingtalk.entity.ChatSession;
 import com.example.dingtalk.service.ChatService;
 import com.example.dingtalk.vo.MemberVO;
 import com.example.dingtalk.vo.MessageVO;
 import com.example.dingtalk.vo.SessionVO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import org.apache.catalina.util.StringUtil;
+import org.apache.tomcat.util.json.JSONParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -22,6 +29,8 @@ import java.util.Map;
 public class ChatController {
 
     private final ChatService chatService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public ChatController(ChatService chatService) {
         this.chatService = chatService;
@@ -102,12 +111,18 @@ public class ChatController {
 
     /* ---- AI助手 ---- */
     @PostMapping(value = "/ai-reply", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<MessageVO> aiReplyStream(@RequestBody Map<String, Object> body) {
+    public Flux<MessageVO> aiReplyStream(@RequestBody Map<String, Object> body) throws JsonProcessingException {
         Long userId = SecurityUtils.getUserId();
         Long sessionId = Long.parseLong(body.get("sessionId").toString());
         String question = (String) body.get("content");
+        String strJson = body.getOrDefault("extra","").toString();
+        ExtraDTO extra = null;
+        if (strJson != null && !strJson.isBlank()) {
+            extra = objectMapper.readValue(strJson, ExtraDTO.class);
+        }
+
         // 返回流式 Flux
-        return chatService.aiReply(userId, sessionId, question);
+        return chatService.aiReply(userId, sessionId, question,extra);
     }
 
     /* ---- 群聊管理 ---- */

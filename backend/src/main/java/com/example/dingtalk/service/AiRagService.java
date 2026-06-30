@@ -1,6 +1,7 @@
 package com.example.dingtalk.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.dingtalk.dto.ExtraDTO;
 import com.example.dingtalk.entity.AiFileChunk;
 import com.example.dingtalk.mapper.AiFileChunkMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,19 +46,18 @@ public class AiRagService {
     private final AiFileChunkMapper aiFileChunkMapper;
     private final AiDocumentIngestService aiDocumentIngestService;
     private final ObjectProvider<EmbeddingModel> embeddingModelProvider;
-    private final ObjectProvider<ChatClient.Builder> chatClientBuilderProvider;
+    private final ChatClient chatClient;
 
     public AiRagService(AiFileChunkMapper aiFileChunkMapper,
                         AiDocumentIngestService aiDocumentIngestService,
-                        ObjectProvider<EmbeddingModel> embeddingModelProvider,
-                        ObjectProvider<ChatClient.Builder> chatClientBuilderProvider) {
+                        ObjectProvider<EmbeddingModel> embeddingModelProvider, MessageChatMemoryAdvisor messageChatMemoryAdvisor, ChatClient chatClient) {
         this.aiFileChunkMapper = aiFileChunkMapper;
         this.aiDocumentIngestService = aiDocumentIngestService;
         this.embeddingModelProvider = embeddingModelProvider;
-        this.chatClientBuilderProvider = chatClientBuilderProvider;
+        this.chatClient = chatClient;
     }
 
-    public Flux<String> answer(Long userId, String question) {
+    public Flux<String> answer(Long userId, String question, ExtraDTO extraDTO) {
         String normalizedQuestion = question == null ? "" : question.trim();
         if (normalizedQuestion.isEmpty()) {
             return Flux.just("请先输入问题。");
@@ -67,17 +69,25 @@ public class AiRagService {
         aiDocumentIngestService.reindexMissingFiles(userId, 20);
 
         EmbeddingModel embeddingModel = embeddingModelProvider.getIfAvailable();
-        ChatClient.Builder chatClientBuilder = chatClientBuilderProvider.getIfAvailable();
-        if (embeddingModel == null || chatClientBuilder == null) {
-            return Flux.just("AI 客户端未初始化，请检查 Spring AI 配置。");
+        if (embeddingModel == null) {
+            return Flux.just("AI 客户端未初始化，请检查配置。");
         }
 
         try {
             // 检索相关文档
             float[] queryEmbedding = embeddingModel.embed(normalizedQuestion);
-            List<AiFileChunk> allChunks = aiFileChunkMapper.selectList(new LambdaQueryWrapper<AiFileChunk>()
-                    .eq(AiFileChunk::getUserId, userId));
-            List<ScoredChunk> relevantChunks = rankChunks(allChunks, queryEmbedding);
+            LambdaQueryWrapper<AiFileChunk> wrapper = new LambdaQueryWrapper<>();
+            // 只查询当前用户拥有的文档
+            wrapper.eq(AiFileChunk::getUserId, userId);
+
+            //假设用户引用文档
+            if(extraDTO!=null && extraDTO.getQuoteContent()!=null){
+                wrapper.like(AiFileChunk::getFileName,extraDTO.getQuoteContent());
+            }
+
+            //查询指定文档
+            List<AiFileChunk> targetChunks = aiFileChunkMapper.selectList(wrapper);
+            List<ScoredChunk> relevantChunks = rankChunks(targetChunks, queryEmbedding);
 
             // 构建提示词
             String prompt;
@@ -89,9 +99,10 @@ public class AiRagService {
                 prompt = buildSimplePrompt(normalizedQuestion);
             }
 
+
             // 流式调用大模型
-            ChatClient chatClient = chatClientBuilder.build();
             return chatClient.prompt(prompt)
+                    .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, userId))
                     .stream()
                     .content()
                     .doOnError(e -> log.error("AI RAG stream failed for user {}", userId, e));
@@ -132,7 +143,7 @@ public class AiRagService {
         int currentLength = 0;
         int index = 1;
         for (ScoredChunk chunk : chunks) {
-            String block = "[" + index++ + "] " + chunk.chunk().getFileName() + "\n"
+            String block =  chunk.chunk().getFileName()+"[" + index++ + "]:" + "\n"
                     + chunk.chunk().getChunkText() + "\n";
             if (currentLength + block.length() > maxContextChars) {
                 break;
@@ -142,7 +153,7 @@ public class AiRagService {
         }
         return """
                 你是企业协作平台里的问答助手，请使用中文，不加带特殊语法（如md，katex），模仿人类办公对话的语气，根据参考文档内容回答用户的问题，并提供有价值的见解。。
-                如果文档中没有直接答案，就明确回复"在当前文档中没有找到直接依据"，不要编造。
+                如果文档中没有直接答案，就明确回复"没有找到直接依据"，不要编造。
                 如能回答，优先给出结论，再补充来自哪些文档片段。
 
                 文档片段:
