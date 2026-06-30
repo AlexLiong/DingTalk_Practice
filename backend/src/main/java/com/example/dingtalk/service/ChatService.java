@@ -34,14 +34,14 @@ public class ChatService {
     private final MessageReadMapper messageReadMapper;
     private final ReactionMapper reactionMapper;
     private final SimpMessagingTemplate messagingTemplate;
-    private final AiRagService aiRagService;
+    private final UnifiedAiService unifiedAiService;
 
     public ChatService(ChatSessionMapper sessionMapper, ChatSessionMemberMapper memberMapper,
                        ChatMessageMapper messageMapper, UserMapper userMapper,
                        MessageReadMapper messageReadMapper,
                        ReactionMapper reactionMapper,
                        @Lazy SimpMessagingTemplate messagingTemplate,
-                       AiRagService aiRagService) {
+                       UnifiedAiService unifiedAiService) {
         this.sessionMapper = sessionMapper;
         this.memberMapper = memberMapper;
         this.messageMapper = messageMapper;
@@ -49,7 +49,7 @@ public class ChatService {
         this.messageReadMapper = messageReadMapper;
         this.reactionMapper = reactionMapper;
         this.messagingTemplate = messagingTemplate;
-        this.aiRagService = aiRagService;
+        this.unifiedAiService = unifiedAiService;
     }
 
     /* ===================== 会话 / 消息 ===================== */
@@ -322,8 +322,8 @@ public class ChatService {
         Long aiMsgId = aiMsg.getId();
         LocalDateTime aiCreateTime = aiMsg.getCreateTime();
 
-        // 3. 调用流式RAG接口，返回Flux<String>分片
-        Flux<String> contentFlux = aiRagService.answer(userId, question,extra);
+        // 3. 调用统一AI接口，自动识别意图（RAG 问答 or 日程创建）
+        Flux<String> contentFlux = unifiedAiService.answer(userId, question);
 
         // 4. 累积流式文本、分段推送WS、实时更新数据库content字段
         return contentFlux

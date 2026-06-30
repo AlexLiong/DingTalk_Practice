@@ -31,7 +31,6 @@ public class AiChatConfig {
     public MessageChatMemoryAdvisor messageChatMemoryAdvisor(MessageWindowChatMemory chatMemory) {
         return MessageChatMemoryAdvisor.builder(chatMemory).build();
     }
-    // 【关键】手动注册 ChatClient Bean
     @Bean
     public ChatClient chatClient(ObjectProvider<ChatClient.Builder> chatClientBuilderProvider, MessageChatMemoryAdvisor memoryAdvisor) {
         ChatClient.Builder builder = chatClientBuilderProvider.getIfAvailable();
