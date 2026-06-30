@@ -2,6 +2,7 @@ package com.example.dingtalk.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.dingtalk.common.BizException;
+import com.example.dingtalk.dto.ExtraDTO;
 import com.example.dingtalk.dto.SendMessageDTO;
 import com.example.dingtalk.entity.*;
 import com.example.dingtalk.mapper.*;
@@ -311,10 +312,9 @@ public class ChatService {
     /**
      * AI 助手自动回复
      */
-    public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question) {
+    public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question, ExtraDTO extra) {
         // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
-        ChatMessage userMsg = saveUserQuestion(sessionId, userId, question);
 
         // 2. 先创建一条空的AI消息记录，后续流式更新内容
         ChatMessage aiMsg = initEmptyAiMessage(sessionId);
@@ -323,7 +323,7 @@ public class ChatService {
         LocalDateTime aiCreateTime = aiMsg.getCreateTime();
 
         // 3. 调用流式RAG接口，返回Flux<String>分片
-        Flux<String> contentFlux = aiRagService.answer(userId, question);
+        Flux<String> contentFlux = aiRagService.answer(userId, question,extra);
 
         // 4. 累积流式文本、分段推送WS、实时更新数据库content字段
         return contentFlux
