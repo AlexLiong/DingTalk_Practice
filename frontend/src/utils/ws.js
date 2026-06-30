@@ -26,19 +26,16 @@ function removeListener(type, handler) {
 }
 
 function emit(type, payload) {
-  console.log(`[WS] emit ${type} listeners=${listeners[type].size}`, payload)
   listeners[type].forEach((handler) => {
     try { handler(payload) } catch (error) { console.error(`[WS] ${type} handler error`, error) }
   })
 }
 
 function makeSubscriptions(c) {
-  console.log('[WS] subscribing to destinations')
   // 消息
   c.subscribe('/user/queue/message', (frame) => {
     try {
       const data = JSON.parse(frame.body)
-      console.log('[WS] /user/queue/message received', data)
       emit('message', data)
     } catch (e) { console.error('[WS] message parse error', e) }
   })
@@ -46,7 +43,6 @@ function makeSubscriptions(c) {
   c.subscribe('/user/queue/receipt', (frame) => {
     try {
       const data = JSON.parse(frame.body)
-      console.log('[WS] /user/queue/receipt received', data)
       emit('receipt', data)
     } catch (e) { console.error('[WS] receipt parse error', e) }
   })
@@ -54,7 +50,6 @@ function makeSubscriptions(c) {
   c.subscribe('/topic/online-status', (frame) => {
     try {
       const data = JSON.parse(frame.body)
-      console.log('[WS] /topic/online-status received', data)
       emit('online', data)
     } catch (e) { console.error('[WS] online parse error', e) }
   })
@@ -62,7 +57,6 @@ function makeSubscriptions(c) {
   c.subscribe('/user/queue/work-notice', (frame) => {
     try {
       const data = JSON.parse(frame.body)
-      console.log('[WS] /user/queue/work-notice received', data)
       emit('workNotice', data)
     } catch (e) { console.error('[WS] work notice parse error', e) }
   })
@@ -70,7 +64,6 @@ function makeSubscriptions(c) {
   c.subscribe('/user/queue/session-unread', (frame) => {
     try {
       const data = JSON.parse(frame.body)
-      console.log('[WS] /user/queue/session-unread received', data)
       emit('sessionUnread', data)
     } catch (e) { console.error('[WS] session unread parse error', e) }
   })
@@ -78,7 +71,6 @@ function makeSubscriptions(c) {
   c.subscribe('/user/queue/kick', (frame) => {
     try {
       const data = JSON.parse(frame.body)
-      console.log('[WS] /user/queue/kick received', data)
       emit('kick', data)
     } catch (e) { console.error('[WS] kick parse error', e) }
   })
@@ -100,7 +92,6 @@ export function connectWs(token, onMessage, onReceipt, onOnlineStatus, onWorkNot
 
   // 若已存在同一 token 的活跃连接，直接复用
   if (client && boundToken === token && client.active) {
-    console.log('[WS] reusing existing connection for same token')
     return client
   }
 

@@ -144,7 +144,9 @@ public class ChatService {
         return vo;
     }
 
-    /** 撤回消息 (本人 或 群主) */
+    /**
+     * 撤回消息 (本人 或 群主)
+     */
     @Transactional
     public void recall(Long userId, Long messageId) {
         ChatMessage msg = messageMapper.selectById(messageId);
@@ -185,7 +187,9 @@ public class ChatService {
         }
     }
 
-    /** 已读回执: 记录用户读了某条消息, 并通过WS通知发送者 */
+    /**
+     * 已读回执: 记录用户读了某条消息, 并通过WS通知发送者
+     */
     public void markMessageRead(Long userId, Long sessionId, Long lastMsgId) {
         // 批量标记到 lastMsgId 为止的消息
         List<ChatMessage> unreadMsgs = messageMapper.selectList(
@@ -223,7 +227,9 @@ public class ChatService {
         }
     }
 
-    /** 查询某条消息的已读用户 */
+    /**
+     * 查询某条消息的已读用户
+     */
     public List<Map<String, Object>> getMessageReaders(Long messageId) {
         List<ChatMessageRead> reads = messageReadMapper.selectList(
                 new LambdaQueryWrapper<ChatMessageRead>()
@@ -241,7 +247,9 @@ public class ChatService {
         return result;
     }
 
-    /** 全局搜索: 搜消息 */
+    /**
+     * 全局搜索: 搜消息
+     */
     public List<MessageVO> searchMessages(Long userId, String keyword) {
         // 取我参与的所有会话
         List<ChatSessionMember> mine = memberMapper.selectList(
@@ -258,7 +266,9 @@ public class ChatService {
         return msgs.stream().map(this::toVO).collect(Collectors.toList());
     }
 
-    /** 置顶/取消置顶 */
+    /**
+     * 置顶/取消置顶
+     */
     public void toggleTop(Long userId, Long sessionId) {
         ChatSessionMember m = memberMapper.selectOne(
                 new LambdaQueryWrapper<ChatSessionMember>()
@@ -270,7 +280,9 @@ public class ChatService {
         }
     }
 
-    /** 切换免打扰 */
+    /**
+     * 切换免打扰
+     */
     public void toggleMute(Long userId, Long sessionId) {
         ChatSessionMember m = memberMapper.selectOne(
                 new LambdaQueryWrapper<ChatSessionMember>()
@@ -282,7 +294,9 @@ public class ChatService {
         }
     }
 
-    /** 切换特别关注 */
+    /**
+     * 切换特别关注
+     */
     public void toggleStar(Long userId, Long sessionId) {
         ChatSessionMember m = memberMapper.selectOne(
                 new LambdaQueryWrapper<ChatSessionMember>()
@@ -294,7 +308,9 @@ public class ChatService {
         }
     }
 
-    /** AI 助手自动回复 */
+    /**
+     * AI 助手自动回复
+     */
     public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question) {
         // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
@@ -351,6 +367,11 @@ public class ChatService {
                     session.setLastTime(aiCreateTime);
                     sessionMapper.updateById(session);
                 })
+                .concatWith(Flux.defer(() -> {
+                    MessageVO endTag = new MessageVO();
+                    endTag.setContent("[DONE]");
+                    return Flux.just(endTag);
+                }))
                 // 异常兜底：推送错误信息分片
                 .onErrorResume(e -> {
                     log.error("流式AI对话异常 userId:{}, sessionId:{}", userId, sessionId, e);
