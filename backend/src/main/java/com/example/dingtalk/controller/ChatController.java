@@ -106,8 +106,23 @@ public class ChatController {
         Long userId = SecurityUtils.getUserId();
         Long sessionId = Long.parseLong(body.get("sessionId").toString());
         String question = (String) body.get("content");
+<<<<<<< alex
         // 返回流式 Flux
         return chatService.aiReply(userId, sessionId, question);
+=======
+        
+        // 解析可选的文件ID列表
+        List<Long> fileIds = null;
+        Object fileIdsObj = body.get("fileIds");
+        if (fileIdsObj instanceof List<?> rawList && !rawList.isEmpty()) {
+            fileIds = rawList.stream()
+                .map(id -> Long.parseLong(id.toString()))
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        // 返回流式 Flux
+        return chatService.aiReply(userId, sessionId, question, fileIds);
+>>>>>>> local
     }
 
     /* ---- 群聊管理 ---- */

@@ -1079,15 +1079,15 @@
               class="msg-textarea"
               placeholder="输入消息, 回车发送"
               ref="inputRef"
-              @keydown.enter.exact.prevent="aiLoading || sendMessage()"
+              @keydown.enter.exact.prevent="(aiLoading || (current && aiSessionLoading[current.id])) || sendMessage()"
             />
             <div class="input-foot">
               <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
               <el-button
                 type="primary"
-                :disabled="!draft.trim() || aiLoading"
+                :disabled="!draft.trim() || aiLoading || (current && aiSessionLoading[current.id])"
                 @click="sendMessage"
-                >{{ aiLoading ? "AI思考中..." : "发送" }}
+                >{{ (aiLoading || (current && aiSessionLoading[current.id])) ? "AI思考中..." : "发送" }}
               </el-button>
             </div>
           </div>
@@ -1436,6 +1436,8 @@ const preferredSessionId = ref(null);
 const emojiTab = ref(0);
 const reactionVisible = ref(false);
 const aiLoading = ref(false);
+// 按会话ID追踪AI加载状态（解决切换会话后状态丢失问题）
+const aiSessionLoading = ref({});
 let aiEventSource = null;
 const emojiCategories = [
   {

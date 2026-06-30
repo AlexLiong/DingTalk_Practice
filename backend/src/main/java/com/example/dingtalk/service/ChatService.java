@@ -294,8 +294,15 @@ public class ChatService {
         }
     }
 
+<<<<<<< alex
     /** AI 助手自动回复 */
     public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question) {
+=======
+    /**
+     * AI 助手自动回复
+     */
+    public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question, List<Long> fileIds) {
+>>>>>>> local
         // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
         ChatMessage userMsg = saveUserQuestion(sessionId, userId, question);
@@ -307,10 +314,15 @@ public class ChatService {
         LocalDateTime aiCreateTime = aiMsg.getCreateTime();
 
         // 3. 调用流式RAG接口，返回Flux<String>分片
+<<<<<<< alex
         Flux<String> contentFlux = aiRagService.answer(userId, question);
+=======
+        Flux<String> contentFlux = aiRagService.answer(userId, question, fileIds);
+>>>>>>> local
 
         // 4. 累积流式文本、分段推送WS、实时更新数据库content字段
         return contentFlux
+                .timeout(java.time.Duration.ofSeconds(60))
                 // 累积拼接完整AI回答文本
                 .scan(new StringBuilder(), StringBuilder::append)
                 // 每次分片生成VO推送给前端
@@ -370,10 +382,9 @@ public class ChatService {
     }
 
     /**
-     * 子方法：事务保存用户提问消息
+     * 保存用户提问消息（由aiReply在同一调用链中调用）
      */
-    @Transactional(rollbackFor = Exception.class)
-    public ChatMessage saveUserQuestion(Long sessionId, Long userId, String question) {
+    private ChatMessage saveUserQuestion(Long sessionId, Long userId, String question) {
         ChatMessage userMsg = new ChatMessage();
         userMsg.setSessionId(sessionId);
         userMsg.setSenderId(userId);
