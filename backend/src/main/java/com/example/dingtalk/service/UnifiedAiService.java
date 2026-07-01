@@ -85,7 +85,7 @@ public class UnifiedAiService {
      * @param question 用户输入
      * @return AI 流式回复
      */
-    public Flux<String> answer(Long userId, String question) {
+    public Flux<String> answer(Long userId, String question,String fileName) {
         String normalizedQuestion = question == null ? "" : question.trim();
         if (normalizedQuestion.isEmpty()) {
             return Flux.just("请先输入问题。");
@@ -106,6 +106,9 @@ public class UnifiedAiService {
             float[] queryEmbedding = embeddingModel.embed(normalizedQuestion);
             LambdaQueryWrapper<AiFileChunk> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(AiFileChunk::getUserId, userId);
+            if(fileName!=null &&!fileName.isBlank()){
+                wrapper.like(AiFileChunk::getFileName,fileName);
+            }
             List<AiFileChunk> targetChunks = aiFileChunkMapper.selectList(wrapper);
             List<ScoredChunk> relevantChunks = rankChunks(targetChunks, queryEmbedding);
 
@@ -141,13 +144,13 @@ public class UnifiedAiService {
         StringBuilder sb = new StringBuilder();
         sb.append("""
                 你是企业协作平台的AI助手。你可以：
-
+                
                 1. 回答用户问题 —— 基于下方提供的文档片段来回答，如果文档中没有相关内容，直接说明没有找到。回答简洁口语化，不要使用 Markdown 格式。
-
+                
                 2. 创建日程提醒 —— 当用户说"提醒我"、"创建日程"、"安排会议"、"约会"等关键词时，请调用 createSchedule 工具来创建日程。如果用户没有提供具体时间，询问用户具体时间。
-
+                
                 注意：优先判断是否是日程相关请求。如果是，调用 createSchedule 工具；否则基于文档片段回答。
-                当前系统时间：""" + LocalDateTime.now().format(DATE_TIME_FMT) + """
+                当前系统时间：""").append(LocalDateTime.now().format(DATE_TIME_FMT)).append("""
                 请以此时间为基准推算用户提到的相对时间（如"明天下午5点"）。时间格式为：yyyy-MM-dd HH:mm:ss
                 """);
 

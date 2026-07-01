@@ -316,7 +316,9 @@ public class ChatService {
         // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
         saveUserQuestion(sessionId, userId, question);
+        String fileName="";
         if (extra!=null && extra.getQuoteContent()!=null){
+            fileName = extra.getQuoteContent();
             question = String.format("%s \n引用:%s",question,extra.getQuoteContent());
         }
         // 2. 先创建一条空的AI消息记录，后续流式更新内容
@@ -326,7 +328,8 @@ public class ChatService {
         LocalDateTime aiCreateTime = aiMsg.getCreateTime();
 
         // 3. 调用统一AI接口，自动识别意图（RAG 问答 or 日程创建）
-        Flux<String> contentFlux = unifiedAiService.answer(userId, question);
+        // 假设用户只引用文件名
+        Flux<String> contentFlux = unifiedAiService.answer(userId, question,fileName);
 
         // 4. 累积流式文本、分段推送WS、实时更新数据库content字段
         return contentFlux
