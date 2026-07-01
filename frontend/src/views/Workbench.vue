@@ -1079,15 +1079,15 @@
               class="msg-textarea"
               placeholder="输入消息, 回车发送"
               ref="inputRef"
-              @keydown.enter.exact.prevent="aiLoading || sendMessage()"
+              @keydown.enter.exact.prevent="(aiLoadingMap.get(current?.id) || false) || sendMessage()"
             />
             <div class="input-foot">
               <span class="foot-tip">Enter 发送 / Shift+Enter 换行</span>
               <el-button
                 type="primary"
-                :disabled="!draft.trim() || aiLoading"
+                :disabled="!draft.trim() || (aiLoadingMap.get(current?.id) || false)"
                 @click="sendMessage"
-                >{{ aiLoading ? "AI思考中..." : "发送" }}
+                >{{ (aiLoadingMap.get(current?.id) || false) ? "AI思考中..." : "发送" }}
               </el-button>
             </div>
           </div>
@@ -1435,7 +1435,7 @@ const workbenchStateReady = ref(false);
 const preferredSessionId = ref(null);
 const emojiTab = ref(0);
 const reactionVisible = ref(false);
-const aiLoading = ref(false);
+const aiLoadingMap = reactive(new Map()); // 按会话ID追踪AI加载状态
 let aiEventSource = null;
 const emojiCategories = [
   {
@@ -2846,7 +2846,7 @@ async function sendMessage() {
 async function sendWithAi(content) {
   if (!content) return;
   // 防止重复请求
-  if (aiLoading.value || aiEventSource) {
+  if (aiLoadingMap.get(current.value.id) || aiEventSource) {
     ElMessage.warning("AI正在回复中，请稍等");
     return;
   }
@@ -2859,7 +2859,7 @@ async function sendWithAi(content) {
       : undefined;
   // 清空输入框
   draft.value = "";
-  aiLoading.value = true;
+  aiLoadingMap.set(current.value.id, true);
   atUserSet.value = new Set();
   quoteRef.value = null;
 
@@ -2934,7 +2934,7 @@ function closeAiSse() {
     aiEventSource.close();
     aiEventSource = null;
   }
-  aiLoading.value = false;
+  if (current.value) aiLoadingMap.delete(current.value.id);
 }
 
 // 消息收藏
