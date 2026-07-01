@@ -327,7 +327,7 @@ public class ChatService {
         Long aiMsgId = aiMsg.getId();
         LocalDateTime aiCreateTime = aiMsg.getCreateTime();
 
-        // 3. 调用统一AI接口，自动识别意图（RAG 问答 or 日程创建）
+        // 3. 调用统一AI接口，自动识别意图
         // 假设用户只引用文件名
         Flux<String> contentFlux = unifiedAiService.answer(userId, question,fileName);
 

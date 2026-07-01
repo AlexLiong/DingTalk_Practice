@@ -121,7 +121,7 @@ public class ChatController {
             extra = objectMapper.readValue(strJson, ExtraDTO.class);
         }
 
-        // 返回流式 Flux（统一 AI 服务，自动识别 RAG 问答或日程创建）
+        // 返回流式 Flux
         String atUserIds = body.getOrDefault("atUserIds","").toString();
         return chatService.aiReply(userId, sessionId, question, strJson, atUserIds, extra);
     }
