@@ -312,10 +312,10 @@ public class ChatService {
     /**
      * AI 助手自动回复
      */
-    public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question, ExtraDTO extra) {
+    public Flux<MessageVO> aiReply(Long userId, Long sessionId, String question, String extraStr, String atUserIds, ExtraDTO extra) {
         // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
-        saveUserQuestion(sessionId, userId, question);
+        saveUserQuestion(sessionId, userId, question, extraStr, atUserIds);
         String fileName="";
         if (extra!=null && extra.getQuoteContent()!=null){
             fileName = extra.getQuoteContent();
@@ -400,12 +400,14 @@ public class ChatService {
      * 子方法：事务保存用户提问消息
      */
     @Transactional(rollbackFor = Exception.class)
-    public ChatMessage saveUserQuestion(Long sessionId, Long userId, String question) {
+    public ChatMessage saveUserQuestion(Long sessionId, Long userId, String question, String extra, String atUserIds) {
         ChatMessage userMsg = new ChatMessage();
         userMsg.setSessionId(sessionId);
         userMsg.setSenderId(userId);
         userMsg.setContentType(1);
         userMsg.setContent(question);
+        userMsg.setExtra(extra);
+        userMsg.setAtUserIds(atUserIds);
         userMsg.setStatus(1);
         userMsg.setCreateTime(LocalDateTime.now());
         messageMapper.insert(userMsg);

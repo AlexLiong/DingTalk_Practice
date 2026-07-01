@@ -122,7 +122,8 @@ public class ChatController {
         }
 
         // 返回流式 Flux（统一 AI 服务，自动识别 RAG 问答或日程创建）
-        return chatService.aiReply(userId, sessionId, question,extra);
+        String atUserIds = body.getOrDefault("atUserIds","").toString();
+        return chatService.aiReply(userId, sessionId, question, strJson, atUserIds, extra);
     }
 
     /* ---- 群聊管理 ---- */
