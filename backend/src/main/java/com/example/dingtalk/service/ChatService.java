@@ -316,6 +316,9 @@ public class ChatService {
         // 1. 同步阻塞操作：校验会话 + 保存用户提问（单独事务，同步执行）
         ChatSession session = requireAiSession(sessionId, userId);
         saveUserQuestion(sessionId, userId, question);
+        if (extra!=null && extra.getQuoteContent()!=null){
+            question = String.format("%s \n引用:%s",question,extra.getQuoteContent());
+        }
         // 2. 先创建一条空的AI消息记录，后续流式更新内容
         ChatMessage aiMsg = initEmptyAiMessage(sessionId);
         messageMapper.insert(aiMsg);
